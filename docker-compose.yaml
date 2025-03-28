@@ -1,0 +1,44 @@
+services:
+  mysql:
+    container_name: pathbook-db
+    image: mysql:8.0-debian
+    ports:
+      - '3307:3306'
+    environment:
+      - MYSQL_DATABASE=pathbook
+      - MYSQL_PASSWORD=pathbook
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=pathbook
+    volumes:
+      - mysql_data:/var/lib/mysqld
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=root"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  app:
+    build: .
+    container_name: pathbook-app
+    ports:
+      - '8081:8080'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/pathbook
+      - SPRING_DATASOURCE_USERNAME=pathbook
+      - SPRING_DATASOURCE_PASSWORD=pathbook
+    depends_on:
+      mysql:
+        condition: service_healthy
+        restart: true
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge
