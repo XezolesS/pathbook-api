@@ -1,10 +1,13 @@
+-- Create database
 CREATE DATABASE IF NOT EXISTS `pathbook` DEFAULT CHARACTER SET 'UTF8MB4';
 
+-- Create roles and grant permissions
 CREATE ROLE IF NOT EXISTS 'pathbook_dev', 'pathbook_read', 'pathbook_write';
 GRANT ALL ON `pathbook%` . * TO 'pathbook_dev';
 GRANT SELECT ON `pathbook%` . * TO 'pathbook_read';
 GRANT INSERT, UPDATE, DELETE ON `pathbook%` . * TO 'pathbook_write';
 
+-- Create users and grant roles
 CREATE USER IF NOT EXISTS 'pathbook'@'%' IDENTIFIED BY 'pathbook';
 CREATE USER IF NOT EXISTS 'pathbook'@'localhost' IDENTIFIED BY 'pathbook';
 GRANT 'pathbook_dev' TO 'pathbook'@'%';

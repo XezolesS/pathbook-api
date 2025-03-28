@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 );
 
 DELIMITER //
-CREATE TRIGGER `trigger_user_insert`
+CREATE TRIGGER IF NOT EXISTS `trigger_user_insert`
     BEFORE INSERT ON `user`
     FOR EACH ROW 
     BEGIN
