@@ -15,13 +15,19 @@ java {
 
 repositories {
 	mavenCentral()
+	jcenter()
 }
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	
+	implementation ("org.springframework.security:spring-security-core:5.8.0")
+	implementation ("io.jsonwebtoken:jjwt:0.11.5")
+	runtimeOnly ("io.jsonwebtoken:jjwt-impl:JJWT_RELEASE_VERSION")
+	implementation ("org.springframework.boot:spring-boot-starter-web")
+
+
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
 	runtimeOnly("com.mysql:mysql-connector-j")
