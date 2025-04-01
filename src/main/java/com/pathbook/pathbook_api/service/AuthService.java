@@ -4,12 +4,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Optional;
 
+import com.pathbook.pathbook_api.JwtValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.repository.UserRepository;
-import com.pathbook.pathbook_api.util.JwtUtil;
+import com.pathbook.pathbook_api.JwtUtil;
 
 @Service
 public class AuthService {
@@ -17,7 +18,7 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    protected JwtUtil jwtUtil;
+    protected JwtValidator JwtValidator;
 
     // TODO: DB 커넥션 체크용, 프로덕션에서는 지워야 함.
     public int testDBConnection() {
@@ -34,7 +35,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email);
         if (user != null && user.getPassword().equals(hashPassword(password))) {
             // 비밀번호가 맞다면 JWT 생성 후 반환
-            return jwtUtil.generateToken(email);  // JWT 토큰 발급
+            return JwtValidator.generateToken(email);  // JWT 토큰 발급
         }
         return null;  // 로그인 실패
     }

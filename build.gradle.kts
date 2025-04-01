@@ -14,29 +14,42 @@ java {
 }
 
 repositories {
+	// 공개 저장소 설정
 	mavenCentral()
-	jcenter()
+	google()
+
+	// 사설 또는 커스텀 저장소 설정 (필요 시 추가)
+	maven {
+		url = uri("https://company.com/maven-repo")
+	}
+
+	// 로컬 Maven 캐시 설정
+	mavenLocal()
+
+	// Flat Directory 설정 (필요 시 추가)
+	flatDir {
+		dirs ("libs")
+	}
 }
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation ("org.springframework.security:spring-security-core:5.8.0")
-	implementation ("io.jsonwebtoken:jjwt:0.11.5")
-	runtimeOnly ("io.jsonwebtoken:jjwt-impl:JJWT_RELEASE_VERSION")
-	implementation ("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	testImplementation("org.springframework.security:spring-security-test")
+	implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
+	implementation("jakarta.servlet:jakarta.servlet-api:5.0.0")
 
-
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
 
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.named<Test>("test") {
-	useJUnitPlatform()
-}
