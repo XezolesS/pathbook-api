@@ -1,4 +1,4 @@
-package com.pathbook.pathbook_api.repository;
+package com.pathbook.pathbook_api.controller;
 
 import com.pathbook.pathbook_api.service.AuthService;
 import org.springframework.http.ResponseEntity;
