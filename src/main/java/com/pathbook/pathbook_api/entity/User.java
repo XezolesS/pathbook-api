@@ -16,31 +16,42 @@ public class User {
     private String email;
     private String password;
     private boolean verified;
-    
-    protected User() {}
+    private String verificationToken;
 
-    public User(String id, String username, String email, String password, boolean verified) {
+    protected User() {
+    }
+
+    public User(String id, String username, String email, String password, boolean verified, String verificationToken) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.verified = verified;
+        this.verificationToken = verificationToken;
     }
 
     public String getId() {
         return this.id;
     }
-
     public String getUsername() {
         return this.username;
     }
-
     public String getEmail() {
         return this.email;
     }
-
     public String getPassword() {
         return this.password;
     }
-
+    public boolean isVerified() {
+        return this.verified;
+    }
+    public String getVerificationToken() {
+        return this.verificationToken;
+    }
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
 }
