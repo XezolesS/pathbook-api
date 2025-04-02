@@ -1,7 +1,5 @@
 package com.pathbook.pathbook_api;
 
-import com.pathbook.pathbook_api.CustomUserDetailsService;
-import com.pathbook.pathbook_api.JwtValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,4 +44,5 @@ public class SecurityConfig {
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager(); // AuthenticationManager를 AuthenticationConfiguration에서 가져옴
     }
+
 }

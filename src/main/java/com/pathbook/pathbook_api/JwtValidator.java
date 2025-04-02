@@ -62,4 +62,5 @@ public class JwtValidator {
             throw new RuntimeException("Invalid JWT token", ex); // 예외 처리
         }
     }
+
 }

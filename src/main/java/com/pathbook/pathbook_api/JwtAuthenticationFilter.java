@@ -1,7 +1,5 @@
 package com.pathbook.pathbook_api;
 
-import com.pathbook.pathbook_api.CustomUserDetailsService;
-import com.pathbook.pathbook_api.JwtValidator;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -48,4 +46,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 }

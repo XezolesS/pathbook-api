@@ -31,4 +31,5 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .authorities("ROLE_USER") // 기본 권한 설정
                 .build();
     }
+
 }

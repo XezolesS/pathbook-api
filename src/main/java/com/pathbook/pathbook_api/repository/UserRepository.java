@@ -13,7 +13,7 @@ public interface UserRepository extends CrudRepository<User, String> {
 
     Optional<User> findById(String id);
 
-    com.pathbook.pathbook_api.repository.User findByEmail(String email);
+    User findByEmail(String email);
 
     // TODO: DB 커넥션 체크용, 프로덕션에서는 지워야 함.
     @Query(value = "SELECT 1 FROM user LIMIT 1", nativeQuery = true)

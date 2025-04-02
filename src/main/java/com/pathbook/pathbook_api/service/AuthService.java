@@ -2,7 +2,6 @@ package com.pathbook.pathbook_api.service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.Optional;
 
 import com.pathbook.pathbook_api.JwtValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.repository.UserRepository;
-import com.pathbook.pathbook_api.JwtUtil;
 
 @Service
 public class AuthService {
@@ -60,4 +58,5 @@ public class AuthService {
             throw new RuntimeException(ex);
         }
     }
+
 }
