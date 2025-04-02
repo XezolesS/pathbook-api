@@ -6,10 +6,8 @@ import org.springframework.stereotype.Repository;
 import com.pathbook.pathbook_api.entity.Post;
 
 @Repository
-public interface PostRepository extends CrudRepository<Post, Long>{
+public interface PostRepository extends CrudRepository<Post, Long> {
     
     Post findById(long id);
-
-    
 
 }

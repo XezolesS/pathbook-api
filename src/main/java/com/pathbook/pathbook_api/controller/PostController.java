@@ -21,7 +21,7 @@ public class PostController {
     private PostService postService;
     
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getMethodName(@PathVariable Long id) {
+    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
         Post post = postService.getPost(id);
 
         if (post == null)
@@ -30,11 +30,21 @@ public class PostController {
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
-    @PostMapping("/write")
-    public ResponseEntity<Post> postMethodName(@RequestBody Post post) {
-        var savedPost = postService.savePost(post);
+    @PostMapping("/save")
+    public ResponseEntity<Post> savePost(@RequestBody Post post) {
+        Post savedPost = postService.savePost(post);
 
         return new ResponseEntity<>(savedPost, HttpStatus.OK);
+    }
+
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+
+        return new ResponseEntity<>(
+            String.format("Successfully delete post(id: %d)", id),
+            HttpStatus.OK
+        );
     }
 
 }
