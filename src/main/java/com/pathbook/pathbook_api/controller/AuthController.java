@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.model.LoginInfo;
 import com.pathbook.pathbook_api.service.AuthService;
-import com.pathbook.pathbook_api.service.EmailService;
 
 @RestController
 @RequestMapping("/auth")
@@ -17,8 +16,6 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
-    @Autowired
-    private EmailService emailService;
 
     // TODO: DB 커넥션 체크용, 프로덕션에서는 지워야 함.
     @GetMapping("/test")
