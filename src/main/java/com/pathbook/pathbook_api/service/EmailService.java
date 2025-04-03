@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
+
     @Autowired
     private JavaMailSender mailSender;
+
     //  이메일 전송
     public void sendEmail(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -17,4 +19,5 @@ public class EmailService {
         message.setText(body);
         mailSender.send(message);
     }
+
 }

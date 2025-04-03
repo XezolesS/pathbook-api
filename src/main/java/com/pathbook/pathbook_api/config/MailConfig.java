@@ -1,4 +1,4 @@
-package com.pathbook.pathbook_api;
+package com.pathbook.pathbook_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,4 +26,5 @@ public class MailConfig {
 
         return mailSender;
     }
+
 }
