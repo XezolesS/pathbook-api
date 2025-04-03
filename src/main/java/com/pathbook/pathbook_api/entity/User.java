@@ -18,8 +18,7 @@ public class User {
     private boolean verified;
     private String verificationToken;
 
-    protected User() {
-    }
+    protected User() {}
 
     public User(String id, String username, String email, String password, boolean verified, String verificationToken) {
         this.id = id;
@@ -33,25 +32,33 @@ public class User {
     public String getId() {
         return this.id;
     }
+
     public String getUsername() {
         return this.username;
     }
+
     public String getEmail() {
         return this.email;
     }
+
     public String getPassword() {
         return this.password;
     }
+
     public boolean isVerified() {
         return this.verified;
     }
+
     public String getVerificationToken() {
         return this.verificationToken;
     }
+
     public void setVerified(boolean verified) {
         this.verified = verified;
     }
+
     public void setVerificationToken(String verificationToken) {
         this.verificationToken = verificationToken;
     }
+
 }
