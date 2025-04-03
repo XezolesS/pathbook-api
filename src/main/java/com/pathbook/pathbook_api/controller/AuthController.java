@@ -38,7 +38,7 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     //  이메일 인증
-    @GetMapping("verify")
+    @GetMapping("/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam String verificationToken) {
         boolean verified = authService.verifyEmail(verificationToken);
         if (verified) {
