@@ -14,10 +14,11 @@ public interface UserRepository extends CrudRepository<User, String> {
     Optional<User> findById(String id);
 
     User findByEmail(String email);
+
+    // ✅ 이메일 인증을 위한 메서드 추가
     User findByVerificationToken(String verificationToken);
 
     // TODO: DB 커넥션 체크용, 프로덕션에서는 지워야 함.
     @Query(value = "SELECT 1 FROM user LIMIT 1", nativeQuery = true)
     int testTableAccess();
 }
-//이것만으로는 인증서비스를 구현하지못함

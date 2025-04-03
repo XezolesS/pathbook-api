@@ -4,12 +4,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.UUID;
 
-import com.pathbook.pathbook_api.JwtValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.repository.UserRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class AuthService {
@@ -18,8 +19,6 @@ public class AuthService {
     private UserRepository userRepository;
     @Autowired
     private EmailService emailService;
-
-    protected JwtValidator JwtValidator;
 
     // TODO: DB 커넥션 체크용, 프로덕션에서는 지워야 함.
     public int testDBConnection() {
@@ -30,46 +29,58 @@ public class AuthService {
         }
     }
 
-    // 로그인
-    public String login(String email, String password) {
+    // 로그인 (세션 방식)
+    public boolean login(String email, String password, HttpSession session) {
         // 이메일로 사용자 검색
         User user = userRepository.findByEmail(email);
         if (user != null && user.getPassword().equals(hashPassword(password))) {
-            // 비밀번호가 맞다면 JWT 생성 후 반환
-            return JwtValidator.generateToken(email);  // JWT 토큰 발급
+            // 세션에 사용자 ID 저장 (보안 강화)
+            session.setAttribute("userId", user.getId());
+            return true;
         }
-        return null;  // 로그인 실패
+        return false;  // 로그인 실패
     }
 
-    public String register(String id, String username, String email, String password) {
-        //  이메일 중복 확인
+    // 회원가입
+    public String register(String username, String email, String password) {
+        // 이메일 중복 확인
         if (userRepository.findByEmail(email) != null) {
             return "이미 가입된 이메일입니다.";
         }
-        //  비밀번호 해싱
+
+        // 비밀번호 해싱
         String hashedPassword = hashPassword(password);
-        //  랜덤 토큰 생성
+
+        // 랜덤 인증 토큰 생성
         String verificationToken = UUID.randomUUID().toString();
-        //  User 객체 저장
-        User user = new User(id, username, email, hashedPassword, false, verificationToken);
+
+        // User 객체 저장
+        User user = new User(null, username, email, hashedPassword, false, verificationToken);
         userRepository.save(user);
-        //  이메일 전송
+
+        // 이메일 전송
         sendVerificationEmail(email, verificationToken);
-        return "회원가입 성공.";
+
+        return "회원가입 성공. 이메일을 확인하여 인증을 완료하세요.";
     }
-    //  이메일 링크 전송
+
+    // 이메일 링크 전송 (인증 토큰 포함)
     private void sendVerificationEmail(String email, String verificationToken) {
         String subject = "이메일 인증";
-        String body = "링크를 클릭하여 이메일을 인증하세요: http://localhost:8080/auth/verify?token=" + verificationToken;
+        String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
+                + "http://localhost:8080/auth/verify?verificationToken=" + verificationToken;
         emailService.sendEmail(email, subject, body);
     }
-    //  이메일 인증 확인
+
+    // 이메일 인증 처리
     public boolean verifyEmail(String verificationToken) {
-        //  사용자 찾기
+        // 인증 토큰으로 사용자 찾기
         User user = userRepository.findByVerificationToken(verificationToken);
+
         if (user != null) {
-            //  사용자가 있으면 verified에 true 저장
+            // 사용자가 있으면 verified 값을 true로 변경
             user.setVerified(true);
+            user.setVerificationToken(null); // 인증 완료 후 토큰 제거
             userRepository.save(user);
             return true;
         }
@@ -96,5 +107,4 @@ public class AuthService {
             throw new RuntimeException(ex);
         }
     }
-
 }
