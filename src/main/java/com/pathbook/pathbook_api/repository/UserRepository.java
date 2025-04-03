@@ -10,7 +10,7 @@ import com.pathbook.pathbook_api.entity.User;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, String> {
-    
+
     Optional<User> findById(String id);
 
     User findByEmail(String email);
@@ -20,3 +20,4 @@ public interface UserRepository extends CrudRepository<User, String> {
     @Query(value = "SELECT 1 FROM user LIMIT 1", nativeQuery = true)
     int testTableAccess();
 }
+//이것만으로는 인증서비스를 구현하지못함
