@@ -41,8 +41,8 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam String verificationToken) {
-        boolean verified = authService.verifyEmail(verificationToken);
+    public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String verificationToken) {
+        boolean verified = authService.verifyEmail(email, verificationToken);
         if (verified) {
             return new ResponseEntity<>("이메일 인증 성공.", HttpStatus.OK);
         } else {
