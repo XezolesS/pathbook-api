@@ -54,7 +54,7 @@ public class AuthService {
         User user = new User(null, username, email, hashedPassword, false);
         userRepository.save(user);
 
-        tokenStore.storeToken(user.getId(), verificationToken);
+        tokenStore.storeToken(email, verificationToken);
 
         // 이메일 전송
         sendVerificationEmail(email, verificationToken);
@@ -73,7 +73,7 @@ public class AuthService {
     public boolean verifyEmail(String email, String verificationToken) {
         String storedToken = tokenStore.getVerificationToken(email);
 
-        if (storedToken != null) {
+        if (storedToken != null && storedToken.equals(verificationToken)) {
             User user = userRepository.findByEmail(email);
             user.setVerified(true);
             userRepository.save(user);
