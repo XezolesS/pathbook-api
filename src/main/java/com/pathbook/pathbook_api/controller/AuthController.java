@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +19,10 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final AuthService authService;
+    @Autowired
+    private AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+    protected AuthController() {}
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user, HttpSession session) {
