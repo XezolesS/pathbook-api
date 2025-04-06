@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.UUID;
 
+import com.pathbook.pathbook_api.TokenStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,8 @@ public class AuthService {
     private UserRepository userRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private TokenStore tokenStore;
 
     // TODO: DB 커넥션 체크용, 프로덕션에서는 지워야 함.
     public int testDBConnection() {
@@ -55,8 +58,10 @@ public class AuthService {
         String verificationToken = UUID.randomUUID().toString();
 
         // User 객체 저장
-        User user = new User(null, username, email, hashedPassword, false, verificationToken);
+        User user = new User(null, username, email, hashedPassword, false);
         userRepository.save(user);
+
+        tokenStore.storeToken(user.getId(), verificationToken);
 
         // 이메일 전송
         sendVerificationEmail(email, verificationToken);
@@ -73,15 +78,14 @@ public class AuthService {
     }
 
     // 이메일 인증 처리
-    public boolean verifyEmail(String verificationToken) {
-        // 인증 토큰으로 사용자 찾기
-        User user = userRepository.findByVerificationToken(verificationToken);
+    public boolean verifyEmail(String email, String verificationToken) {
+        String storedToken = tokenStore.getVerificationToken(email);
 
-        if (user != null) {
-            // 사용자가 있으면 verified 값을 true로 변경
+        if (storedToken != null) {
+            User user = userRepository.findByEmail(email);
             user.setVerified(true);
-            user.setVerificationToken(null); // 인증 완료 후 토큰 제거
             userRepository.save(user);
+            tokenStore.removeVerificationToken(email);
             return true;
         }
         return false;
