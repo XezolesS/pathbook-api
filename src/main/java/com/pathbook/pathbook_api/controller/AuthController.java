@@ -3,6 +3,7 @@ package com.pathbook.pathbook_api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -82,6 +83,13 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         return ResponseEntity.ok("Logout");
+    }
+
+    // 유저 로그인 디버그용
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @GetMapping("/user")
+    public ResponseEntity<?> getUser(HttpServletRequest request) {
+        return ResponseEntity.ok("User authenticated successfully.");
     }
 
     @GetMapping("/verify")
