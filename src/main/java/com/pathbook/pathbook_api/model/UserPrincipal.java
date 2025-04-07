@@ -11,14 +11,20 @@ import com.pathbook.pathbook_api.entity.User;
 
 public class UserPrincipal implements UserDetails {
 
+    private String id;
     private String username;
     private String password;
     private String email;
 
     public UserPrincipal(User user) {
+        this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.email = user.getEmail();
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override
