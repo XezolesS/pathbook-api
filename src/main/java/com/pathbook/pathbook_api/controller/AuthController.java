@@ -40,7 +40,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         try {
             Authentication authenticationRequest = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -67,26 +67,28 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
-        String encodedPassword = passwordEncoder.encode(registerRequest.password());
-        boolean userAdded = authService.addUser(
-            registerRequest.id(),
-            registerRequest.username(),
-            registerRequest.email(),
-            encodedPassword
-        );
-
-        if (userAdded) {
-            // TODO: 이메일 인증 로직 추가
-
-            return new ResponseEntity<>("Successfully registered.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Failed to register.", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> postRegister(@RequestBody RegisterRequest registerRequest) {
+        try {
+            String encodedPassword = passwordEncoder.encode(registerRequest.password());
+            boolean userAdded = authService.addUser(
+                registerRequest.id(),
+                registerRequest.username(),
+                registerRequest.email(),
+                encodedPassword
+            );
+    
+            if (userAdded) {
+                return new ResponseEntity<>("Successfully registered.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Failed to register.", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    public ResponseEntity<String> postLogout(HttpServletRequest request) {
         return ResponseEntity.ok("Logout");
     }
 
@@ -98,12 +100,12 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String verificationToken) {
-        boolean verified = authService.verifyEmail(email, verificationToken);
+    public ResponseEntity<String> getVerify(@RequestParam String id, @RequestParam String token) {
+        boolean verified = authService.verifyUser(id, token);
         if (verified) {
-            return new ResponseEntity<>("이메일 인증 성공.", HttpStatus.OK);
+            return new ResponseEntity<>("Successfully verified.", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("이메일 인증 실패.", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("Failed to verify.", HttpStatus.BAD_REQUEST);
         }
     }
 
