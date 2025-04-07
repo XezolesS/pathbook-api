@@ -3,7 +3,6 @@ package com.pathbook.pathbook_api.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -19,7 +18,7 @@ public class User {
     protected User() {}
 
     public User(String id, String username, String email, String password, boolean verified) {
-        this.id = id != null ? id : UUID.randomUUID().toString();
+        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
