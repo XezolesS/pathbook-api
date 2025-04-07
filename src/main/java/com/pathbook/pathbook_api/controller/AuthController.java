@@ -79,6 +79,11 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        return ResponseEntity.ok("Logout");
+    }
+
     @GetMapping("/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String verificationToken) {
         boolean verified = authService.verifyEmail(email, verificationToken);
