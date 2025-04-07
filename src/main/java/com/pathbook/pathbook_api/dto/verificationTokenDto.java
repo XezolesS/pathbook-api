@@ -1,6 +1,7 @@
 package com.pathbook.pathbook_api.dto;
 
 public class verificationTokenDto {
+
     private String email;
     private String verificationToken;
 
@@ -24,4 +25,5 @@ public class verificationTokenDto {
     private void setVerificationToken(String verificationToken) {
         this.verificationToken = verificationToken;
     }
+
 }

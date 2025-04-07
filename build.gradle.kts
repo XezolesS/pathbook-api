@@ -15,22 +15,10 @@ java {
 
 repositories {
 	mavenCentral()
-	google()
-
-	maven {
-		url = uri("https://company.com/maven-repo")
-	}
-
-	mavenLocal()
-
-	flatDir {
-		dirs ("libs")
-	}
 }
 
 dependencies {
-	implementation("io.jsonwebtoken:jjwt-api:0.12.3")
-	implementation("jakarta.servlet:jakarta.servlet-api:5.0.0")
+	implementation("jakarta.servlet:jakarta.servlet-api")
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-mail")
@@ -45,9 +33,6 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 
 	runtimeOnly("com.mysql:mysql-connector-j")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
 	annotationProcessor("org.projectlombok:lombok")
 }
-

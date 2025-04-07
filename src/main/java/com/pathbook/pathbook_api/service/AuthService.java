@@ -42,22 +42,17 @@ public class AuthService {
         return false;
     }
 
-    public String register(String username, String email, String password) {
+    public String register(String id, String username, String email, String password) {
         if (userRepository.findByEmail(email) != null) {
             return "이미 가입된 이메일입니다.";
         }
 
-        String hashedPassword = hashPassword(password);
-        String verificationToken = UUID.randomUUID().toString();
-
-        // User 객체 저장
-        User user = new User(null, username, email, hashedPassword, false);
+        User user = new User(id, username, email, password, false);
         userRepository.save(user);
 
-        tokenStore.storeToken(user.getId(), verificationToken);
-
-        // 이메일 전송
-        sendVerificationEmail(email, verificationToken);
+        // String verificationToken = UUID.randomUUID().toString();
+        // tokenStore.storeToken(user.getId(), verificationToken);
+        // sendVerificationEmail(email, verificationToken);
 
         return "회원가입 성공. 이메일을 확인하여 인증을 완료하세요.";
     }
