@@ -69,15 +69,20 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
         String encodedPassword = passwordEncoder.encode(registerRequest.password());
-
-        String response = authService.register(
+        boolean userAdded = authService.addUser(
             registerRequest.id(),
             registerRequest.username(),
             registerRequest.email(),
             encodedPassword
         );
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        if (userAdded) {
+            // TODO: 이메일 인증 로직 추가
+
+            return new ResponseEntity<>("Successfully registered.", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Failed to register.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/logout")

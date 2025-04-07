@@ -19,28 +19,25 @@ public class AuthService {
     @Autowired
     private TokenStore tokenStore;
 
-    // TODO: DB 커넥션 체크용, 프로덕션에서는 지워야 함.
-    public int testDBConnection() {
-        try {
-            return userRepository.testTableAccess();
-        } catch (Exception ex) {
-            return -1;
-        }
-    }
-
-    public String register(String id, String username, String email, String password) {
+    /**
+     * 사용자를 데이터베이스에 추가합니다.
+     * 
+     * @param id 사용자 ID
+     * @param username 사용자 이름
+     * @param email 사용자 이메일
+     * @param password 사용자 비밀번호. 암호화된 비밀번호만 저장해야 합니다.
+     * 
+     * @return 성공적으로 추가된 경우는 true, 실패한 경우는 false.
+     */
+    public boolean addUser(String id, String username, String email, String password) {
         if (userRepository.findByEmail(email) != null) {
-            return "이미 가입된 이메일입니다.";
+            return false;
         }
 
         User user = new User(id, username, email, password, false);
         userRepository.save(user);
 
-        // String verificationToken = UUID.randomUUID().toString();
-        // tokenStore.storeToken(user.getId(), verificationToken);
-        // sendVerificationEmail(email, verificationToken);
-
-        return "회원가입 성공. 이메일을 확인하여 인증을 완료하세요.";
+        return true;
     }
 
     private void sendVerificationEmail(String email, String verificationToken) {
