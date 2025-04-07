@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.model.LoginRequest;
-import com.pathbook.pathbook_api.model.RegisterRequest;
-import com.pathbook.pathbook_api.model.UserPrincipal;
+import com.pathbook.pathbook_api.dto.LoginRequest;
+import com.pathbook.pathbook_api.dto.RegisterRequest;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;

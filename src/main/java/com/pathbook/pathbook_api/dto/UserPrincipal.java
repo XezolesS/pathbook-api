@@ -1,4 +1,4 @@
-package com.pathbook.pathbook_api.model;
+package com.pathbook.pathbook_api.dto;
 
 import java.util.Collection;
 import java.util.Collections;
