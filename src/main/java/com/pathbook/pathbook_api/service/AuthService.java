@@ -60,7 +60,7 @@ public class AuthService {
         // 토큰 저장
         userVerifyTokenRepository.save(
             new UserVerifyToken(
-                savedUser.getId(),
+                savedUser,
                 token,
                 LocalDateTime.now().plusDays(1),
                 false
@@ -91,20 +91,17 @@ public class AuthService {
 
     @Transactional
     public boolean verifyUser(String userId, String token) {
-        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(userId).get();
+        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).get();
 
         // TODO: 각 조건에 대한 예외 처리
         if (userVerifyToken == null || 
             userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
             userVerifyToken.isUsed() ||
-            userVerifyToken.getToken().equals(token) == false) {
+            userVerifyToken.getUser().getId().equals(userId) == false) {
             return false;
         }
         
-        User user = userRepository.findById(userId).get();
-        if (user == null) {
-            return false;
-        }
+        User user = userVerifyToken.getUser();
 
         user.setVerified(true);
         userRepository.save(user);

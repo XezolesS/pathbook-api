@@ -10,9 +10,10 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 CREATE TABLE IF NOT EXISTS `user_verify_token` (
     `user_id` VARCHAR(32) NOT NULL,
-    `token` VARCHAR(32) NOT NULL,
+    `token` VARCHAR(32) NOT NULL UNIQUE,
     `expires_at` DATETIME NOT NULL,
     `used` BOOLEAN NOT NULL DEFAULT 0,
+    PRIMARY KEY (`token`),
     FOREIGN KEY (`user_id`)
         REFERENCES `user`(`id`) 
         ON DELETE CASCADE,
