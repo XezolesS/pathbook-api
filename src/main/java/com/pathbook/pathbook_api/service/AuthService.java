@@ -68,7 +68,7 @@ public class AuthService {
     public boolean verifyEmail(String email, String verificationToken) {
         String storedToken = tokenStore.getVerificationToken(email);
 
-        if (storedToken != null) {
+        if (storedToken != null && storedToken.equals(verificationToken)) {
             User user = userRepository.findByEmail(email);
             user.setVerified(true);
             userRepository.save(user);
