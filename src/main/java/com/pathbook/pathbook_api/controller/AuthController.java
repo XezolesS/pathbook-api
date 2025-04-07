@@ -3,6 +3,7 @@ package com.pathbook.pathbook_api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.model.LoginRequest;
-import com.pathbook.pathbook_api.model.RegisterRequest;
-import com.pathbook.pathbook_api.model.UserPrincipal;
+import com.pathbook.pathbook_api.dto.LoginRequest;
+import com.pathbook.pathbook_api.dto.RegisterRequest;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         try {
             Authentication authenticationRequest = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -66,26 +67,45 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
-        String encodedPassword = passwordEncoder.encode(registerRequest.password());
+    public ResponseEntity<?> postRegister(@RequestBody RegisterRequest registerRequest) {
+        try {
+            String encodedPassword = passwordEncoder.encode(registerRequest.password());
+            boolean userAdded = authService.addUser(
+                registerRequest.id(),
+                registerRequest.username(),
+                registerRequest.email(),
+                encodedPassword
+            );
+    
+            if (userAdded) {
+                return new ResponseEntity<>("Successfully registered.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Failed to register.", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-        String response = authService.register(
-            registerRequest.id(),
-            registerRequest.username(),
-            registerRequest.email(),
-            encodedPassword
-        );
+    @PostMapping("/logout")
+    public ResponseEntity<String> postLogout(HttpServletRequest request) {
+        return ResponseEntity.ok("Logout");
+    }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    // 유저 로그인 디버그용
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @GetMapping("/user")
+    public ResponseEntity<?> getUser(HttpServletRequest request) {
+        return ResponseEntity.ok("User authenticated successfully.");
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String verificationToken) {
-        boolean verified = authService.verifyEmail(email, verificationToken);
+    public ResponseEntity<String> getVerify(@RequestParam String id, @RequestParam String token) {
+        boolean verified = authService.verifyUser(id, token);
         if (verified) {
-            return new ResponseEntity<>("이메일 인증 성공.", HttpStatus.OK);
+            return new ResponseEntity<>("Successfully verified.", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("이메일 인증 실패.", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("Failed to verify.", HttpStatus.BAD_REQUEST);
         }
     }
 

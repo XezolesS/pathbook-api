@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import com.pathbook.pathbook_api.service.PathbookUserDetailsService;
 
@@ -23,8 +24,15 @@ public class SecurityConfig {
         return http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/auth/*").permitAll()
+                .requestMatchers("/auth/login", "/auth/register", "/auth/verify").permitAll()
                 .anyRequest().authenticated()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/auth/logout")
+                .logoutSuccessHandler(logoutSuccessHandler())
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .clearAuthentication(true)
             )
             .build();
     }
@@ -38,6 +46,16 @@ public class SecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         
         return new ProviderManager(authenticationProvider);
+    }
+
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return (request, response, authentication) -> {
+            response.setStatus(200);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"message\": \"Logout successful\"}");
+            response.getWriter().flush();
+        };
     }
 
     @Bean

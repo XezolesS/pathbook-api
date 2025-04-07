@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.entity.User;
-import com.pathbook.pathbook_api.model.UserPrincipal;
 import com.pathbook.pathbook_api.repository.UserRepository;
 
 public class PathbookUserDetailsService implements UserDetailsService {
