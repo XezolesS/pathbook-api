@@ -109,4 +109,25 @@ public class AuthController {
         }
     }
 
-}
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        boolean result = authService.sendResetPasswordEmail(email);
+        if (result) {
+            return new ResponseEntity<>("Successfully sent", HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>("Failed to send email.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String id, @RequestParam String token, @RequestParam String newpassword) {
+        boolean result = authService.resetPassword(id, token, newpassword);
+        if (result) {
+            return new ResponseEntity<>("Successfully reset password.", HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>("Failed to send reset password.", HttpStatus.BAD_REQUEST);
+        }
+    }
+ }
