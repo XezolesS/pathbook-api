@@ -42,28 +42,34 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         try {
+            boolean loginSuccess = authService.handleLogin(loginRequest.email(), loginRequest.password());
+            if (loginSuccess == false) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Invalid email or password, account is locked");
+            }
+
             Authentication authenticationRequest = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    loginRequest.email(),
-                    loginRequest.password()
-                )
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.email(),
+                            loginRequest.password()
+                    )
             );
-    
+
             // 세션 생성
             SecurityContextHolder.getContext().setAuthentication(authenticationRequest);
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-            
+
             UserPrincipal userPrincipal = (UserPrincipal) authenticationRequest.getPrincipal();
-    
+
             return new ResponseEntity<>(userPrincipal, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body("Invalid email or password");
+                    .body("Invalid email or password");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Authentication failed: " + e.getMessage());
-        } 
+                    .body("Authentication failed: " + e.getMessage());
+        }
     }
 
     @PostMapping("/register")
@@ -71,12 +77,12 @@ public class AuthController {
         try {
             String encodedPassword = passwordEncoder.encode(registerRequest.password());
             boolean userAdded = authService.addUser(
-                registerRequest.id(),
-                registerRequest.username(),
-                registerRequest.email(),
-                encodedPassword
+                    registerRequest.id(),
+                    registerRequest.username(),
+                    registerRequest.email(),
+                    encodedPassword
             );
-    
+
             if (userAdded) {
                 return new ResponseEntity<>("Successfully registered.", HttpStatus.OK);
             } else {
@@ -114,8 +120,7 @@ public class AuthController {
         boolean result = authService.sendResetPasswordEmail(email);
         if (result) {
             return new ResponseEntity<>("Successfully sent", HttpStatus.OK);
-        }
-        else{
+        } else {
             return new ResponseEntity<>("Failed to send email.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -125,9 +130,9 @@ public class AuthController {
         boolean result = authService.resetPassword(id, token, newpassword);
         if (result) {
             return new ResponseEntity<>("Successfully reset password.", HttpStatus.OK);
-        }
-        else {
+        } else {
             return new ResponseEntity<>("Failed to send reset password.", HttpStatus.BAD_REQUEST);
         }
     }
- }
+
+}
