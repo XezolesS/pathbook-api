@@ -141,9 +141,9 @@ public class AuthService {
         UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).get();
 
         if (userVerifyToken == null ||
-                userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
-                userVerifyToken.isUsed() ||
-                userVerifyToken.getUser().getId().equals(userId) == false) {
+            userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
+            userVerifyToken.isUsed() ||
+            userVerifyToken.getUser().getId().equals(userId) == false) {
             return false;
         }
         User user = userVerifyToken.getUser();
@@ -152,6 +152,7 @@ public class AuthService {
 
         userRepository.save(user);
         userVerifyTokenRepository.save(userVerifyToken);
+
         return true;
     }
 
