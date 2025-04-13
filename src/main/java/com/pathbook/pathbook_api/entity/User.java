@@ -64,4 +64,8 @@ public class User {
         this.verified = verified;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 }
