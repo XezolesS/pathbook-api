@@ -130,4 +130,5 @@ public class AuthController {
             return new ResponseEntity<>("Failed to send reset password.", HttpStatus.BAD_REQUEST);
         }
     }
- }
+
+}

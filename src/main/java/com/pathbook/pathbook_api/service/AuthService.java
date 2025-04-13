@@ -48,7 +48,6 @@ public class AuthService {
 
         User user = new User(id, username, email, password, false);
         User savedUser = userRepository.save(user);
-
         String token = generateToken();
         
         // 토큰 저장
@@ -115,12 +114,12 @@ public class AuthService {
 
         String token = generateToken();
         userVerifyTokenRepository.save(
-                new UserVerifyToken(
-                        user,
-                        token,
-                        LocalDateTime.now().plusDays(1),
-                        false
-                )
+            new UserVerifyToken(
+                user,
+                token,
+                LocalDateTime.now().plusDays(1),
+                false
+            )
         );
 
         sendResetPasswordEmail(user, token);
@@ -130,9 +129,9 @@ public class AuthService {
     private void sendResetPasswordEmail(User user, String token) {
         String subject = "[Pathbook] 비밀번호 재설정 이메일 인증";
         String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-                + "http://localhost:8080/auth/reset-password-form?"
-                + "id=" + user.getId() + "&"
-                + "token=" + token;
+            + "http://localhost:8080/auth/reset-password-form?"
+            + "id=" + user.getId() + "&"
+            + "token=" + token;
 
         emailService.sendEmail(user.getEmail(), subject, body);
     }
@@ -168,4 +167,5 @@ public class AuthService {
         }
         return tokenBuilder.toString();
     }
+
 }
