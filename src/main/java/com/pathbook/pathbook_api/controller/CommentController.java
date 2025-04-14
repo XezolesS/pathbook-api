@@ -23,11 +23,15 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+    // TODO: 경로의 모호함 수정.
+    // PostController의 매핑이 /post이므로 /comment/post는 모호함. /comment/{postId}로 변경
+    // 단 하나의 댓글에 대한 경로는 /comment/{postId}/{commentID}로 설정. (필요시)
     @GetMapping("/post/{postId}")
     public ResponseEntity<List<Comment>> getComments(@PathVariable Long postId) {
         return ResponseEntity.ok(commentService.getCommentsByPostId(postId));
     }
 
+    // TODO: Post의 글 추가 리퀘스트와 경로가 같도록 변경 (add, save, write 중 하나로 통일)
     @PostMapping("/add")
     public ResponseEntity<Comment> addComment(@RequestBody CommentRequest request) {
         return ResponseEntity.ok(commentService.addComment(request));
@@ -46,6 +50,7 @@ public class CommentController {
 
     @PostMapping("/like/{commentId}")
     public ResponseEntity<Void> likeComment(@PathVariable Long commentId) {
+        // TODO: 사용자 한 명당 하나의 좋아요만 가능하도록 변경
         commentService.likeComment(commentId);
         return ResponseEntity.ok().build();
     }

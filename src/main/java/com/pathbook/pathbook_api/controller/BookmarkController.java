@@ -32,7 +32,9 @@ public class BookmarkController {
 
     @Autowired
     private PostRepository postRepository;
-
+    
+    // TODO: 경로에서 {userId}를 제거하고, 세션에서 사용자 정보를 가져오도록 변경.
+    // 북마크는 사용자 전용 기능이므로 무조건 로그인 된 상태에서만 사용 가능하므로 위의 방법이 타당함.
     @PostMapping("/add/{userId}/{postId}")
     public ResponseEntity<?> addBookmark(@PathVariable String userId, @PathVariable Long postId) {
         Optional<User> user = findUserById(userId);
@@ -81,6 +83,7 @@ public class BookmarkController {
         return ResponseEntity.ok(bookmarks);
     }
 
+    // TODO: 리팩토링 필요
     private Optional<User> findUserById(String userId) {
         return userRepository.findById(userId);
     }
