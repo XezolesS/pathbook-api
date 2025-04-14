@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.repository.PostRepository;
 
+import java.util.Optional;
+
 @Service
 public class PostService {
     
@@ -13,9 +15,9 @@ public class PostService {
     private PostRepository postRepository;
 
     public Post getPost(long id) {
-        Post post = postRepository.findById(id);
+        Optional<Post> post = postRepository.findById(id);
 
-        return post;
+        return post.orElse(null);
     }
 
     public Post savePost(Post post) {

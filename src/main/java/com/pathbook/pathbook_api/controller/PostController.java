@@ -20,6 +20,7 @@ public class PostController {
     @Autowired
     private PostService postService;
     
+    // TODO: 사용자 인증 없이 게시글을 조회할 수 있도록 변경
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
         Post post = postService.getPost(id);
@@ -37,6 +38,7 @@ public class PostController {
         return new ResponseEntity<>(savedPost, HttpStatus.OK);
     }
 
+    // DeleteMapping으로 변경
     @PostMapping("/delete/{id}")
     public ResponseEntity<String> deletePost(@PathVariable Long id) {
         postService.deletePost(id);
