@@ -44,6 +44,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         try {
+            // TODO: 계정 잠금 로직 변경, 실패 시 반환 코드 변경 (403)
+            boolean loginSuccess = authService.handleLogin(loginRequest.email(), loginRequest.password());
+            if (loginSuccess == false) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid email or password, account is locked");
+            }
+
             Authentication authenticationRequest = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.email(),
@@ -55,9 +62,9 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authenticationRequest);
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-
+            
             UserPrincipal userPrincipal = (UserPrincipal) authenticationRequest.getPrincipal();
-
+    
             return new ResponseEntity<>(userPrincipal, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -65,7 +72,7 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Authentication failed: " + e.getMessage());
-        }
+        } 
     }
 
     @PostMapping("/register")
@@ -121,7 +128,7 @@ public class AuthController {
             return new ResponseEntity<>("Failed to send email.", HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(

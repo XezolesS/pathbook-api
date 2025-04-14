@@ -11,6 +11,8 @@ import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.entity.UserVerifyToken;
 import com.pathbook.pathbook_api.repository.UserRepository;
 import com.pathbook.pathbook_api.repository.UserVerifyTokenRepository;
+import com.pathbook.pathbook_api.entity.AccountLockStatus;
+import com.pathbook.pathbook_api.repository.AccountLockStatusRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -28,6 +30,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AccountLockStatusRepository accountLockStatusRepository;
 
     /**
      * 사용자를 데이터베이스에 추가합니다.
@@ -49,7 +54,7 @@ public class AuthService {
         User user = new User(id, username, email, password, false);
         User savedUser = userRepository.save(user);
         String token = generateToken();
-        
+
         // 토큰 저장
         userVerifyTokenRepository.save(
             new UserVerifyToken(
@@ -106,7 +111,7 @@ public class AuthService {
     }
 
     @Transactional
-    public boolean sendResetPasswordEmail(String email){
+    public boolean sendResetPasswordEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             return false;
@@ -150,9 +155,16 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(newpassword));
         userVerifyToken.setUsed(true);
 
+        AccountLockStatus lockStatus = accountLockStatusRepository.findByUserId(user.getId());
+        if (lockStatus == null) {
+            lockStatus = new AccountLockStatus(user.getId());
+        }
+        lockStatus.setLocked(true);
+        lockStatus.setFailedAttempts(0);
+
         userRepository.save(user);
         userVerifyTokenRepository.save(userVerifyToken);
-
+        accountLockStatusRepository.save(lockStatus);
         return true;
     }
 
@@ -167,6 +179,52 @@ public class AuthService {
             tokenBuilder.append(tokenChars.charAt(randomInt));
         }
         return tokenBuilder.toString();
+    }
+
+
+    public boolean handleLogin(String email, String password) {
+        // TODO: 로그인 로직 단순화
+        // FIXME: 비밀번호 실패 5회 째, 계정 잠금처리에 문제가 있어보임. (500 코드 반환)
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return false;
+        }
+
+        AccountLockStatus lockStatus = accountLockStatusRepository.findByUserId(user.getId());
+        if (lockStatus == null) {
+            lockStatus = new AccountLockStatus(user.getId());
+        }
+
+        if (lockStatus.isLocked()) {
+            return false;
+        }
+
+        boolean isPasswordValid = passwordEncoder.matches(password, user.getPassword());
+        if (isPasswordValid) {
+            lockStatus.setFailedAttempts(0);
+            accountLockStatusRepository.save(lockStatus);
+            return true;
+        } else {
+            lockStatus.setFailedAttempts(lockStatus.getFailedAttempts() + 1);
+
+            if (lockStatus.getFailedAttempts() >= 5) {
+                lockStatus.setLocked(true);
+
+                String token = generateToken();
+
+                userVerifyTokenRepository.save(
+                    new UserVerifyToken(
+                        user,
+                        token,
+                        LocalDateTime.now().plusDays(1),
+                        false
+                    )
+                );
+                sendResetPasswordEmail(user, token);
+            }
+            accountLockStatusRepository.save(lockStatus);
+            return false;
+        }
     }
 
 }
