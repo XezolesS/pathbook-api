@@ -1,20 +1,15 @@
 package com.pathbook.pathbook_api.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.pathbook.pathbook_api.dto.CommentRequest;
+import com.pathbook.pathbook_api.dto.LikeRequest;
 import com.pathbook.pathbook_api.entity.Comment;
 import com.pathbook.pathbook_api.service.CommentService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/comment")
@@ -23,36 +18,57 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    // TODO: 경로의 모호함 수정.
-    // PostController의 매핑이 /post이므로 /comment/post는 모호함. /comment/{postId}로 변경
-    // 단 하나의 댓글에 대한 경로는 /comment/{postId}/{commentID}로 설정. (필요시)
-    @GetMapping("/post/{postId}")
+    @GetMapping("/{postId}")
     public ResponseEntity<List<Comment>> getComments(@PathVariable Long postId) {
         return ResponseEntity.ok(commentService.getCommentsByPostId(postId));
     }
 
-    // TODO: Post의 글 추가 리퀘스트와 경로가 같도록 변경 (add, save, write 중 하나로 통일)
-    @PostMapping("/add")
+    @PostMapping("/save")
     public ResponseEntity<Comment> addComment(@RequestBody CommentRequest request) {
-        return ResponseEntity.ok(commentService.addComment(request));
+        validateCommentRequest(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.addComment(request));
     }
 
-    @PostMapping("/update/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<Comment> updateComment(@PathVariable Long commentId, @RequestBody CommentRequest request) {
+        validateCommentRequest(request);
+
         return ResponseEntity.ok(commentService.updateComment(commentId, request.content()));
     }
 
-    @DeleteMapping("/delete/{commentId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/like/{commentId}")
-    public ResponseEntity<Void> likeComment(@PathVariable Long commentId) {
-        // TODO: 사용자 한 명당 하나의 좋아요만 가능하도록 변경
-        commentService.likeComment(commentId);
-        return ResponseEntity.ok().build();
+    @PostMapping("/like")
+    public ResponseEntity<String> likeComment(@RequestBody LikeRequest likeRequest) {
+        validateLikeRequest(likeRequest);
+
+        commentService.likeComment(likeRequest.userId(), likeRequest.commentId(), likeRequest.like());
+        return ResponseEntity.ok(likeRequest.like() ? "Liked successfully." : "Unliked successfully.");
     }
 
+    private void validateCommentRequest(CommentRequest request) {
+        if (request.postId() == null || request.postId() <= 0) {
+            throw new IllegalArgumentException("Invalid postId: must be a positive number.");
+        }
+        if (request.authorId() == null || request.authorId().isBlank()) {
+            throw new IllegalArgumentException("Invalid authorId: must not be null or blank.");
+        }
+        if (request.content() == null || request.content().isBlank()) {
+            throw new IllegalArgumentException("Invalid content: must not be null or blank.");
+        }
+    }
+
+    private void validateLikeRequest(LikeRequest likeRequest) {
+        if (likeRequest.userId() == null || likeRequest.userId().isBlank()) {
+            throw new IllegalArgumentException("Invalid userId: must not be null or blank.");
+        }
+        if (likeRequest.commentId() == null || likeRequest.commentId() <= 0) {
+            throw new IllegalArgumentException("Invalid commentId: must be a positive number.");
+        }
+    }
 }
