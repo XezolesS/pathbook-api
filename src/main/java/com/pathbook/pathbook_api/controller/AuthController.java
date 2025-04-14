@@ -44,6 +44,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         try {
+            // TODO: 계정 잠금 로직 변경, 실패 시 반환 코드 변경 (403)
             boolean loginSuccess = authService.handleLogin(loginRequest.email(), loginRequest.password());
             if (loginSuccess == false) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

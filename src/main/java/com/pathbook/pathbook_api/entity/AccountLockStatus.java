@@ -11,7 +11,7 @@ public class AccountLockStatus {
 
     @Id
     @Column(name = "user_id", length = 32, nullable = false)
-    private String id;
+    private String userId;
 
     @Column(name = "failed_attempts", nullable = false)
     private int failedAttempts = 0;
@@ -23,13 +23,13 @@ public class AccountLockStatus {
     }
 
     public AccountLockStatus(String id) {
-        this.id = id;
+        this.userId = id;
         this.failedAttempts = 0;
         this.isLocked = false;
     }
 
     public String getUserId() {
-        return id;
+        return userId;
     }
 
     public int getFailedAttempts() {
@@ -47,4 +47,5 @@ public class AccountLockStatus {
     public void setLocked(boolean locked) {
         isLocked = locked;
     }
+
 }

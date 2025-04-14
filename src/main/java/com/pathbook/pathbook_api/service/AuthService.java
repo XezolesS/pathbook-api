@@ -183,6 +183,8 @@ public class AuthService {
 
 
     public boolean handleLogin(String email, String password) {
+        // TODO: 로그인 로직 단순화
+        // FIXME: 비밀번호 실패 5회 째, 계정 잠금처리에 문제가 있어보임. (500 코드 반환)
         User user = userRepository.findByEmail(email);
         if (user == null) {
             return false;
@@ -224,4 +226,5 @@ public class AuthService {
             return false;
         }
     }
+
 }
