@@ -37,11 +37,12 @@ public class AuthService {
     /**
      * 사용자를 데이터베이스에 추가합니다.
      * 동시에 사용자 인증을 위한 이메일도 전송합니다.
-     *
+     * 
      * @param id 사용자 ID.
      * @param username 사용자 이름.
      * @param email 사용자 이메일.
      * @param password 사용자 비밀번호. 암호화된 비밀번호만 저장해야 합니다.
+     * 
      * @return 성공적으로 추가된 경우는 true, 실패한 경우는 false.
      */
     @Transactional
@@ -52,7 +53,6 @@ public class AuthService {
 
         User user = new User(id, username, email, password, false);
         User savedUser = userRepository.save(user);
-
         String token = generateToken();
 
         // 토큰 저장
@@ -73,7 +73,7 @@ public class AuthService {
 
     /**
      * 사용자 인증을 위한 이메일을 전송합니다.
-     *
+     * 
      * @param user 사용자 엔티티.
      * @param token 인증 토큰.
      */
@@ -83,7 +83,7 @@ public class AuthService {
             + "http://localhost:8080/auth/verify?"
             + "id=" + user.getId() + "&"
             + "token=" + token;
-
+        
         emailService.sendEmail(user.getEmail(), subject, body);
     }
 
@@ -92,13 +92,13 @@ public class AuthService {
         UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).get();
 
         // TODO: 각 조건에 대한 예외 처리
-        if (userVerifyToken == null ||
+        if (userVerifyToken == null || 
             userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
             userVerifyToken.isUsed() ||
             userVerifyToken.getUser().getId().equals(userId) == false) {
             return false;
         }
-
+        
         User user = userVerifyToken.getUser();
 
         user.setVerified(true);
