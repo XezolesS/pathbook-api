@@ -89,4 +89,5 @@ public class Comment {
     public void increaseLikes() {
         this.likes += 1;
     }
+
 }

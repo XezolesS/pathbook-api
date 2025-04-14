@@ -38,4 +38,5 @@ public class BookmarkService {
     public boolean isBookmarked(User user, Post post) {
         return bookmarkRepository.findByUserAndPost(user, post).isPresent();
     }
+
 }

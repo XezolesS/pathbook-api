@@ -27,6 +27,7 @@ public class CommentService {
                 request.authorId(),
                 request.content()
         );
+
         return commentRepository.save(comment);
     }
 
@@ -50,4 +51,5 @@ public class CommentService {
         comment.setLikes(comment.getLikes() + 1);
         commentRepository.save(comment);
     }
+
 }

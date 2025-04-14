@@ -42,4 +42,5 @@ public class Bookmark {
     public Post getPost() {
         return post;
     }
+
 }

@@ -49,4 +49,5 @@ public class CommentController {
         commentService.likeComment(commentId);
         return ResponseEntity.ok().build();
     }
+
 }
