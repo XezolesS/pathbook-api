@@ -45,14 +45,14 @@ public class AuthController {
             boolean loginSuccess = authService.handleLogin(loginRequest.email(), loginRequest.password());
             if (loginSuccess == false) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Invalid email or password, account is locked");
+                    .body("Invalid email or password, account is locked");
             }
 
             Authentication authenticationRequest = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.email(),
-                            loginRequest.password()
-                    )
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.email(),
+                    loginRequest.password()
+                )
             );
 
             // 세션 생성
@@ -65,10 +65,10 @@ public class AuthController {
             return new ResponseEntity<>(userPrincipal, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid email or password");
+                .body("Invalid email or password");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Authentication failed: " + e.getMessage());
+                .body("Authentication failed: " + e.getMessage());
         }
     }
 
@@ -77,10 +77,10 @@ public class AuthController {
         try {
             String encodedPassword = passwordEncoder.encode(registerRequest.password());
             boolean userAdded = authService.addUser(
-                    registerRequest.id(),
-                    registerRequest.username(),
-                    registerRequest.email(),
-                    encodedPassword
+                registerRequest.id(),
+                registerRequest.username(),
+                registerRequest.email(),
+                encodedPassword
             );
 
             if (userAdded) {
@@ -134,5 +134,4 @@ public class AuthController {
             return new ResponseEntity<>("Failed to send reset password.", HttpStatus.BAD_REQUEST);
         }
     }
-
 }

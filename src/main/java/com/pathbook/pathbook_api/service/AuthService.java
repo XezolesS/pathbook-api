@@ -38,9 +38,9 @@ public class AuthService {
      * 사용자를 데이터베이스에 추가합니다.
      * 동시에 사용자 인증을 위한 이메일도 전송합니다.
      *
-     * @param id       사용자 ID.
+     * @param id 사용자 ID.
      * @param username 사용자 이름.
-     * @param email    사용자 이메일.
+     * @param email 사용자 이메일.
      * @param password 사용자 비밀번호. 암호화된 비밀번호만 저장해야 합니다.
      * @return 성공적으로 추가된 경우는 true, 실패한 경우는 false.
      */
@@ -57,12 +57,12 @@ public class AuthService {
 
         // 토큰 저장
         userVerifyTokenRepository.save(
-                new UserVerifyToken(
-                        savedUser,
-                        token,
-                        LocalDateTime.now().plusDays(1),
-                        false
-                )
+            new UserVerifyToken(
+                savedUser,
+                token,
+                LocalDateTime.now().plusDays(1),
+                false
+            )
         );
 
         // 이메일 전송
@@ -74,28 +74,28 @@ public class AuthService {
     /**
      * 사용자 인증을 위한 이메일을 전송합니다.
      *
-     * @param user  사용자 엔티티.
+     * @param user 사용자 엔티티.
      * @param token 인증 토큰.
      */
     private void sendVerificationEmail(User user, String token) {
         String subject = "[Pathbook] 회원가입 이메일 인증";
         String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-                + "http://localhost:8080/auth/verify?"
-                + "id=" + user.getId() + "&"
-                + "token=" + token;
+            + "http://localhost:8080/auth/verify?"
+            + "id=" + user.getId() + "&"
+            + "token=" + token;
 
         emailService.sendEmail(user.getEmail(), subject, body);
     }
 
     @Transactional
     public boolean verifyUser(String userId, String token) {
-        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).orElse(null);
+        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).get();
 
         // TODO: 각 조건에 대한 예외 처리
         if (userVerifyToken == null ||
-                userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
-                userVerifyToken.isUsed() ||
-                userVerifyToken.getUser().getId().equals(userId) == false) {
+            userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
+            userVerifyToken.isUsed() ||
+            userVerifyToken.getUser().getId().equals(userId) == false) {
             return false;
         }
 
@@ -119,12 +119,12 @@ public class AuthService {
 
         String token = generateToken();
         userVerifyTokenRepository.save(
-                new UserVerifyToken(
-                        user,
-                        token,
-                        LocalDateTime.now().plusDays(1),
-                        false
-                )
+            new UserVerifyToken(
+                user,
+                token,
+                LocalDateTime.now().plusDays(1),
+                false
+            )
         );
 
         sendResetPasswordEmail(user, token);
@@ -134,21 +134,21 @@ public class AuthService {
     private void sendResetPasswordEmail(User user, String token) {
         String subject = "[Pathbook] 비밀번호 재설정 이메일 인증";
         String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-                + "http://localhost:8080/auth/reset-password-form?"
-                + "id=" + user.getId() + "&"
-                + "token=" + token;
+            + "http://localhost:8080/auth/reset-password-form?"
+            + "id=" + user.getId() + "&"
+            + "token=" + token;
 
         emailService.sendEmail(user.getEmail(), subject, body);
     }
 
     @Transactional
     public boolean resetPassword(String userId, String token, String newpassword) {
-        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).orElse(null);
+        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).get();
 
         if (userVerifyToken == null ||
-                userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
-                userVerifyToken.isUsed() ||
-                userVerifyToken.getUser().getId().equals(userId) == false) {
+            userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
+            userVerifyToken.isUsed() ||
+            userVerifyToken.getUser().getId().equals(userId) == false) {
             return false;
         }
         User user = userVerifyToken.getUser();
@@ -181,6 +181,7 @@ public class AuthService {
         return tokenBuilder.toString();
     }
 
+
     public boolean handleLogin(String email, String password) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
@@ -192,7 +193,7 @@ public class AuthService {
             lockStatus = new AccountLockStatus(user.getId());
         }
 
-        if(lockStatus.isLocked()){
+        if (lockStatus.isLocked()) {
             return false;
         }
 
@@ -201,22 +202,21 @@ public class AuthService {
             lockStatus.setFailedAttempts(0);
             accountLockStatusRepository.save(lockStatus);
             return true;
-        }
-        else{
+        } else {
             lockStatus.setFailedAttempts(lockStatus.getFailedAttempts() + 1);
 
-            if(lockStatus.getFailedAttempts() >= 5){
+            if (lockStatus.getFailedAttempts() >= 5) {
                 lockStatus.setLocked(true);
 
                 String token = generateToken();
 
                 userVerifyTokenRepository.save(
-                        new UserVerifyToken(
-                                user,
-                                token,
-                                LocalDateTime.now().plusDays(1),
-                                false
-                        )
+                    new UserVerifyToken(
+                        user,
+                        token,
+                        LocalDateTime.now().plusDays(1),
+                        false
+                    )
                 );
                 sendResetPasswordEmail(user, token);
             }
