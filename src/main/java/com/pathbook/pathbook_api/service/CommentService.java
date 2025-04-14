@@ -23,9 +23,9 @@ public class CommentService {
 
     public Comment addComment(CommentRequest request) {
         Comment comment = new Comment(
-                request.getPostId(),
-                request.getAuthorId(),
-                request.getContent()
+                request.postId(),
+                request.authorId(),
+                request.content()
         );
         return commentRepository.save(comment);
     }
