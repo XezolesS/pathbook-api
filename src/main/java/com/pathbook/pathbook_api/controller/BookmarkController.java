@@ -36,11 +36,11 @@ public class BookmarkController {
         }
     }
 
-    @DeleteMapping("/remove/{postId}")
-    public ResponseEntity<?> removeBookmark(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
+    @DeleteMapping("/delete/{postId}")
+    public ResponseEntity<?> deleteBookmark(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
         try {
-            bookmarkService.removeBookmark(user.getId(), postId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Bookmark removed");
+            bookmarkService.deleteBookmark(user.getId(), postId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Bookmark deleted.");
         } catch (BookmarkNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
         }

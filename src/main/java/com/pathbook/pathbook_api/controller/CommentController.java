@@ -34,11 +34,11 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentListByPostId(postId));
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<Comment> saveComment(
+    @PostMapping("/write")
+    public ResponseEntity<Comment> writeComment(
             @AuthenticationPrincipal UserPrincipal user,
             @RequestBody CommentRequest request) {
-        Comment resultComment = commentService.saveComment(
+        Comment resultComment = commentService.writeComment(
                 user.getId(),
                 request.postId(),
                 request.content());
@@ -53,8 +53,8 @@ public class CommentController {
             @RequestBody CommentRequest request) {
         try {
             Comment resultComment = commentService.updateComment(
-                    user.getId(),
                     commentId,
+                    user.getId(),
                     request.content());
 
             return ResponseEntity.ok(resultComment);
@@ -65,12 +65,12 @@ public class CommentController {
         }
     }
 
-    @DeleteMapping("/remove/{commentId}")
-    public ResponseEntity<?> removeComment(
+    @DeleteMapping("/delete/{commentId}")
+    public ResponseEntity<?> deleteComment(
             @AuthenticationPrincipal UserPrincipal user,
             @PathVariable Long commentId) {
         try {
-            commentService.removeComment(user.getId(), commentId);
+            commentService.deleteComment(user.getId(), commentId);
             return ResponseEntity.ok().build();
         } catch (CommentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);

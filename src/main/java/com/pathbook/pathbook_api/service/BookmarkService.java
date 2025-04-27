@@ -29,7 +29,7 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void removeBookmark(String userId, Long postId) {
+    public void deleteBookmark(String userId, Long postId) {
         if (!bookmarkRepository.existsByUserIdAndPostId(userId, postId)) {
             throw new BookmarkNotFoundException(userId, postId);
         }

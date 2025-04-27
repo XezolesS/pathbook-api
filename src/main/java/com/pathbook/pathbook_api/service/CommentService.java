@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pathbook.pathbook_api.entity.Comment;
 import com.pathbook.pathbook_api.entity.CommentLike;
@@ -11,8 +12,6 @@ import com.pathbook.pathbook_api.exception.CommentNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
 import com.pathbook.pathbook_api.repository.CommentLikeRepository;
 import com.pathbook.pathbook_api.repository.CommentRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class CommentService {
@@ -28,13 +27,13 @@ public class CommentService {
         return commentRepository.findAllByPostId(postId);
     }
 
-    public Comment saveComment(String authorId, Long postId, String content) {
+    public Comment writeComment(String authorId, Long postId, String content) {
         Comment comment = new Comment(authorId, postId, content);
         return commentRepository.save(comment);
     }
 
     @Transactional
-    public Comment updateComment(String authorId, Long commentId, String newContent) {
+    public Comment updateComment(Long commentId, String authorId, String newContent) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
 
@@ -49,7 +48,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void removeComment(String authorId, Long commentId) {
+    public void deleteComment(String authorId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
 
