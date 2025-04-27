@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .clearAuthentication(true)
             )
+            .userDetailsService(userDetailsService())
             .build();
     }
 

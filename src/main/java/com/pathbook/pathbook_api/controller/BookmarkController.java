@@ -1,20 +1,23 @@
 package com.pathbook.pathbook_api.controller;
 
-import com.pathbook.pathbook_api.entity.Bookmark;
-import com.pathbook.pathbook_api.entity.Post;
-import com.pathbook.pathbook_api.entity.User;
-import com.pathbook.pathbook_api.repository.UserRepository;
-import com.pathbook.pathbook_api.repository.PostRepository;
-import com.pathbook.pathbook_api.service.BookmarkService;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.entity.Bookmark;
+import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
+import com.pathbook.pathbook_api.exception.BookmarkNotExistsException;
+import com.pathbook.pathbook_api.service.BookmarkService;
 
 @RestController
 @RequestMapping("/bookmark")
@@ -23,75 +26,30 @@ public class BookmarkController {
     @Autowired
     private BookmarkService bookmarkService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
     @PostMapping("/add/{postId}")
-    public ResponseEntity<?> addBookmark(@PathVariable Long postId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-
-        Optional<Post> post = findPostById(postId);
-        if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Post not found"));
+    public ResponseEntity<?> addBookmark(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
+        try {
+            Bookmark bookmark = bookmarkService.addBookmark(user.getId(), postId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookmark);
+        } catch (BookmarkAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e);
         }
-
-        Bookmark bookmark = bookmarkService.addBookmark(postId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookmark);
     }
 
     @DeleteMapping("/remove/{postId}")
-    public ResponseEntity<?> removeBookmark(@PathVariable Long postId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-
-        Optional<Post> post = findPostById(postId);
-        if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Post not found"));
+    public ResponseEntity<?> removeBookmark(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
+        try {
+            bookmarkService.removeBookmark(user.getId(), postId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Bookmark removed");
+        } catch (BookmarkNotExistsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
         }
-
-        bookmarkService.removeBookmark(postId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Bookmark removed");
     }
 
     @GetMapping("/list/{userId}")
     public ResponseEntity<?> getBookmarks(@PathVariable String userId) {
-        Optional<User> user = findUserById(userId);
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("User not found"));
-        }
-
-        List<Bookmark> bookmarks = bookmarkService.getBookmarksByUser(user.get());
+        List<Bookmark> bookmarks = bookmarkService.getBookmarksByUserId(userId);
         return ResponseEntity.ok(bookmarks);
     }
 
-    private Optional<User> findUserById(String userId) {
-        return userRepository.findById(userId);
-    }
-
-    private Optional<Post> findPostById(Long postId) {
-        return postRepository.findById(postId);
-    }
-
-    public static class ErrorResponse {
-        private String message;
-
-        public ErrorResponse(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-    }
 }
