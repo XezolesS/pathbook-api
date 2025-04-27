@@ -1,17 +1,18 @@
 package com.pathbook.pathbook_api.service;
 
-import com.pathbook.pathbook_api.dto.CommentRequest;
-import com.pathbook.pathbook_api.entity.Comment;
-import com.pathbook.pathbook_api.entity.UserCommentLike;
-import com.pathbook.pathbook_api.repository.CommentRepository;
-import com.pathbook.pathbook_api.repository.UserCommentLikeRepository;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pathbook.pathbook_api.entity.Comment;
+import com.pathbook.pathbook_api.entity.CommentLike;
+import com.pathbook.pathbook_api.exception.CommentNotFoundException;
+import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.repository.CommentLikeRepository;
+import com.pathbook.pathbook_api.repository.CommentRepository;
+
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class CommentService {
@@ -20,52 +21,54 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     @Autowired
-    private UserCommentLikeRepository userCommentLikeRepository;
+    private CommentLikeRepository commentLikeRepository;
 
-    public List<Comment> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
+    public List<Comment> getCommentListByPostId(Long postId) {
+        // TODO: postId Validation
+        return commentRepository.findAllByPostId(postId);
     }
 
-    public Comment addComment(CommentRequest request) {
-        Comment comment = new Comment(
-                request.postId(),
-                request.authorId(),
-                request.content()
-        );
+    public Comment saveComment(String authorId, Long postId, String content) {
+        Comment comment = new Comment(authorId, postId, content);
         return commentRepository.save(comment);
     }
 
     @Transactional
-    public Comment updateComment(Long commentId, String newContent) {
+    public Comment updateComment(String authorId, Long commentId, String newContent) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
+
+        if (!comment.getAuthorId().equals(authorId)) {
+            throw new UnauthorizedAccessException(
+                    String.format("User %s has no access to comment %d", authorId, commentId));
+        }
+
         comment.setContent(newContent);
-        comment.setUpdatedAt(LocalDateTime.now());
+
         return commentRepository.save(comment);
     }
 
-    public void deleteComment(Long commentId) {
+    @Transactional
+    public void removeComment(String authorId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
+
+        if (!comment.getAuthorId().equals(authorId)) {
+            throw new UnauthorizedAccessException(
+                    String.format("User %s has no access to comment %d", authorId, commentId));
+        }
+
         commentRepository.deleteById(commentId);
     }
 
-    @Transactional
-    public void likeComment(String userId, Long commentId, boolean like) {
-        // user_comment_like 테이블 업데이트
-        UserCommentLike userCommentLike = userCommentLikeRepository.findByUserIdAndCommentId(userId, commentId)
-                .orElse(new UserCommentLike(userId, commentId, false));
-
-        if (userCommentLike.isLike() == like) {
-            return;
-        }
-
-        userCommentLike.setLike(like);
-        userCommentLikeRepository.save(userCommentLike);
-
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
-
-        int likeChange = like ? 1 : -1; // 좋아요 추가 시 +1, 취소 시 -1
-        comment.setLikes(comment.getLikes() + likeChange);
-        commentRepository.save(comment);
+    public void likeComment(String userId, Long commentId) {
+        CommentLike commentLike = new CommentLike(userId, commentId);
+        commentLikeRepository.save(commentLike);
     }
+
+    @Transactional
+    public void unlikeComment(String userId, Long commentId) {
+        commentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
+    }
+
 }

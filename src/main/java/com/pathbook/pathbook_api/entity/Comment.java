@@ -1,7 +1,14 @@
 package com.pathbook.pathbook_api.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "comment")
@@ -11,45 +18,45 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "author_id", length = 32, nullable = false)
+    private String authorId;
+
     @Column(name = "post_id", nullable = false)
     private Long postId;
-
-    @Column(name = "author_id", nullable = false, length = 32)
-    private String authorId;
 
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "likes", nullable = false)
-    private int likes = 0;
-
-    protected Comment() {}
-
-    public Comment(Long postId, String authorId, String content) {
-        this.postId = postId;
-        this.authorId = authorId;
-        this.content = content;
-        this.createdAt = LocalDateTime.now();
-        this.likes = 0;
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // Getters
+    protected Comment() {
+    }
+
+    public Comment(String authorId, Long postId, String content) {
+        this.authorId = authorId;
+        this.postId = postId;
+        this.content = content;
+    }
+
     public Long getId() {
         return id;
     }
 
-    public Long getPostId() {
-        return postId;
-    }
-
     public String getAuthorId() {
         return authorId;
+    }
+
+    public Long getPostId() {
+        return postId;
     }
 
     public String getContent() {
@@ -64,10 +71,6 @@ public class Comment {
         return updatedAt;
     }
 
-    public int getLikes() {
-        return likes;
-    }
-
     public void setContent(String content) {
         this.content = content;
     }
@@ -76,11 +79,4 @@ public class Comment {
         this.updatedAt = updatedAt;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
-    }
-
-    public void increaseLikes() {
-        this.likes += 1;
-    }
 }
