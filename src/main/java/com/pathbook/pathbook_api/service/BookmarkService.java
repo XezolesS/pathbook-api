@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pathbook.pathbook_api.entity.Bookmark;
 import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
-import com.pathbook.pathbook_api.exception.BookmarkNotExistsException;
+import com.pathbook.pathbook_api.exception.BookmarkNotFoundException;
 import com.pathbook.pathbook_api.repository.BookmarkRepository;
 
 @Service
@@ -31,7 +31,7 @@ public class BookmarkService {
     @Transactional
     public void removeBookmark(String userId, Long postId) {
         if (!bookmarkRepository.existsByUserIdAndPostId(userId, postId)) {
-            throw new BookmarkNotExistsException(userId, postId);
+            throw new BookmarkNotFoundException(userId, postId);
         }
 
         bookmarkRepository.deleteByUserIdAndPostId(userId, postId);

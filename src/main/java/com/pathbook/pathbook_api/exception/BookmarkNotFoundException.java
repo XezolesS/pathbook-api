@@ -1,11 +1,11 @@
 package com.pathbook.pathbook_api.exception;
 
-public class BookmarkNotExistsException extends RecordNotExistsException {
+public class BookmarkNotFoundException extends RecordNotFoundException {
 
     private final String userId;
     private final Long postId;
 
-    public BookmarkNotExistsException(String userId, Long postId) {
+    public BookmarkNotFoundException(String userId, Long postId) {
         super(String.format("User %s is not bookmarked post %d", userId, postId));
 
         this.userId = userId;

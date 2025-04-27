@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.entity.Bookmark;
 import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
-import com.pathbook.pathbook_api.exception.BookmarkNotExistsException;
+import com.pathbook.pathbook_api.exception.BookmarkNotFoundException;
 import com.pathbook.pathbook_api.service.BookmarkService;
 
 @RestController
@@ -41,7 +41,7 @@ public class BookmarkController {
         try {
             bookmarkService.removeBookmark(user.getId(), postId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Bookmark removed");
-        } catch (BookmarkNotExistsException e) {
+        } catch (BookmarkNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
         }
     }
