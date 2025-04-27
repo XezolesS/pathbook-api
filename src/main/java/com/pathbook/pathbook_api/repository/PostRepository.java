@@ -1,15 +1,8 @@
 package com.pathbook.pathbook_api.repository;
 
-import java.util.Optional;
-
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.pathbook.pathbook_api.entity.Post;
 
-@Repository
-public interface PostRepository extends CrudRepository<Post, Long> {
-
-    Optional<Post> findById(Long id);
-
+public interface PostRepository extends JpaRepository<Post, Long> {
 }
