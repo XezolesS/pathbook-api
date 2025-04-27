@@ -19,3 +19,9 @@ CREATE TABLE IF NOT EXISTS `user_verify_token` (
         ON DELETE CASCADE,
     INDEX `idx_expires_at` (`expires_at`)
 );
+
+CREATE TABLE IF NOT EXISTS 'account_lock_status' (
+    user_id VARCHAR(32) NOT NULL PRIMARY KEY,
+    failed_attempts INT NOT NULL DEFAULT 0,
+    is_locked BOOLEAN NOT NULL DEFAULT FALSE
+);
