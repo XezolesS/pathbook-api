@@ -24,13 +24,23 @@ import com.pathbook.pathbook_api.service.PathbookUserDetailsService;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final String[] permitAllPatterns = {
+        "/auth/login",
+        "/auth/register",
+        "/auth/verify",
+        
+        "/post/{id}",
+
+        "/comment/list/{postId}",
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .csrf(csrf -> csrf.disable())
             .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/auth/login", "/auth/register", "/auth/verify").permitAll()
+                .requestMatchers(permitAllPatterns).permitAll()
                 .anyRequest().authenticated()
             )
             .logout(logout -> logout
@@ -40,6 +50,7 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .clearAuthentication(true)
             )
+            .userDetailsService(userDetailsService())
             .build();
     }
 

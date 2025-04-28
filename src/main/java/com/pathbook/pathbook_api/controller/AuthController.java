@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pathbook.pathbook_api.dto.LoginRequest;
 import com.pathbook.pathbook_api.dto.RegisterRequest;
+import com.pathbook.pathbook_api.dto.ResetPasswordRequest;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.service.AuthService;
 
@@ -42,6 +44,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         try {
+            // TODO: 계정 잠금 로직 변경, 실패 시 반환 코드 변경 (403)
+            boolean loginSuccess = authService.handleLogin(loginRequest.email(), loginRequest.password());
+            if (loginSuccess == false) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid email or password, account is locked");
+            }
+
             Authentication authenticationRequest = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.email(),
@@ -74,9 +83,8 @@ public class AuthController {
                 registerRequest.id(),
                 registerRequest.username(),
                 registerRequest.email(),
-                encodedPassword
-            );
-    
+                encodedPassword);
+
             if (userAdded) {
                 return new ResponseEntity<>("Successfully registered.", HttpStatus.OK);
             } else {
@@ -95,8 +103,8 @@ public class AuthController {
     // 유저 로그인 디버그용
     @PreAuthorize("hasAuthority('ROLE_USER')")
     @GetMapping("/user")
-    public ResponseEntity<?> getUser(HttpServletRequest request) {
-        return ResponseEntity.ok("User authenticated successfully.");
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(userPrincipal);
     }
 
     @GetMapping("/verify")
@@ -106,6 +114,37 @@ public class AuthController {
             return new ResponseEntity<>("Successfully verified.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Failed to verify.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        // TODO: GET 리퀘스트에선 페이지 표시
+        boolean result = authService.sendResetPasswordEmail(userPrincipal.getEmail());
+        if (result) {
+            return new ResponseEntity<>("Successfully sent", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Failed to send email.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+        @RequestBody ResetPasswordRequest resetPasswordRequest,
+        @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        // TODO: GET 리퀘스트에선 페이지 표시
+        boolean result = authService.resetPassword(
+            userPrincipal.getId(),
+            resetPasswordRequest.token(),
+            resetPasswordRequest.newPassword()
+        );
+
+        if (result) {
+            return new ResponseEntity<>("Successfully reset password.", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Failed to send reset password.", HttpStatus.BAD_REQUEST);
         }
     }
 
