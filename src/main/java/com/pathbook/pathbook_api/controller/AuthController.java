@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pathbook.pathbook_api.dto.ForgotPasswordRequest;
 import com.pathbook.pathbook_api.dto.LoginRequest;
 import com.pathbook.pathbook_api.dto.RegisterRequest;
 import com.pathbook.pathbook_api.dto.ResetPasswordRequest;
@@ -42,37 +43,36 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request,
+            HttpServletResponse response) {
         try {
             // TODO: 계정 잠금 로직 변경, 실패 시 반환 코드 변경 (403)
             boolean loginSuccess = authService.handleLogin(loginRequest.email(), loginRequest.password());
             if (loginSuccess == false) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid email or password, account is locked");
+                        .body("Invalid email or password, account is locked");
             }
 
             Authentication authenticationRequest = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    loginRequest.email(),
-                    loginRequest.password()
-                )
-            );
-    
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.email(),
+                            loginRequest.password()));
+
             // 세션 생성
             SecurityContextHolder.getContext().setAuthentication(authenticationRequest);
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-            
+
             UserPrincipal userPrincipal = (UserPrincipal) authenticationRequest.getPrincipal();
-    
+
             return new ResponseEntity<>(userPrincipal, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Invalid email or password");
+                    .body("Invalid email or password");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Authentication failed: " + e.getMessage());
-        } 
+                    .body("Authentication failed: " + e.getMessage());
+        }
     }
 
     @PostMapping("/register")
@@ -80,10 +80,10 @@ public class AuthController {
         try {
             String encodedPassword = passwordEncoder.encode(registerRequest.password());
             boolean userAdded = authService.addUser(
-                registerRequest.id(),
-                registerRequest.username(),
-                registerRequest.email(),
-                encodedPassword);
+                    registerRequest.id(),
+                    registerRequest.username(),
+                    registerRequest.email(),
+                    encodedPassword);
 
             if (userAdded) {
                 return new ResponseEntity<>("Successfully registered.", HttpStatus.OK);
@@ -108,39 +108,38 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> getVerify(@RequestParam String id, @RequestParam String token) {
-        boolean verified = authService.verifyUser(id, token);
-        if (verified) {
-            return new ResponseEntity<>("Successfully verified.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Failed to verify.", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> getVerify(@RequestParam String token) {
+        try {
+            authService.verifyUserEmail(token);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        boolean result = authService.sendResetPasswordEmail(userPrincipal.getEmail());
-        if (result) {
-            return new ResponseEntity<>("Successfully sent", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Failed to send email.", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        try {
+            authService.requestPasswordReset(forgotPasswordRequest.email());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(
-        @RequestBody ResetPasswordRequest resetPasswordRequest,
-        @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        boolean result = authService.resetPassword(
-            userPrincipal.getId(),
-            resetPasswordRequest.token(),
-            resetPasswordRequest.newPassword()
-        );
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        try {
+            String encodedPassword = passwordEncoder.encode(resetPasswordRequest.newPassword());
+            authService.resetPassword(
+                    resetPasswordRequest.token(),
+                    encodedPassword);
 
-        if (result) {
-            return new ResponseEntity<>("Successfully reset password.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Failed to send reset password.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
