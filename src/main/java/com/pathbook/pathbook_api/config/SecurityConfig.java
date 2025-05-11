@@ -25,45 +25,43 @@ import com.pathbook.pathbook_api.service.PathbookUserDetailsService;
 public class SecurityConfig {
 
     private final String[] permitAllPatterns = {
-        "/auth/login",
-        "/auth/register",
-        "/auth/verify",
-        "/auth/forgot-password",
-        "/auth/reset-password",
-        
-        "/post/{id}",
+            "/auth/login",
+            "/auth/register",
+            "/auth/verify",
+            "/auth/forgot-password",
+            "/auth/reset-password",
 
-        "/comment/list/{postId}",
+            "/post/{id}",
+
+            "/comment/list/{postId}",
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(csrf -> csrf.disable())
-            .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
-            .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers(permitAllPatterns).permitAll()
-                .anyRequest().authenticated()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/auth/logout")
-                .logoutSuccessHandler(logoutSuccessHandler())
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .clearAuthentication(true)
-            )
-            .userDetailsService(userDetailsService())
-            .build();
+                .csrf(csrf -> csrf.disable())
+                .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(permitAllPatterns).permitAll()
+                        .anyRequest().authenticated())
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessHandler(logoutSuccessHandler())
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .clearAuthentication(true))
+                .userDetailsService(userDetailsService())
+                .build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(
-        UserDetailsService userDetailsService,
-        PasswordEncoder passwordEncoder) {
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
-        
+
         return new ProviderManager(authenticationProvider);
     }
 
@@ -90,7 +88,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        //Make the below setting as * to allow connection from any host
+        // Make the below setting as * to allow connection from any host
         corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST"));
         corsConfiguration.setAllowCredentials(true);

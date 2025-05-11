@@ -1,3 +1,5 @@
 package com.pathbook.pathbook_api.dto;
 
-public record LoginRequest(String email, String password) {}
+public record LoginRequest(String email, String password) {
+
+}

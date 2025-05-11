@@ -72,7 +72,7 @@ public class EmailVerificationJwt extends JwtBase {
             if (isNotBefore(body, now)) {
                 throw new PrematureJwtException(jws.getHeader(), body, "Token cannot be used yet");
             }
-            
+
             this.userId = body.get("uid", String.class);
             this.email = body.get("email", String.class);
         } catch (JwtException e) {

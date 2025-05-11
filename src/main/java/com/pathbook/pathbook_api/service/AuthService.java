@@ -36,9 +36,9 @@ public class AuthService {
      * 사용자를 데이터베이스에 추가합니다.
      * 동시에 사용자 인증을 위한 이메일도 전송합니다.
      * 
-     * @param id 사용자 ID.
+     * @param id       사용자 ID.
      * @param username 사용자 이름.
-     * @param email 사용자 이메일.
+     * @param email    사용자 이메일.
      * @param password 사용자 비밀번호. 암호화된 비밀번호만 저장해야 합니다.
      * 
      * @return 성공적으로 추가된 경우는 true, 실패한 경우는 false.
@@ -78,7 +78,7 @@ public class AuthService {
             // Suggest: MissingTokenException, InvalidTokenException
             throw new RuntimeException("Token is missing required claims");
         }
-        
+
         // TODO: 토큰 사용 여부 검증
 
         User user = userRepository.findById(userId)
@@ -109,7 +109,7 @@ public class AuthService {
     @Transactional
     public void resetPassword(String token, String newPassword) {
         ResetPasswordJwt resetPasswordJwt = new ResetPasswordJwt();
-        
+
         try {
             resetPasswordJwt.verify(token);
         } catch (ExpiredJwtException ex) {
@@ -119,20 +119,20 @@ public class AuthService {
         } catch (JwtException ex) {
             throw ex;
         }
-        
+
         String userId = resetPasswordJwt.getUserId();
 
         if (userId == null) {
             throw new RuntimeException("userId is null");
         }
-        
+
         // TODO: 토큰 사용 여부 검증
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + userId));
-        
+
         user.setPassword(newPassword);
-        
+
         AccountLockStatus lockStatus = accountLockStatusRepository.findByUserId(user.getId());
         if (lockStatus == null) {
             lockStatus = new AccountLockStatus(user.getId());
@@ -182,20 +182,20 @@ public class AuthService {
     /**
      * 사용자 인증을 위한 이메일을 전송합니다.
      * 
-     * @param user 사용자 엔티티.
+     * @param user  사용자 엔티티.
      * @param token 인증 토큰.
      */
     private void sendVerificationEmail(User user) {
         EmailVerificationJwt emailVerificationJwt = new EmailVerificationJwt(
-            user.getId(),
-            user.getEmail());
+                user.getId(),
+                user.getEmail());
         String token = emailVerificationJwt.buildToken();
 
         String subject = "[Pathbook] 회원가입 이메일 인증";
         String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-            + "http://localhost:8080/auth/verify?"
-            + "token=" + token;
-        
+                + "http://localhost:8080/auth/verify?"
+                + "token=" + token;
+
         emailService.sendEmail(user.getEmail(), subject, body);
     }
 
@@ -205,8 +205,8 @@ public class AuthService {
 
         String subject = "[Pathbook] 비밀번호 재설정 이메일 인증";
         String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-            + "http://localhost:8080/auth/reset-password-form?"
-            + "token=" + token;
+                + "http://localhost:8080/auth/reset-password-form?"
+                + "token=" + token;
 
         emailService.sendEmail(user.getEmail(), subject, body);
     }
