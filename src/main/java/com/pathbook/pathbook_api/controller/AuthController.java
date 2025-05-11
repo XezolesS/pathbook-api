@@ -117,10 +117,8 @@ public class AuthController {
         }
     }
 
-    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        // TODO: GET 리퀘스트에선 페이지 표시
         boolean result = authService.sendResetPasswordEmail(userPrincipal.getEmail());
         if (result) {
             return new ResponseEntity<>("Successfully sent", HttpStatus.OK);
@@ -129,12 +127,10 @@ public class AuthController {
         }
     }
 
-    @PreAuthorize("hasAuthority('ROLE_USER')")
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(
         @RequestBody ResetPasswordRequest resetPasswordRequest,
         @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        // TODO: GET 리퀘스트에선 페이지 표시
         boolean result = authService.resetPassword(
             userPrincipal.getId(),
             resetPasswordRequest.token(),

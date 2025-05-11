@@ -28,6 +28,8 @@ public class SecurityConfig {
         "/auth/login",
         "/auth/register",
         "/auth/verify",
+        "/auth/forgot-password",
+        "/auth/reset-password",
         
         "/post/{id}",
 
