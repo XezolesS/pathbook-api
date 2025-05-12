@@ -1,19 +1,20 @@
 package com.pathbook.pathbook_api.service;
 
-import java.time.LocalDateTime;
-import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.pathbook.pathbook_api.entity.User;
-import com.pathbook.pathbook_api.entity.UserVerifyToken;
-import com.pathbook.pathbook_api.repository.UserRepository;
-import com.pathbook.pathbook_api.repository.UserVerifyTokenRepository;
 import com.pathbook.pathbook_api.entity.AccountLockStatus;
+import com.pathbook.pathbook_api.entity.User;
+import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.jwt.EmailVerificationJwt;
+import com.pathbook.pathbook_api.jwt.ResetPasswordJwt;
 import com.pathbook.pathbook_api.repository.AccountLockStatusRepository;
+import com.pathbook.pathbook_api.repository.UserRepository;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.PrematureJwtException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -21,9 +22,6 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserVerifyTokenRepository userVerifyTokenRepository;
 
     @Autowired
     private EmailService emailService;
@@ -34,13 +32,19 @@ public class AuthService {
     @Autowired
     private AccountLockStatusRepository accountLockStatusRepository;
 
+    @Autowired
+    private EmailVerificationJwt emailVerificationJwt;
+
+    @Autowired
+    private ResetPasswordJwt resetPasswordJwt;
+
     /**
      * 사용자를 데이터베이스에 추가합니다.
      * 동시에 사용자 인증을 위한 이메일도 전송합니다.
      * 
-     * @param id 사용자 ID.
+     * @param id       사용자 ID.
      * @param username 사용자 이름.
-     * @param email 사용자 이메일.
+     * @param email    사용자 이메일.
      * @param password 사용자 비밀번호. 암호화된 비밀번호만 저장해야 합니다.
      * 
      * @return 성공적으로 추가된 경우는 true, 실패한 경우는 false.
@@ -53,134 +57,97 @@ public class AuthService {
 
         User user = new User(id, username, email, password, false);
         User savedUser = userRepository.save(user);
-        String token = generateToken();
 
-        // 토큰 저장
-        userVerifyTokenRepository.save(
-            new UserVerifyToken(
-                savedUser,
-                token,
-                LocalDateTime.now().plusDays(1),
-                false
-            )
-        );
-
-        // 이메일 전송
-        sendVerificationEmail(savedUser, token);
+        sendVerificationEmail(savedUser);
 
         return true;
     }
 
-    /**
-     * 사용자 인증을 위한 이메일을 전송합니다.
-     * 
-     * @param user 사용자 엔티티.
-     * @param token 인증 토큰.
-     */
-    private void sendVerificationEmail(User user, String token) {
-        String subject = "[Pathbook] 회원가입 이메일 인증";
-        String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-            + "http://localhost:8080/auth/verify?"
-            + "id=" + user.getId() + "&"
-            + "token=" + token;
-        
-        emailService.sendEmail(user.getEmail(), subject, body);
-    }
-
     @Transactional
-    public boolean verifyUser(String userId, String token) {
-        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).get();
-
-        // TODO: 각 조건에 대한 예외 처리
-        if (userVerifyToken == null || 
-            userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
-            userVerifyToken.isUsed() ||
-            userVerifyToken.getUser().getId().equals(userId) == false) {
-            return false;
+    public void verifyUserEmail(String token) {
+        try {
+            emailVerificationJwt.verify(token);
+        } catch (ExpiredJwtException ex) {
+            throw ex;
+        } catch (PrematureJwtException ex) {
+            throw ex;
+        } catch (JwtException ex) {
+            throw ex;
         }
-        
-        User user = userVerifyToken.getUser();
+
+        String userId = emailVerificationJwt.getUserId();
+        String email = emailVerificationJwt.getEmail();
+
+        if (userId == null || email == null) {
+            // Suggest: MissingTokenException, InvalidTokenException
+            throw new RuntimeException("Token is missing required claims");
+        }
+
+        // TODO: 토큰 사용 여부 검증
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + userId));
+
+        if (!user.getEmail().equals(email)) {
+            // Suggest: EmailMismatchException
+            throw new RuntimeException("Email is not matched");
+        }
+
+        // TODO: Check if the email is already verified
 
         user.setVerified(true);
         userRepository.save(user);
-
-        userVerifyToken.setUsed(true);
-        userVerifyTokenRepository.save(userVerifyToken);
-
-        return true;
     }
 
     @Transactional
-    public boolean sendResetPasswordEmail(String email) {
+    public void requestPasswordReset(String email) {
         User user = userRepository.findByEmail(email);
+
         if (user == null) {
-            return false;
+            throw new UserNotFoundException("Cannot find user with email " + email);
         }
 
-        String token = generateToken();
-        userVerifyTokenRepository.save(
-            new UserVerifyToken(
-                user,
-                token,
-                LocalDateTime.now().plusDays(1),
-                false
-            )
-        );
-
-        sendResetPasswordEmail(user, token);
-        return true;
-    }
-
-    private void sendResetPasswordEmail(User user, String token) {
-        String subject = "[Pathbook] 비밀번호 재설정 이메일 인증";
-        String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-            + "http://localhost:8080/auth/reset-password-form?"
-            + "id=" + user.getId() + "&"
-            + "token=" + token;
-
-        emailService.sendEmail(user.getEmail(), subject, body);
+        sendResetPasswordEmail(user);
     }
 
     @Transactional
-    public boolean resetPassword(String userId, String token, String newpassword) {
-        UserVerifyToken userVerifyToken = userVerifyTokenRepository.findById(token).get();
+    public void resetPassword(String token, String newPassword) {
+        ResetPasswordJwt resetPasswordJwt = new ResetPasswordJwt();
 
-        if (userVerifyToken == null ||
-            userVerifyToken.getExpiresAt().isBefore(LocalDateTime.now()) ||
-            userVerifyToken.isUsed() ||
-            userVerifyToken.getUser().getId().equals(userId) == false) {
-            return false;
+        try {
+            resetPasswordJwt.verify(token);
+        } catch (ExpiredJwtException ex) {
+            throw ex;
+        } catch (PrematureJwtException ex) {
+            throw ex;
+        } catch (JwtException ex) {
+            throw ex;
         }
-        User user = userVerifyToken.getUser();
-        user.setPassword(passwordEncoder.encode(newpassword));
-        userVerifyToken.setUsed(true);
+
+        String userId = resetPasswordJwt.getUserId();
+
+        if (userId == null) {
+            throw new RuntimeException("userId is null");
+        }
+
+        // TODO: 토큰 사용 여부 검증
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + userId));
+
+        user.setPassword(newPassword);
 
         AccountLockStatus lockStatus = accountLockStatusRepository.findByUserId(user.getId());
         if (lockStatus == null) {
             lockStatus = new AccountLockStatus(user.getId());
         }
+
         lockStatus.setLocked(true);
         lockStatus.setFailedAttempts(0);
 
         userRepository.save(user);
-        userVerifyTokenRepository.save(userVerifyToken);
         accountLockStatusRepository.save(lockStatus);
-        return true;
     }
-
-    private String generateToken() {
-        // 랜덤 토큰 생성
-        // 임시이므로 추후 필요시에 변경
-        final String tokenChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        Random random = new Random();
-        StringBuilder tokenBuilder = new StringBuilder();
-        while (tokenBuilder.length() < 32) {
-            int randomInt = random.nextInt(tokenChars.length());
-            tokenBuilder.append(tokenChars.charAt(randomInt));
-        }
-        return tokenBuilder.toString();
-    }
-
 
     public boolean handleLogin(String email, String password) {
         // TODO: 로그인 로직 단순화
@@ -209,22 +176,44 @@ public class AuthService {
 
             if (lockStatus.getFailedAttempts() >= 5) {
                 lockStatus.setLocked(true);
-
-                String token = generateToken();
-
-                userVerifyTokenRepository.save(
-                    new UserVerifyToken(
-                        user,
-                        token,
-                        LocalDateTime.now().plusDays(1),
-                        false
-                    )
-                );
-                sendResetPasswordEmail(user, token);
+                sendResetPasswordEmail(user);
             }
             accountLockStatusRepository.save(lockStatus);
             return false;
         }
+    }
+
+    /**
+     * 사용자 인증을 위한 이메일을 전송합니다.
+     * 
+     * @param user  사용자 엔티티.
+     * @param token 인증 토큰.
+     */
+    private void sendVerificationEmail(User user) {
+        String token = emailVerificationJwt
+                .setUserId(user.getId())
+                .setEmail(user.getEmail())
+                .buildToken();
+
+        String subject = "[Pathbook] 회원가입 이메일 인증";
+        String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
+                + "http://localhost:8080/auth/verify?"
+                + "token=" + token;
+
+        emailService.sendEmail(user.getEmail(), subject, body);
+    }
+
+    private void sendResetPasswordEmail(User user) {
+        String token = resetPasswordJwt
+                .setUserId(user.getId())
+                .buildToken();
+
+        String subject = "[Pathbook] 비밀번호 재설정 이메일 인증";
+        String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
+                + "http://localhost:8080/auth/reset-password-form?"
+                + "token=" + token;
+
+        emailService.sendEmail(user.getEmail(), subject, body);
     }
 
 }

@@ -32,9 +32,8 @@ public class PostResponse {
     private List<PostLikeResponse> mapLikes(List<PostLike> postLikes) {
         return postLikes.stream()
                 .map(likes -> new PostLikeResponse(
-                    Hibernate.unproxy(likes.getUser(), User.class),
-                    likes.getCreatedAt()
-                ))
+                        Hibernate.unproxy(likes.getUser(), User.class),
+                        likes.getCreatedAt()))
                 .toList();
     }
 

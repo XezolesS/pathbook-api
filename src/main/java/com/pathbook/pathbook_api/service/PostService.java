@@ -86,11 +86,7 @@ public class PostService {
 
     @Transactional
     public void unlikePost(String userId, Long postId) {
-        postLikeRepository.delete(new PostLike(
-                userRepository.getReferenceById(userId),
-                postRepository.getReferenceById(postId)
-
-        ));
+        postLikeRepository.deleteByUserIdAndPostId(userId, postId);
     }
 
 }

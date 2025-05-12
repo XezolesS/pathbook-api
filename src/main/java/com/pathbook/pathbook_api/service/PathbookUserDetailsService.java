@@ -10,7 +10,7 @@ import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.repository.UserRepository;
 
 public class PathbookUserDetailsService implements UserDetailsService {
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -23,6 +23,6 @@ public class PathbookUserDetailsService implements UserDetailsService {
         }
 
         return new UserPrincipal(user);
-    } 
+    }
 
 }
