@@ -32,6 +32,12 @@ public class AuthService {
     @Autowired
     private AccountLockStatusRepository accountLockStatusRepository;
 
+    @Autowired
+    private EmailVerificationJwt emailVerificationJwt;
+
+    @Autowired
+    private ResetPasswordJwt resetPasswordJwt;
+
     /**
      * 사용자를 데이터베이스에 추가합니다.
      * 동시에 사용자 인증을 위한 이메일도 전송합니다.
@@ -59,8 +65,6 @@ public class AuthService {
 
     @Transactional
     public void verifyUserEmail(String token) {
-        EmailVerificationJwt emailVerificationJwt = new EmailVerificationJwt();
-
         try {
             emailVerificationJwt.verify(token);
         } catch (ExpiredJwtException ex) {
@@ -186,10 +190,10 @@ public class AuthService {
      * @param token 인증 토큰.
      */
     private void sendVerificationEmail(User user) {
-        EmailVerificationJwt emailVerificationJwt = new EmailVerificationJwt(
-                user.getId(),
-                user.getEmail());
-        String token = emailVerificationJwt.buildToken();
+        String token = emailVerificationJwt
+                .setUserId(user.getId())
+                .setEmail(user.getEmail())
+                .buildToken();
 
         String subject = "[Pathbook] 회원가입 이메일 인증";
         String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
@@ -200,8 +204,9 @@ public class AuthService {
     }
 
     private void sendResetPasswordEmail(User user) {
-        ResetPasswordJwt resetPasswordJwt = new ResetPasswordJwt(user.getId());
-        String token = resetPasswordJwt.buildToken();
+        String token = resetPasswordJwt
+                .setUserId(user.getId())
+                .buildToken();
 
         String subject = "[Pathbook] 비밀번호 재설정 이메일 인증";
         String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"

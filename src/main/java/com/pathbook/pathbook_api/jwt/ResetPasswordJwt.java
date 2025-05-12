@@ -2,6 +2,8 @@ package com.pathbook.pathbook_api.jwt;
 
 import java.util.Date;
 
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -9,6 +11,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.PrematureJwtException;
 
+@Component
 public class ResetPasswordJwt extends JwtBase {
 
     private static final String SUBJECT = "reset-password";
@@ -21,8 +24,9 @@ public class ResetPasswordJwt extends JwtBase {
         super();
     }
 
-    public ResetPasswordJwt(String userId) {
+    public ResetPasswordJwt setUserId(String userId) {
         this.userId = userId;
+        return this;
     }
 
     public String getUserId() {

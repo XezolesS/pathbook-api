@@ -2,6 +2,8 @@ package com.pathbook.pathbook_api.jwt;
 
 import java.util.Date;
 
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -9,6 +11,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.PrematureJwtException;
 
+@Component
 public class EmailVerificationJwt extends JwtBase {
 
     private static final String SUBJECT = "verify-email";
@@ -22,13 +25,18 @@ public class EmailVerificationJwt extends JwtBase {
         super();
     }
 
-    public EmailVerificationJwt(String userId, String email) {
+    public EmailVerificationJwt setUserId(String userId) {
         this.userId = userId;
-        this.email = email;
+        return this;
     }
 
     public String getUserId() {
         return userId;
+    }
+
+    public EmailVerificationJwt setEmail(String email) {
+        this.email = email;
+        return this;
     }
 
     public String getEmail() {
