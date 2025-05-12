@@ -1,7 +1,9 @@
 package com.pathbook.pathbook_api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,7 +45,9 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> postLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request,
+    public ResponseEntity<?> postLogin(
+            @RequestBody LoginRequest loginRequest,
+            HttpServletRequest request,
             HttpServletResponse response) {
         try {
             // TODO: 계정 잠금 로직 변경, 실패 시 반환 코드 변경 (403)
@@ -62,6 +66,15 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authenticationRequest);
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
+            // 로그인 여부 쿠키 생성
+            ResponseCookie loggedInCookie = ResponseCookie.from("logged_in", "1")
+                    .path("/")
+                    .maxAge(24 * 60 * 60) // 24 hours
+                    .sameSite("Lax")
+                    .build();
+
+            response.addHeader(HttpHeaders.SET_COOKIE, loggedInCookie.toString());
 
             UserPrincipal userPrincipal = (UserPrincipal) authenticationRequest.getPrincipal();
 
@@ -93,11 +106,6 @@ public class AuthController {
         } catch (Exception e) {
             return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> postLogout(HttpServletRequest request) {
-        return ResponseEntity.ok("Logout");
     }
 
     // 유저 로그인 디버그용

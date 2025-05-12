@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .logoutSuccessHandler(logoutSuccessHandler())
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .deleteCookies("logged_in")
                         .clearAuthentication(true))
                 .userDetailsService(userDetailsService())
                 .build();
