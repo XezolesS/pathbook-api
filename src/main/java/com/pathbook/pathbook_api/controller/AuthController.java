@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.controller;
 
+import com.pathbook.pathbook_api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.dto.ForgotPasswordRequest;
-import com.pathbook.pathbook_api.dto.LoginRequest;
-import com.pathbook.pathbook_api.dto.RegisterRequest;
-import com.pathbook.pathbook_api.dto.ResetPasswordRequest;
-import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -147,6 +143,19 @@ public class AuthController {
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/reset-username")
+    public ResponseEntity<?> resetUsername(@RequestBody ResetUsernameRequest resetUsernameRequest) {
+        try{
+            authService.resetUsername(resetUsernameRequest.email(),
+                    resetUsernameRequest.newUsername());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch(Exception e){
             return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

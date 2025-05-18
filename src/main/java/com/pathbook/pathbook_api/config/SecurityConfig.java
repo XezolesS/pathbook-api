@@ -30,6 +30,7 @@ public class SecurityConfig {
             "/auth/verify",
             "/auth/forgot-password",
             "/auth/reset-password",
+            "/auth/reset-username",
 
             "/post/{id}",
 

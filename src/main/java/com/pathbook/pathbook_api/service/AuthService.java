@@ -149,6 +149,16 @@ public class AuthService {
         accountLockStatusRepository.save(lockStatus);
     }
 
+    @Transactional
+    public void resetUsername(String email, String newUsername) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("Cannot find user with email " + email);
+        }
+        user.setUsername(newUsername);
+        userRepository.save(user);
+    }
+
     public boolean handleLogin(String email, String password) {
         // TODO: 로그인 로직 단순화
         // FIXME: 비밀번호 실패 5회 째, 계정 잠금처리에 문제가 있어보임. (500 코드 반환)
