@@ -34,6 +34,8 @@ public class SecurityConfig {
             "/post/{id}",
 
             "/comment/list/{postId}",
+
+            "/proxy/**"
     };
 
     @Bean
