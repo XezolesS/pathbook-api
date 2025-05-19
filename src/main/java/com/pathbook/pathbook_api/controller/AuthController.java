@@ -135,7 +135,7 @@ public class AuthController {
         }
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("/delete-user")
     public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
          try {
             authService.deleteUser(userPrincipal.getId());
