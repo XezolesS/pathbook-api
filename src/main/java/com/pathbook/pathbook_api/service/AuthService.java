@@ -100,6 +100,24 @@ public class AuthService {
     }
 
     @Transactional
+    public void changeUsername(String id, String newUsername) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + id));
+
+        user.setUsername(newUsername);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + id));
+
+        // TODO: Soft deletion
+        userRepository.delete(user);
+    }
+
+    @Transactional
     public void requestPasswordReset(String email) {
         User user = userRepository.findByEmail(email);
 

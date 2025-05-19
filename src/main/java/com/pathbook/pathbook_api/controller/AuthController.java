@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,9 @@ import com.pathbook.pathbook_api.dto.ForgotPasswordRequest;
 import com.pathbook.pathbook_api.dto.LoginRequest;
 import com.pathbook.pathbook_api.dto.RegisterRequest;
 import com.pathbook.pathbook_api.dto.ResetPasswordRequest;
+import com.pathbook.pathbook_api.dto.ChangeUsernameRequest;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.exception.UserNotFoundException;
 import com.pathbook.pathbook_api.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -113,6 +116,36 @@ public class AuthController {
     @GetMapping("/user")
     public ResponseEntity<?> getUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(userPrincipal);
+    }
+
+    @PostMapping("/change-username")
+    public ResponseEntity<?> changeUsername(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody ChangeUsernameRequest resetUsernameRequest) {
+        try {
+            authService.changeUsername(
+                    userPrincipal.getId(),
+                    resetUsernameRequest.newUsername());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/")
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+         try {
+            authService.deleteUser(userPrincipal.getId());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/verify")
