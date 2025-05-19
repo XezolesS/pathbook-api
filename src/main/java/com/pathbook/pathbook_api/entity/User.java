@@ -48,10 +48,6 @@ public class User {
         this.verified = verified;
     }
 
-    public void withdraw(){
-        this.email = null;
-    }
-
     public String getId() {
         return this.id;
     }

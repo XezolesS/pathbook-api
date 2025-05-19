@@ -1,6 +1,5 @@
 package com.pathbook.pathbook_api.controller;
 
-import com.pathbook.pathbook_api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,8 +13,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.pathbook.pathbook_api.dto.ForgotPasswordRequest;
+import com.pathbook.pathbook_api.dto.LoginRequest;
+import com.pathbook.pathbook_api.dto.RegisterRequest;
+import com.pathbook.pathbook_api.dto.ResetPasswordRequest;
+import com.pathbook.pathbook_api.dto.ChangeUsernameRequest;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.exception.UserNotFoundException;
 import com.pathbook.pathbook_api.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -106,6 +118,36 @@ public class AuthController {
         return ResponseEntity.ok(userPrincipal);
     }
 
+    @PostMapping("/change-username")
+    public ResponseEntity<?> changeUsername(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody ChangeUsernameRequest resetUsernameRequest) {
+        try {
+            authService.changeUsername(
+                    userPrincipal.getId(),
+                    resetUsernameRequest.newUsername());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/")
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+         try {
+            authService.deleteUser(userPrincipal.getId());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/verify")
     public ResponseEntity<?> getVerify(@RequestParam String token) {
         try {
@@ -140,25 +182,6 @@ public class AuthController {
         } catch (Exception e) {
             return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @PostMapping("/reset-username")
-    public ResponseEntity<?> resetUsername(@RequestBody ResetUsernameRequest resetUsernameRequest) {
-        try{
-            authService.resetUsername(resetUsernameRequest.email(),
-                    resetUsernameRequest.newUsername());
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        catch(Exception e){
-            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @DeleteMapping("/withdraw")
-    public ResponseEntity<?> withdraw(@RequestParam String id) {
-        authService.withdrawUser(id);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
