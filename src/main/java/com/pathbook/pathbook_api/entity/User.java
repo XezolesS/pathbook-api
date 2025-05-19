@@ -56,6 +56,10 @@ public class User {
         return this.username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getEmail() {
         return this.email;
     }
@@ -64,20 +68,16 @@ public class User {
         return this.password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public boolean isVerified() {
         return this.verified;
     }
 
     public void setVerified(boolean verified) {
         this.verified = verified;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
 }
