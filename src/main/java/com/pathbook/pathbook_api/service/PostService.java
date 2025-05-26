@@ -26,6 +26,7 @@ public class PostService {
 
     @Autowired
     private PostLikeRepository postLikeRepository;
+
     @Autowired
     private PostReportService postReportService;
 

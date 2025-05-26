@@ -100,7 +100,7 @@ public class PostController {
     @PostMapping("/report/{postId}")
     public ResponseEntity<?> reportPost(@RequestBody PostReportRequest request){
         postReportService.reportPost(request.postId(), request.reporterId(), request.reason(), request.detailReason());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Post Reported successfully.");
     }
 
 }

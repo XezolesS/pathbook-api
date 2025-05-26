@@ -30,7 +30,7 @@ public class PostReportService {
                 .orElseThrow(() -> new IllegalArgumentException("Reporter not found"));
 
         if(postReportRepository.existsByPostAndReporter(post, reporter)) {
-            throw new IllegalArgumentException("Post already exists");
+            throw new IllegalArgumentException("Post already reported");
         }
 
         PostReport report = new PostReport(post, reporter, reason, detailReason);

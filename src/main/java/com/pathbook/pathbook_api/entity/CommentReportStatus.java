@@ -6,11 +6,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "post_report_status")
-public class PostReportStatus {
+@Table(name = "comment_report_status")
+public class CommentReportStatus {
 
     @Id
-    private Long postId;
+    private Long commentId;
 
     @Column(nullable = false)
     private int reportCount = 0;
@@ -18,10 +18,11 @@ public class PostReportStatus {
     @Column(nullable = false)
     private boolean hidden = false;
 
-    protected PostReportStatus() {}
+    protected CommentReportStatus() {
+    }
 
-    public PostReportStatus(long postId) {
-        this.postId = postId;
+    public CommentReportStatus(Long commentId) {
+        this.commentId = commentId;
     }
 
     public int getReportCount() {
@@ -39,4 +40,5 @@ public class PostReportStatus {
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
+
 }
