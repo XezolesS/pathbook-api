@@ -16,8 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.pathbook.pathbook_api.dto.ImageDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
-import com.pathbook.pathbook_api.dto.UserResponse;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.response.UserResponse;
 import com.pathbook.pathbook_api.service.UserService;
 
 @RestController

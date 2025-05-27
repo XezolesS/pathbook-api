@@ -1,4 +1,4 @@
-package com.pathbook.pathbook_api.dto;
+package com.pathbook.pathbook_api.request;
 
 public record CommentRequest(Long postId, String content) {
 

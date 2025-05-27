@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.dto.ForgotPasswordRequest;
-import com.pathbook.pathbook_api.dto.LoginRequest;
-import com.pathbook.pathbook_api.dto.RegisterRequest;
-import com.pathbook.pathbook_api.dto.ResetPasswordRequest;
-import com.pathbook.pathbook_api.dto.ChangeUsernameRequest;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.request.ChangeUsernameRequest;
+import com.pathbook.pathbook_api.request.ForgotPasswordRequest;
+import com.pathbook.pathbook_api.request.LoginRequest;
+import com.pathbook.pathbook_api.request.RegisterRequest;
+import com.pathbook.pathbook_api.request.ResetPasswordRequest;
 import com.pathbook.pathbook_api.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;

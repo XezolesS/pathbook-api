@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pathbook.pathbook_api.dto.ImageDto;
-import com.pathbook.pathbook_api.dto.UserResponse;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
 import com.pathbook.pathbook_api.repository.UserRepository;
+import com.pathbook.pathbook_api.response.UserResponse;
 
 @Service
 public class UserService {

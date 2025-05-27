@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.pathbook.pathbook_api.dto.PostRequest;
-import com.pathbook.pathbook_api.dto.PostResponse;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.request.PostRequest;
+import com.pathbook.pathbook_api.response.PostResponse;
 import com.pathbook.pathbook_api.service.PostService;
 
 @Controller
