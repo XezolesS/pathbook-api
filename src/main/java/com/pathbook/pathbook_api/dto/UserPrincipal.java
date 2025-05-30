@@ -15,12 +15,14 @@ public class UserPrincipal implements UserDetails {
     private String username;
     private String password;
     private String email;
+    private boolean verified;
 
     public UserPrincipal(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.email = user.getEmail();
+        this.verified = user.isVerified();
     }
 
     public String getId() {
@@ -39,6 +41,10 @@ public class UserPrincipal implements UserDetails {
 
     public String getEmail() {
         return email;
+    }
+
+    public boolean IsVerified() {
+        return verified;
     }
 
     @Override
