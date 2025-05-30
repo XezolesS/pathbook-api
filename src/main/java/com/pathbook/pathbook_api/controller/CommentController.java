@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.dto.CommentRequest;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.entity.Comment;
 import com.pathbook.pathbook_api.exception.CommentNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.request.CommentRequest;
 import com.pathbook.pathbook_api.service.CommentService;
 
 @RestController

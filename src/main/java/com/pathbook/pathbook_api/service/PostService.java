@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pathbook.pathbook_api.dto.PostResponse;
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostLike;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
@@ -14,6 +13,7 @@ import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
 import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
 import com.pathbook.pathbook_api.repository.UserRepository;
+import com.pathbook.pathbook_api.response.PostResponse;
 
 @Service
 public class PostService {

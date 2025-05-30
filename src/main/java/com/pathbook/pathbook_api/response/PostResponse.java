@@ -1,4 +1,4 @@
-package com.pathbook.pathbook_api.dto;
+package com.pathbook.pathbook_api.response;
 
 import java.time.LocalDateTime;
 import java.util.List;

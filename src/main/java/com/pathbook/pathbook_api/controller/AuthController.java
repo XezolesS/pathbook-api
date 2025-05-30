@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,13 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.dto.ForgotPasswordRequest;
-import com.pathbook.pathbook_api.dto.LoginRequest;
-import com.pathbook.pathbook_api.dto.RegisterRequest;
-import com.pathbook.pathbook_api.dto.ResetPasswordRequest;
-import com.pathbook.pathbook_api.dto.ChangeUsernameRequest;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.request.ChangeUsernameRequest;
+import com.pathbook.pathbook_api.request.ForgotPasswordRequest;
+import com.pathbook.pathbook_api.request.LoginRequest;
+import com.pathbook.pathbook_api.request.RegisterRequest;
+import com.pathbook.pathbook_api.request.ResetPasswordRequest;
+import com.pathbook.pathbook_api.response.UserResponse;
 import com.pathbook.pathbook_api.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -80,8 +80,13 @@ public class AuthController {
             response.addHeader(HttpHeaders.SET_COOKIE, loggedInCookie.toString());
 
             UserPrincipal userPrincipal = (UserPrincipal) authenticationRequest.getPrincipal();
+            UserResponse userResponse = new UserResponse(
+                    userPrincipal.getId(),
+                    userPrincipal.getUsername(),
+                    userPrincipal.getEmail(),
+                    userPrincipal.IsVerified());
 
-            return new ResponseEntity<>(userPrincipal, HttpStatus.OK);
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Invalid email or password");
@@ -111,11 +116,19 @@ public class AuthController {
         }
     }
 
-    // 유저 로그인 디버그용
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    @GetMapping("/user")
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(userPrincipal);
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        try {
+            UserResponse userResponse = new UserResponse(
+                    userPrincipal.getId(),
+                    userPrincipal.getUsername(),
+                    userPrincipal.getEmail(),
+                    userPrincipal.IsVerified());
+
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/change-username")
@@ -137,7 +150,7 @@ public class AuthController {
 
     @DeleteMapping("/delete-user")
     public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-         try {
+        try {
             authService.deleteUser(userPrincipal.getId());
 
             return new ResponseEntity<>(HttpStatus.OK);
