@@ -22,7 +22,13 @@ public class CommentService {
     @Autowired
     private CommentLikeRepository commentLikeRepository;
 
-    public List<Comment> getCommentListByPostId(Long postId) {
+    @Autowired
+    private CommentReportService commentReportService;
+
+    public List<Comment> getCommentListByPostId(Long postId, Long commentId) {
+        if(commentReportService.isCommentHidden(commentId)) {
+            throw new UnauthorizedAccessException("You are not authorized to view this comment");
+        }
         // TODO: postId Validation
         return commentRepository.findAllByPostId(postId);
     }

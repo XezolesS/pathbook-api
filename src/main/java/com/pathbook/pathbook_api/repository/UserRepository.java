@@ -7,5 +7,4 @@ import com.pathbook.pathbook_api.entity.User;
 public interface UserRepository extends JpaRepository<User, String> {
 
     User findByEmail(String email);
-
 }

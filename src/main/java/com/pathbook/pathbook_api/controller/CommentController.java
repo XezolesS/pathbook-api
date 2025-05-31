@@ -2,6 +2,8 @@ package com.pathbook.pathbook_api.controller;
 
 import java.util.List;
 
+import com.pathbook.pathbook_api.dto.CommentReportRequest;
+import com.pathbook.pathbook_api.service.CommentReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +31,12 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private CommentReportService commentReportService;
+
     @GetMapping("/list/{postId}")
     public ResponseEntity<List<Comment>> getCommentList(@PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.getCommentListByPostId(postId));
+        return ResponseEntity.ok(commentService.getCommentListByPostId(postId, commentId));
     }
 
     @PostMapping("/write")
@@ -95,4 +100,9 @@ public class CommentController {
         return ResponseEntity.ok("Unliked successfully.");
     }
 
+    @PostMapping("/report/{commentId}")
+    public ResponseEntity<?> reportComment(@RequestBody CommentReportRequest request) {
+        commentReportService.reportComment(request.commentId(),request.reporterId(),request.reason(),request.detailReason());
+        return ResponseEntity.ok("Comment Reported successfully.");
+    }
 }
