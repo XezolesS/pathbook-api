@@ -2,18 +2,14 @@ package com.pathbook.pathbook_api.controller;
 
 import java.util.List;
 
+import com.pathbook.pathbook_api.dto.PostReportRequest;
+import com.pathbook.pathbook_api.service.PostReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
@@ -28,6 +24,9 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private PostReportService postReportService;
 
     @GetMapping("/list")
     public ResponseEntity<?> getPostList() {
@@ -96,6 +95,12 @@ public class PostController {
             @PathVariable Long postId) {
         postService.unlikePost(user.getId(), postId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/report/{postId}")
+    public ResponseEntity<?> reportPost(@RequestBody PostReportRequest request){
+        postReportService.reportPost(request.postId(), request.reporterId(), request.reason(), request.detailReason());
+        return ResponseEntity.ok("Post Reported successfully.");
     }
 
 }

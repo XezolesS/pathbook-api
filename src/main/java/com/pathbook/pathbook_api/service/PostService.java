@@ -27,6 +27,9 @@ public class PostService {
     @Autowired
     private PostLikeRepository postLikeRepository;
 
+    @Autowired
+    private PostReportService postReportService;
+
     // TODO: Pagination
     @Transactional(readOnly = true)
     public List<PostResponse> getPostList() {
@@ -39,6 +42,10 @@ public class PostService {
     public PostResponse getPost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
+
+        if(postReportService.isPostHidden(postId)) {
+            throw new UnauthorizedAccessException("You are not authorized to view this post");
+        }
 
         return new PostResponse(post);
     }
