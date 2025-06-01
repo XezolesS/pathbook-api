@@ -1,9 +1,5 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,35 +8,38 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 public class User {
-    
     @Id
     @Column(name = "id", length = 32, nullable = false)
     private String id;
-    
+
     @Column(name = "username", length = 32, nullable = false)
     private String username;
-    
+
     @Column(name = "email", length = 320, nullable = false, unique = true)
     private String email;
-    
+
     @Column(name = "password", length = 255, nullable = false)
     private String password;
-    
+
     @Column(name = "verified")
     private boolean verified;
-    
+
     // TODO: 아이콘과 배너는 DB가 아닌 스토리지에 저장하는 것이 더 좋음.
     // 추후 컬럼은 Path로 변경하고, 파일 시스템을 구현!
     @Lob
     @Column(name = "icon", length = 16 * 1024 * 1024)
     private byte[] icon;
-    
+
     @Column(name = "icon_content_type")
     private String iconContentType;
-    
+
     @Lob
     @Column(name = "banner", length = 16 * 1024 * 1024)
     private byte[] banner;
@@ -54,8 +53,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> likedPosts = new ArrayList<>();
 
-    protected User() {
-    }
+    protected User() {}
 
     public User(String id, String username, String email, String password, boolean verified) {
         this.id = id;
@@ -128,5 +126,4 @@ public class User {
     public void setBannerContentType(String bannerContentType) {
         this.bannerContentType = bannerContentType;
     }
-
 }

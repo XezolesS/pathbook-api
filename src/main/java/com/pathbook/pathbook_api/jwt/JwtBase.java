@@ -1,22 +1,19 @@
 package com.pathbook.pathbook_api.jwt;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.Date;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Value;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.security.Keys;
-
 public abstract class JwtBase {
-
     @Value("${jwt.secret}")
     protected String secret;
 
-    public JwtBase() {
-
-    }
+    public JwtBase() {}
 
     public abstract String buildToken();
 
@@ -35,5 +32,4 @@ public abstract class JwtBase {
         Date notBefore = body.getNotBefore();
         return notBefore != null && notBefore.after(now);
     }
-
 }

@@ -1,7 +1,5 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,10 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-@Entity
-@Table(name = "bookmark", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "post_id" }))
-public class Bookmark {
+import java.time.LocalDateTime;
 
+@Entity
+@Table(
+        name = "bookmark",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"}))
+public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,5 +50,4 @@ public class Bookmark {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
 }

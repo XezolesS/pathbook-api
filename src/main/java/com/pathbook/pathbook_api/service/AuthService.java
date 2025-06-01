@@ -1,9 +1,5 @@
 package com.pathbook.pathbook_api.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.pathbook.pathbook_api.entity.AccountLockStatus;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
@@ -15,38 +11,34 @@ import com.pathbook.pathbook_api.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.PrematureJwtException;
+
 import jakarta.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+    @Autowired private UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private EmailService emailService;
 
-    @Autowired
-    private EmailService emailService;
+    @Autowired private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @Autowired private AccountLockStatusRepository accountLockStatusRepository;
 
-    @Autowired
-    private AccountLockStatusRepository accountLockStatusRepository;
+    @Autowired private EmailVerificationJwt emailVerificationJwt;
 
-    @Autowired
-    private EmailVerificationJwt emailVerificationJwt;
-
-    @Autowired
-    private ResetPasswordJwt resetPasswordJwt;
+    @Autowired private ResetPasswordJwt resetPasswordJwt;
 
     /**
-     * 사용자를 데이터베이스에 추가합니다.
-     * 동시에 사용자 인증을 위한 이메일도 전송합니다.
-     * 
-     * @param id       사용자 ID.
+     * 사용자를 데이터베이스에 추가합니다. 동시에 사용자 인증을 위한 이메일도 전송합니다.
+     *
+     * @param id 사용자 ID.
      * @param username 사용자 이름.
-     * @param email    사용자 이메일.
+     * @param email 사용자 이메일.
      * @param password 사용자 비밀번호. 암호화된 비밀번호만 저장해야 합니다.
-     * 
      * @return 성공적으로 추가된 경우는 true, 실패한 경우는 false.
      */
     @Transactional
@@ -85,8 +77,13 @@ public class AuthService {
 
         // TODO: 토큰 사용 여부 검증
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(
+                                () ->
+                                        new UserNotFoundException(
+                                                "Cannot find user with id: " + userId));
 
         if (!user.getEmail().equals(email)) {
             // Suggest: EmailMismatchException
@@ -101,8 +98,11 @@ public class AuthService {
 
     @Transactional
     public void changeUsername(String id, String newUsername) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + id));
+        User user =
+                userRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new UserNotFoundException("Cannot find user with id: " + id));
 
         user.setUsername(newUsername);
         userRepository.save(user);
@@ -110,8 +110,11 @@ public class AuthService {
 
     @Transactional
     public void deleteUser(String id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + id));
+        User user =
+                userRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new UserNotFoundException("Cannot find user with id: " + id));
 
         // TODO: Soft deletion
         userRepository.delete(user);
@@ -150,8 +153,13 @@ public class AuthService {
 
         // TODO: 토큰 사용 여부 검증
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Cannot find user with id: " + userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(
+                                () ->
+                                        new UserNotFoundException(
+                                                "Cannot find user with id: " + userId));
 
         user.setPassword(newPassword);
 
@@ -203,35 +211,34 @@ public class AuthService {
 
     /**
      * 사용자 인증을 위한 이메일을 전송합니다.
-     * 
-     * @param user  사용자 엔티티.
+     *
+     * @param user 사용자 엔티티.
      * @param token 인증 토큰.
      */
     private void sendVerificationEmail(User user) {
-        String token = emailVerificationJwt
-                .setUserId(user.getId())
-                .setEmail(user.getEmail())
-                .buildToken();
+        String token =
+                emailVerificationJwt.setUserId(user.getId()).setEmail(user.getEmail()).buildToken();
 
         String subject = "[Pathbook] 회원가입 이메일 인증";
-        String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-                + "http://localhost:8080/auth/verify?"
-                + "token=" + token;
+        String body =
+                "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
+                        + "http://localhost:8080/auth/verify?"
+                        + "token="
+                        + token;
 
         emailService.sendEmail(user.getEmail(), subject, body);
     }
 
     private void sendResetPasswordEmail(User user) {
-        String token = resetPasswordJwt
-                .setUserId(user.getId())
-                .buildToken();
+        String token = resetPasswordJwt.setUserId(user.getId()).buildToken();
 
         String subject = "[Pathbook] 비밀번호 재설정 이메일 인증";
-        String body = "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
-                + "http://localhost:8080/auth/reset-password-form?"
-                + "token=" + token;
+        String body =
+                "이메일 인증을 위해 아래 링크를 클릭하세요:\n"
+                        + "http://localhost:8080/auth/reset-password-form?"
+                        + "token="
+                        + token;
 
         emailService.sendEmail(user.getEmail(), subject, body);
     }
-
 }

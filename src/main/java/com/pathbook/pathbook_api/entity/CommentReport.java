@@ -1,5 +1,7 @@
 package com.pathbook.pathbook_api.entity;
 
+import com.pathbook.pathbook_api.dto.ReportReason;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +15,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "comment_report")
 public class CommentReport {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

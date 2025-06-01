@@ -1,16 +1,15 @@
 package com.pathbook.pathbook_api.dto;
 
-import java.util.Collection;
-import java.util.Collections;
+import com.pathbook.pathbook_api.entity.User;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.pathbook.pathbook_api.entity.User;
+import java.util.Collection;
+import java.util.Collections;
 
 public class UserPrincipal implements UserDetails {
-
     private String id;
     private String username;
     private String password;
@@ -71,5 +70,4 @@ public class UserPrincipal implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }

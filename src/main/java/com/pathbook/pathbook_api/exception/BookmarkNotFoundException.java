@@ -1,7 +1,6 @@
 package com.pathbook.pathbook_api.exception;
 
 public class BookmarkNotFoundException extends RecordNotFoundException {
-
     private final String userId;
     private final Long postId;
 
@@ -19,5 +18,4 @@ public class BookmarkNotFoundException extends RecordNotFoundException {
     public Long getPostId() {
         return postId;
     }
-
 }

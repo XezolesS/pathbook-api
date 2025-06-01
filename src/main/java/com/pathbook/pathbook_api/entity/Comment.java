@@ -1,7 +1,5 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,10 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "comment")
 public class Comment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,8 +37,7 @@ public class Comment {
         this.updatedAt = LocalDateTime.now();
     }
 
-    protected Comment() {
-    }
+    protected Comment() {}
 
     public Comment(String authorId, Long postId, String content) {
         this.authorId = authorId;
@@ -78,5 +76,4 @@ public class Comment {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }
