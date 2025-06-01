@@ -8,7 +8,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "account_lock_status")
 public class AccountLockStatus {
-
     @Id
     @Column(name = "user_id", length = 32, nullable = false)
     private String userId;
@@ -19,8 +18,7 @@ public class AccountLockStatus {
     @Column(name = "is_locked", nullable = false)
     private boolean isLocked = false;
 
-    protected AccountLockStatus() {
-    }
+    protected AccountLockStatus() {}
 
     public AccountLockStatus(String id) {
         this.userId = id;
@@ -47,5 +45,4 @@ public class AccountLockStatus {
     public void setLocked(boolean locked) {
         isLocked = locked;
     }
-
 }

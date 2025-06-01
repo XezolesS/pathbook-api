@@ -1,7 +1,6 @@
 package com.pathbook.pathbook_api.exception;
 
 public class CommentNotFoundException extends RecordNotFoundException {
-
     private final Long commentId;
 
     public CommentNotFoundException(Long commentId) {
@@ -13,5 +12,4 @@ public class CommentNotFoundException extends RecordNotFoundException {
     public Long getCommentId() {
         return commentId;
     }
-
 }

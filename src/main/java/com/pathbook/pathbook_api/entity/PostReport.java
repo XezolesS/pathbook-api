@@ -1,5 +1,7 @@
 package com.pathbook.pathbook_api.entity;
 
+import com.pathbook.pathbook_api.dto.ReportReason;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,11 +12,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-
 @Entity
 @Table(name = "post_report")
 public class PostReport {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

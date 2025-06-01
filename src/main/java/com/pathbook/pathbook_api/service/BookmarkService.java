@@ -1,21 +1,19 @@
 package com.pathbook.pathbook_api.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.pathbook.pathbook_api.entity.Bookmark;
 import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
 import com.pathbook.pathbook_api.exception.BookmarkNotFoundException;
 import com.pathbook.pathbook_api.repository.BookmarkRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 @Service
 public class BookmarkService {
-
-    @Autowired
-    private BookmarkRepository bookmarkRepository;
+    @Autowired private BookmarkRepository bookmarkRepository;
 
     @Transactional
     public Bookmark addBookmark(String userId, Long postId) {
@@ -40,5 +38,4 @@ public class BookmarkService {
     public List<Bookmark> getBookmarksByUserId(String userId) {
         return bookmarkRepository.findAllByUserId(userId);
     }
-
 }

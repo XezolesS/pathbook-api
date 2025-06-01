@@ -1,7 +1,5 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,10 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "comment_like")
 public class CommentLike {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,8 +25,7 @@ public class CommentLike {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public CommentLike() {
-    }
+    public CommentLike() {}
 
     public CommentLike(String userId, Long commentId) {
         this.userId = userId;
@@ -45,5 +43,4 @@ public class CommentLike {
     public Long getCommentId() {
         return commentId;
     }
-
 }

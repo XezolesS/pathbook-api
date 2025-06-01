@@ -1,7 +1,7 @@
-package com.pathbook.pathbook_api.entity;
+package com.pathbook.pathbook_api.dto;
 
 public enum ReportReason {
-    SPAM,       //도배
+    SPAM,
     ABUSE,
     INAPPROPRIATE_LANGUAGE,
     ADVERTISEMENT,

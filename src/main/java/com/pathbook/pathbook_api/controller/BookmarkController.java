@@ -1,6 +1,10 @@
 package com.pathbook.pathbook_api.controller;
 
-import java.util.List;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.entity.Bookmark;
+import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
+import com.pathbook.pathbook_api.exception.BookmarkNotFoundException;
+import com.pathbook.pathbook_api.service.BookmarkService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,21 +17,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.dto.UserPrincipal;
-import com.pathbook.pathbook_api.entity.Bookmark;
-import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
-import com.pathbook.pathbook_api.exception.BookmarkNotFoundException;
-import com.pathbook.pathbook_api.service.BookmarkService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/bookmark")
 public class BookmarkController {
-
-    @Autowired
-    private BookmarkService bookmarkService;
+    @Autowired private BookmarkService bookmarkService;
 
     @PostMapping("/add/{postId}")
-    public ResponseEntity<?> addBookmark(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
+    public ResponseEntity<?> addBookmark(
+            @AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
         try {
             Bookmark bookmark = bookmarkService.addBookmark(user.getId(), postId);
             return ResponseEntity.status(HttpStatus.CREATED).body(bookmark);
@@ -37,7 +36,8 @@ public class BookmarkController {
     }
 
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<?> deleteBookmark(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
+    public ResponseEntity<?> deleteBookmark(
+            @AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
         try {
             bookmarkService.deleteBookmark(user.getId(), postId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Bookmark deleted.");
@@ -51,5 +51,4 @@ public class BookmarkController {
         List<Bookmark> bookmarks = bookmarkService.getBookmarksByUserId(userId);
         return ResponseEntity.ok(bookmarks);
     }
-
 }

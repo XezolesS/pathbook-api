@@ -1,11 +1,5 @@
 package com.pathbook.pathbook_api.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.pathbook.pathbook_api.entity.Comment;
 import com.pathbook.pathbook_api.entity.CommentLike;
 import com.pathbook.pathbook_api.exception.CommentNotFoundException;
@@ -13,22 +7,21 @@ import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
 import com.pathbook.pathbook_api.repository.CommentLikeRepository;
 import com.pathbook.pathbook_api.repository.CommentRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 @Service
 public class CommentService {
+    @Autowired private CommentRepository commentRepository;
 
-    @Autowired
-    private CommentRepository commentRepository;
+    @Autowired private CommentLikeRepository commentLikeRepository;
 
-    @Autowired
-    private CommentLikeRepository commentLikeRepository;
+    @Autowired private CommentReportService commentReportService;
 
-    @Autowired
-    private CommentReportService commentReportService;
-
-    public List<Comment> getCommentListByPostId(Long postId, Long commentId) {
-        if(commentReportService.isCommentHidden(commentId)) {
-            throw new UnauthorizedAccessException("You are not authorized to view this comment");
-        }
+    public List<Comment> getCommentListByPostId(Long postId) {
         // TODO: postId Validation
         return commentRepository.findAllByPostId(postId);
     }
@@ -40,8 +33,10 @@ public class CommentService {
 
     @Transactional
     public Comment updateComment(Long commentId, String authorId, String newContent) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException(commentId));
+        Comment comment =
+                commentRepository
+                        .findById(commentId)
+                        .orElseThrow(() -> new CommentNotFoundException(commentId));
 
         if (!comment.getAuthorId().equals(authorId)) {
             throw new UnauthorizedAccessException(
@@ -55,8 +50,10 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(String authorId, Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException(commentId));
+        Comment comment =
+                commentRepository
+                        .findById(commentId)
+                        .orElseThrow(() -> new CommentNotFoundException(commentId));
 
         if (!comment.getAuthorId().equals(authorId)) {
             throw new UnauthorizedAccessException(
@@ -75,5 +72,4 @@ public class CommentService {
     public void unlikeComment(String userId, Long commentId) {
         commentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
     }
-
 }

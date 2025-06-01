@@ -1,7 +1,5 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,10 +11,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-@Entity
-@Table(name = "post_like", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "post_id" }) })
-public class PostLike {
+import java.time.LocalDateTime;
 
+@Entity
+@Table(
+        name = "post_like",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id"})})
+public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,8 +33,7 @@ public class PostLike {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public PostLike() {
-    }
+    public PostLike() {}
 
     public PostLike(User user, Post post) {
         this.user = user;
@@ -55,5 +55,4 @@ public class PostLike {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
 }

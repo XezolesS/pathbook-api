@@ -1,9 +1,14 @@
 package com.pathbook.pathbook_api.controller;
 
-import java.util.List;
-
 import com.pathbook.pathbook_api.dto.CommentReportRequest;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.entity.Comment;
+import com.pathbook.pathbook_api.exception.CommentNotFoundException;
+import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.request.CommentRequest;
 import com.pathbook.pathbook_api.service.CommentReportService;
+import com.pathbook.pathbook_api.service.CommentService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,36 +22,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pathbook.pathbook_api.dto.UserPrincipal;
-import com.pathbook.pathbook_api.entity.Comment;
-import com.pathbook.pathbook_api.exception.CommentNotFoundException;
-import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
-import com.pathbook.pathbook_api.request.CommentRequest;
-import com.pathbook.pathbook_api.service.CommentService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
+    @Autowired private CommentService commentService;
 
-    @Autowired
-    private CommentService commentService;
-
-    @Autowired
-    private CommentReportService commentReportService;
+    @Autowired private CommentReportService commentReportService;
 
     @GetMapping("/list/{postId}")
     public ResponseEntity<List<Comment>> getCommentList(@PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.getCommentListByPostId(postId, commentId));
+        return ResponseEntity.ok(commentService.getCommentListByPostId(postId));
     }
 
     @PostMapping("/write")
     public ResponseEntity<Comment> writeComment(
-            @AuthenticationPrincipal UserPrincipal user,
-            @RequestBody CommentRequest request) {
-        Comment resultComment = commentService.writeComment(
-                user.getId(),
-                request.postId(),
-                request.content());
+            @AuthenticationPrincipal UserPrincipal user, @RequestBody CommentRequest request) {
+        Comment resultComment =
+                commentService.writeComment(user.getId(), request.postId(), request.content());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(resultComment);
     }
@@ -57,10 +51,8 @@ public class CommentController {
             @PathVariable Long commentId,
             @RequestBody CommentRequest request) {
         try {
-            Comment resultComment = commentService.updateComment(
-                    commentId,
-                    user.getId(),
-                    request.content());
+            Comment resultComment =
+                    commentService.updateComment(commentId, user.getId(), request.content());
 
             return ResponseEntity.ok(resultComment);
         } catch (CommentNotFoundException e) {
@@ -72,8 +64,7 @@ public class CommentController {
 
     @DeleteMapping("/delete/{commentId}")
     public ResponseEntity<?> deleteComment(
-            @AuthenticationPrincipal UserPrincipal user,
-            @PathVariable Long commentId) {
+            @AuthenticationPrincipal UserPrincipal user, @PathVariable Long commentId) {
         try {
             commentService.deleteComment(user.getId(), commentId);
             return ResponseEntity.ok().build();
@@ -86,23 +77,25 @@ public class CommentController {
 
     @PostMapping("/like/{commentId}")
     public ResponseEntity<String> likeComment(
-            @AuthenticationPrincipal UserPrincipal user,
-            @PathVariable Long commentId) {
+            @AuthenticationPrincipal UserPrincipal user, @PathVariable Long commentId) {
         commentService.likeComment(user.getId(), commentId);
         return ResponseEntity.ok("Liked successfully.");
     }
 
     @PostMapping("/unlike/{commentId}")
     public ResponseEntity<String> unlikeComment(
-            @AuthenticationPrincipal UserPrincipal user,
-            @PathVariable Long commentId) {
+            @AuthenticationPrincipal UserPrincipal user, @PathVariable Long commentId) {
         commentService.unlikeComment(user.getId(), commentId);
         return ResponseEntity.ok("Unliked successfully.");
     }
 
     @PostMapping("/report/{commentId}")
     public ResponseEntity<?> reportComment(@RequestBody CommentReportRequest request) {
-        commentReportService.reportComment(request.commentId(),request.reporterId(),request.reason(),request.detailReason());
+        commentReportService.reportComment(
+                request.commentId(),
+                request.reporterId(),
+                request.reason(),
+                request.detailReason());
         return ResponseEntity.ok("Comment Reported successfully.");
     }
 }

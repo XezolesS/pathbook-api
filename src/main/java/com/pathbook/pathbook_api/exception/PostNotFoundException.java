@@ -1,7 +1,6 @@
 package com.pathbook.pathbook_api.exception;
 
 public class PostNotFoundException extends RecordNotFoundException {
-    
     private final Long postId;
 
     public PostNotFoundException(Long postId) {
@@ -13,5 +12,4 @@ public class PostNotFoundException extends RecordNotFoundException {
     public Long getPostId() {
         return postId;
     }
-
 }
