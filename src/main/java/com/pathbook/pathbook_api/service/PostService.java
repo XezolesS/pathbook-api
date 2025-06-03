@@ -1,19 +1,19 @@
 package com.pathbook.pathbook_api.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.pathbook.pathbook_api.entity.Post;
-import com.pathbook.pathbook_api.entity.PostLike;
+import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.exception.UserNotFoundException;
 import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
 import com.pathbook.pathbook_api.repository.UserRepository;
 import com.pathbook.pathbook_api.response.PostResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class PostService {
@@ -27,66 +27,71 @@ public class PostService {
     @Autowired
     private PostLikeRepository postLikeRepository;
 
-    // TODO: Pagination
     @Transactional(readOnly = true)
     public List<PostResponse> getPostList() {
-        List<Post> postList = postRepository.findAll();
-        return postList.stream()
+        return postRepository.findAll().stream()
                 .map(PostResponse::new)
                 .toList();
     }
 
-    public PostResponse getPost(Long postId) {
+    @Transactional(readOnly = true)
+    public PostResponse getPost(Integer postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
-
         return new PostResponse(post);
     }
 
-    public PostResponse writePost(String authorId, String title, String content) {
-        Post post = new Post(authorId, title, content);
+    @Transactional
+    public PostResponse createPost(String authorId, String title, String content) {
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new UserNotFoundException(authorId));
+        Post post = new Post(author, title, content);
         return new PostResponse(postRepository.save(post));
     }
 
     @Transactional
-    public PostResponse updatePost(Long postId, String authorId, String title, String content) {
+    public PostResponse updatePost(Integer postId, String authorId, String title, String content) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
-        if (!post.getAuthorId().equals(authorId)) {
-            throw new UnauthorizedAccessException(
-                    String.format("User %s has no access to post %d", authorId, postId));
+        if (!post.getAuthor().getId().equals(authorId)) {
+            throw new UnauthorizedAccessException("게시글 수정 권한이 없습니다");
         }
 
         post.setTitle(title);
         post.setContent(content);
+        post.setUpdatedAt(java.time.LocalDateTime.now());
 
         return new PostResponse(postRepository.save(post));
     }
 
     @Transactional
-    public void deletePost(String authorId, Long postId) {
+    public void deletePost(String authorId, Integer postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
-        if (!post.getAuthorId().equals(authorId)) {
-            throw new UnauthorizedAccessException(
-                    String.format("User %s has no access to post %d", authorId, postId));
+        if (!post.getAuthor().getId().equals(authorId)) {
+            throw new UnauthorizedAccessException("게시글 삭제 권한이 없습니다");
         }
 
-        postRepository.deleteById(postId);
+        postRepository.delete(post);
     }
 
     @Transactional
-    public void likePost(String userId, Long postId) {
-        postLikeRepository.save(new PostLike(
-                userRepository.getReferenceById(userId),
-                postRepository.getReferenceById(postId)));
+    public void likePost(String userId, Integer postId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        postLikeRepository.save(new PostLike(user, post));
     }
 
     @Transactional
-    public void unlikePost(String userId, Long postId) {
-        postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+    public void unlikePost(String userId, Integer postId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        postLikeRepository.deleteByUserAndPost(user, post);
     }
-
 }

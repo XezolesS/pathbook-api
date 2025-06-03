@@ -1,0 +1,62 @@
+package com.pathbook.pathbook_api.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "user_post_likes")
+@IdClass(UserPostLikeId.class)
+public class UserPostLike {
+
+    @Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    protected UserPostLike() {}
+
+    public UserPostLike(User user, Post post) {
+        this.user = user;
+        this.post = post;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public UserPostLike(User user, Post post, LocalDateTime createdAt) {
+        this.user = user;
+        this.post = post;
+        this.createdAt = createdAt;
+    }
+
+    // Getter/Setter
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+}

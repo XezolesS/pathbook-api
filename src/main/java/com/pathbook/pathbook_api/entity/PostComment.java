@@ -1,8 +1,10 @@
 package com.pathbook.pathbook_api.entity;
 
 import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,20 +14,21 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "posts")
-public class Post {
+@Table(name = "post_comments")
+public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
-
-    @Column(name = "title", columnDefinition = "TINYTEXT", nullable = false)
-    private String title;
 
     @Lob
     @Column(name = "content", nullable = false)
@@ -37,17 +40,16 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    protected Post() {}
+    protected PostComment() {}
 
-    public Post(User author, String title, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public PostComment(Post post, User author, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.post = post;
         this.author = author;
-        this.title = title;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // Getter/Setter
     public Integer getId() {
         return id;
     }
@@ -56,20 +58,20 @@ public class Post {
         this.id = id;
     }
 
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
     public User getAuthor() {
         return author;
     }
 
     public void setAuthor(User author) {
         this.author = author;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getContent() {

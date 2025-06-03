@@ -4,12 +4,15 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.pathbook.pathbook_api.entity.PostLike;
+import com.pathbook.pathbook_api.entity.UserPostLike;
+import com.pathbook.pathbook_api.entity.UserPostLikeId;
+import com.pathbook.pathbook_api.entity.User;
+import com.pathbook.pathbook_api.entity.Post;
 
-public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
+public interface PostLikeRepository extends JpaRepository<UserPostLike, UserPostLikeId> {
 
-    Optional<PostLike> findByUserIdAndPostId(String userId, Long postId);
+    Optional<UserPostLike> findByUserAndPost(User user, Post post);
 
-    void deleteByUserIdAndPostId(String userId, Long postId);
+    void deleteByUserAndPost(User user, Post post);
 
 }
