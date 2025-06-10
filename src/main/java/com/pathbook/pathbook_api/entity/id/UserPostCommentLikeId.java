@@ -1,15 +1,15 @@
-package com.pathbook.pathbook_api.entity;
+package com.pathbook.pathbook_api.entity.id;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class UserPostCommentReportId implements Serializable {
+public class UserPostCommentLikeId implements Serializable {
     private String user;
     private Integer comment;
 
-    public UserPostCommentReportId() {}
+    public UserPostCommentLikeId() {}
 
-    public UserPostCommentReportId(String user, Integer comment) {
+    public UserPostCommentLikeId(String user, Integer comment) {
         this.user = user;
         this.comment = comment;
     }
@@ -17,10 +17,9 @@ public class UserPostCommentReportId implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserPostCommentReportId)) return false;
-        UserPostCommentReportId that = (UserPostCommentReportId) o;
-        return Objects.equals(user, that.user) &&
-               Objects.equals(comment, that.comment);
+        if (!(o instanceof UserPostCommentLikeId)) return false;
+        UserPostCommentLikeId that = (UserPostCommentLikeId) o;
+        return Objects.equals(user, that.user) && Objects.equals(comment, that.comment);
     }
 
     @Override

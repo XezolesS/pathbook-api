@@ -1,6 +1,7 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
+import com.pathbook.pathbook_api.entity.id.UserPostBookmarkId;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,11 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "user_post_bookmarks")
 @IdClass(UserPostBookmarkId.class)
 public class UserPostBookmark {
-
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

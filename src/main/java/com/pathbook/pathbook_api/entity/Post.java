@@ -1,6 +1,5 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,10 +10,11 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "posts")
 public class Post {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -39,7 +39,12 @@ public class Post {
 
     protected Post() {}
 
-    public Post(User author, String title, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Post(
+            User author,
+            String title,
+            String content,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
         this.author = author;
         this.title = title;
         this.content = content;

@@ -8,7 +8,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "post_paths")
 public class PostPath {
-
     @Id
     @Column(name = "post_id", nullable = false)
     private Integer postId;

@@ -1,7 +1,5 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,10 +11,11 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "post_comments")
 public class PostComment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -42,7 +41,12 @@ public class PostComment {
 
     protected PostComment() {}
 
-    public PostComment(Post post, User author, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public PostComment(
+            Post post,
+            User author,
+            String content,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
         this.post = post;
         this.author = author;
         this.content = content;

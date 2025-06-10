@@ -1,16 +1,16 @@
 package com.pathbook.pathbook_api.entity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @Column(name = "id", length = 33, nullable = false)
     private String id;
@@ -55,7 +55,7 @@ public class User {
     private String sex;
 
     @Column(name = "birth_date")
-    private LocalDate  birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "bio", columnDefinition = "TINYTEXT")
     private String bio;
@@ -68,10 +68,25 @@ public class User {
 
     protected User() {}
 
-    public User(String id, String email, byte[] password, LocalDateTime createdAt, LocalDateTime lastLoginAt,
-                String lastLoginIp, Integer failedLoginAttempts, LocalDateTime accountLockedUntil,
-                Boolean isVerified, Boolean isEnabled, LocalDateTime bannedUntil, String bannedReason,
-                String username, String sex, LocalDate  birthDate, String bio, String iconUrl, String bannerUrl) {
+    public User(
+            String id,
+            String email,
+            byte[] password,
+            LocalDateTime createdAt,
+            LocalDateTime lastLoginAt,
+            String lastLoginIp,
+            Integer failedLoginAttempts,
+            LocalDateTime accountLockedUntil,
+            Boolean isVerified,
+            Boolean isEnabled,
+            LocalDateTime bannedUntil,
+            String bannedReason,
+            String username,
+            String sex,
+            LocalDate birthDate,
+            String bio,
+            String iconUrl,
+            String bannerUrl) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -91,7 +106,8 @@ public class User {
         this.iconUrl = iconUrl;
         this.bannerUrl = bannerUrl;
     }
-public String getId() {
+
+    public String getId() {
         return id;
     }
 
@@ -203,11 +219,11 @@ public String getId() {
         this.sex = sex;
     }
 
-    public LocalDate  getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate  birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -235,4 +251,3 @@ public String getId() {
         this.bannerUrl = bannerUrl;
     }
 }
-    
