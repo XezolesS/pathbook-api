@@ -19,8 +19,8 @@ public class User {
     @Column(name = "email", length = 256, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", columnDefinition = "BINARY(72)", nullable = false)
-    private byte[] password;
+    @Column(name = "password", length = 72, nullable = false)
+    private String password;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -72,38 +72,12 @@ public class User {
     public User(
             String id,
             String email,
-            byte[] password,
-            LocalDateTime lastLoginAt,
-            String lastLoginIp,
-            Integer failedLoginAttempts,
-            LocalDateTime accountLockedUntil,
-            Boolean isVerified,
-            Boolean isEnabled,
-            LocalDateTime bannedUntil,
-            String bannedReason,
-            String username,
-            String sex,
-            LocalDate birthDate,
-            String bio,
-            String iconUrl,
-            String bannerUrl) {
+            String password,
+            String username) {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.lastLoginAt = lastLoginAt;
-        this.lastLoginIp = lastLoginIp;
-        this.failedLoginAttempts = failedLoginAttempts;
-        this.accountLockedUntil = accountLockedUntil;
-        this.isVerified = isVerified;
-        this.isEnabled = isEnabled;
-        this.bannedUntil = bannedUntil;
-        this.bannedReason = bannedReason;
         this.username = username;
-        this.sex = sex;
-        this.birthDate = birthDate;
-        this.bio = bio;
-        this.iconUrl = iconUrl;
-        this.bannerUrl = bannerUrl;
     }
 
     public String getId() {
@@ -122,11 +96,11 @@ public class User {
         this.email = email;
     }
 
-    public byte[] getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(byte[] password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
