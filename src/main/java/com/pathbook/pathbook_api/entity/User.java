@@ -3,6 +3,7 @@ package com.pathbook.pathbook_api.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
@@ -72,7 +73,6 @@ public class User {
             String id,
             String email,
             byte[] password,
-            LocalDateTime createdAt,
             LocalDateTime lastLoginAt,
             String lastLoginIp,
             Integer failedLoginAttempts,
@@ -90,7 +90,6 @@ public class User {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.createdAt = createdAt;
         this.lastLoginAt = lastLoginAt;
         this.lastLoginIp = lastLoginIp;
         this.failedLoginAttempts = failedLoginAttempts;
@@ -249,5 +248,10 @@ public class User {
 
     public void setBannerUrl(String bannerUrl) {
         this.bannerUrl = bannerUrl;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 }

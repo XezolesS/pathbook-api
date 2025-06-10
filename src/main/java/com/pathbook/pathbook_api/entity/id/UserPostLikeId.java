@@ -5,20 +5,26 @@ import java.util.Objects;
 
 public class UserPostLikeId implements Serializable {
     private String user;
-    private Integer post;
+    private Long post;
 
     public UserPostLikeId() {}
 
-    public UserPostLikeId(String user, Integer post) {
+    public UserPostLikeId(String user, Long post) {
         this.user = user;
         this.post = post;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserPostLikeId)) return false;
-        UserPostLikeId that = (UserPostLikeId) o;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof UserPostLikeId)) {
+            return false;
+        }
+
+        UserPostLikeId that = (UserPostLikeId) object;
         return Objects.equals(user, that.user) && Objects.equals(post, that.post);
     }
 
@@ -35,11 +41,11 @@ public class UserPostLikeId implements Serializable {
         this.user = user;
     }
 
-    public Integer getPost() {
+    public Long getPost() {
         return post;
     }
 
-    public void setPost(Integer post) {
+    public void setPost(Long post) {
         this.post = post;
     }
 }

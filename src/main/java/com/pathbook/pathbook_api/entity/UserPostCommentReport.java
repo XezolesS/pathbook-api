@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
@@ -43,7 +44,6 @@ public class UserPostCommentReport {
         this.comment = comment;
         this.reason = reason;
         this.message = message;
-        this.createdAt = LocalDateTime.now();
     }
 
     public UserPostCommentReport(
@@ -85,5 +85,10 @@ public class UserPostCommentReport {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 }

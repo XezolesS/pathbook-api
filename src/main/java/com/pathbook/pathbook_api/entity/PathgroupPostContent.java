@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.UserPostLikeId;
+import com.pathbook.pathbook_api.entity.id.PathgroupPostContentId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,13 +15,13 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_post_likes")
-@IdClass(UserPostLikeId.class)
-public class UserPostLike {
+@Table(name = "pathgroup_post_contents")
+@IdClass(PathgroupPostContentId.class)
+public class PathgroupPostContent {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "pathgroup_id", nullable = false)
+    private Pathgroup pathgroup;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,20 +31,19 @@ public class UserPostLike {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    protected UserPostLike() {}
+    protected PathgroupPostContent() {}
 
-    public UserPostLike(User user, Post post) {
-        this.user = user;
+    public PathgroupPostContent(Pathgroup pathgroup, Post post) {
+        this.pathgroup = pathgroup;
         this.post = post;
     }
 
-    // Getter/Setter
-    public User getUser() {
-        return user;
+    public Pathgroup getPathgroup() {
+        return pathgroup;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPathgroup(Pathgroup pathgroup) {
+        this.pathgroup = pathgroup;
     }
 
     public Post getPost() {
@@ -57,10 +56,6 @@ public class UserPostLike {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     @PrePersist

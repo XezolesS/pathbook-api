@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
@@ -43,24 +44,22 @@ public class UserPostReport {
         this.post = post;
         this.reason = reason;
         this.message = message;
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public UserPostReport(
-            User user, Post post, String reason, String message, LocalDateTime createdAt) {
-        this.user = user;
-        this.post = post;
-        this.reason = reason;
-        this.message = message;
-        this.createdAt = createdAt;
     }
 
     public User getUser() {
         return user;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public Post getPost() {
         return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     public String getReason() {
@@ -81,5 +80,10 @@ public class UserPostReport {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 }

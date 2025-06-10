@@ -15,7 +15,7 @@ public class PostAttachment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
@@ -35,12 +35,8 @@ public class PostAttachment {
         this.contentUrl = contentUrl;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Post getPost() {

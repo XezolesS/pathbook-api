@@ -5,20 +5,26 @@ import java.util.Objects;
 
 public class UserPostCommentReportId implements Serializable {
     private String user;
-    private Integer comment;
+    private Long comment;
 
     public UserPostCommentReportId() {}
 
-    public UserPostCommentReportId(String user, Integer comment) {
+    public UserPostCommentReportId(String user, Long comment) {
         this.user = user;
         this.comment = comment;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserPostCommentReportId)) return false;
-        UserPostCommentReportId that = (UserPostCommentReportId) o;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof UserPostCommentReportId)) {
+            return false;
+        }
+
+        UserPostCommentReportId that = (UserPostCommentReportId) object;
         return Objects.equals(user, that.user) && Objects.equals(comment, that.comment);
     }
 
@@ -35,11 +41,11 @@ public class UserPostCommentReportId implements Serializable {
         this.user = user;
     }
 
-    public Integer getComment() {
+    public Long getComment() {
         return comment;
     }
 
-    public void setComment(Integer comment) {
+    public void setComment(Long comment) {
         this.comment = comment;
     }
 }

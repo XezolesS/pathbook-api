@@ -2,7 +2,6 @@ package com.pathbook.pathbook_api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,24 +15,23 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_comments")
-public class PostComment {
+@Table(name = "post_paths")
+public class Pathgroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
+    @Column(name = "title", columnDefinition = "TINYTEXT", nullable = false)
+    private String title;
+
     @Lob
-    @Column(name = "content", nullable = false)
-    private String content;
+    @Column(name = "description", nullable = false)
+    private String description;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -41,24 +39,16 @@ public class PostComment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    protected PostComment() {}
+    protected Pathgroup() {}
 
-    public PostComment(Post post, User author, String content) {
-        this.post = post;
+    public Pathgroup(User author, String title, String description) {
         this.author = author;
-        this.content = content;
+        this.title = title;
+        this.description = description;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
     }
 
     public User getAuthor() {
@@ -69,12 +59,20 @@ public class PostComment {
         this.author = author;
     }
 
-    public String getContent() {
-        return content;
+    public String getTitle() {
+        return title;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getCreatedAt() {
