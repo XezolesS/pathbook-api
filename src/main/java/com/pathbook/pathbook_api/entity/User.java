@@ -73,16 +73,22 @@ public class User {
     @Column(name = "banner_url", length = 2048)
     private String bannerUrl;
 
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserReport> userReports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reportee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserReport> reported = new ArrayList<>();
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<UserPostLike> postLikes = new ArrayList<>();
-    
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<UserPostBookmark> postBookmarks = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = false)
+
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPostReport> postReports = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
@@ -91,10 +97,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<UserPostLike> commentLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPostReport> commentReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pathgroup> pathgroups = new ArrayList<>();
 
     // endregion
@@ -258,14 +264,22 @@ public class User {
         this.bannerUrl = bannerUrl;
     }
 
+    public List<UserReport> getUserReports() {
+        return userReports;
+    }
+
+    public List<UserReport> getReported() {
+        return reported;
+    }
+
     public List<Post> getPosts() {
         return posts;
     }
-    
+
     public List<UserPostLike> getPostLikes() {
         return postLikes;
     }
-    
+
     public List<UserPostBookmark> getPostBookmarks() {
         return postBookmarks;
     }
