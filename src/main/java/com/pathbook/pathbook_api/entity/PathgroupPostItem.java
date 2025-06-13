@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.PathgroupPostContentId;
+import com.pathbook.pathbook_api.entity.id.PathgroupPostItemId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +15,11 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "pathgroup_post_contents")
-@IdClass(PathgroupPostContentId.class)
-public class PathgroupPostContent {
+@Table(name = "pathgroup_post_items")
+@IdClass(PathgroupPostItemId.class)
+public class PathgroupPostItem {
+    // region Fields
+
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pathgroup_id", nullable = false)
@@ -31,12 +33,20 @@ public class PathgroupPostContent {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    protected PathgroupPostContent() {}
+    // endregion
 
-    public PathgroupPostContent(Pathgroup pathgroup, Post post) {
+    // region Constructors
+
+    protected PathgroupPostItem() {}
+
+    public PathgroupPostItem(Pathgroup pathgroup, Post post) {
         this.pathgroup = pathgroup;
         this.post = post;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public Pathgroup getPathgroup() {
         return pathgroup;
@@ -58,8 +68,14 @@ public class PathgroupPostContent {
         return createdAt;
     }
 
+    // endregion
+
+    // region Events
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    // endregion
 }

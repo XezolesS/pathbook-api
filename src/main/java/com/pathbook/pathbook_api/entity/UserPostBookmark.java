@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 @Table(name = "user_post_bookmarks")
 @IdClass(UserPostBookmarkId.class)
 public class UserPostBookmark {
+    // region Fields
+
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -31,6 +33,10 @@ public class UserPostBookmark {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    // endregion
+
+    // region Constructors
+
     protected UserPostBookmark() {}
 
     public UserPostBookmark(User user, Post post) {
@@ -38,7 +44,10 @@ public class UserPostBookmark {
         this.post = post;
     }
 
-    // Getter/Setter
+    // endregion
+
+    // region Getters & Setters
+
     public User getUser() {
         return user;
     }
@@ -59,8 +68,14 @@ public class UserPostBookmark {
         return createdAt;
     }
 
+    // endregion
+
+    // region Events
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    // endregion
 }

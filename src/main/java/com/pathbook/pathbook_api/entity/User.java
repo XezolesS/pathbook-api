@@ -1,17 +1,23 @@
 package com.pathbook.pathbook_api.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
 public class User {
+    // region Fields
+
     @Id
     @Column(name = "id", length = 33, nullable = false)
     private String id;
@@ -67,18 +73,46 @@ public class User {
     @Column(name = "banner_url", length = 2048)
     private String bannerUrl;
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<UserPostLike> postLikes = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<UserPostBookmark> postBookmarks = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<UserPostReport> postReports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<PostComment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<UserPostLike> commentLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<UserPostReport> commentReports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Pathgroup> pathgroups = new ArrayList<>();
+
+    // endregion
+
+    // region Constructors
+
     protected User() {}
 
-    public User(
-            String id,
-            String email,
-            String password,
-            String username) {
+    public User(String id, String email, String password, String username) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public String getId() {
         return id;
@@ -224,8 +258,50 @@ public class User {
         this.bannerUrl = bannerUrl;
     }
 
+    public List<Post> getPosts() {
+        return posts;
+    }
+    
+    public List<UserPostLike> getPostLikes() {
+        return postLikes;
+    }
+    
+    public List<UserPostBookmark> getPostBookmarks() {
+        return postBookmarks;
+    }
+
+    public List<UserPostReport> getPostReports() {
+        return postReports;
+    }
+
+    public List<PostComment> getComments() {
+        return comments;
+    }
+
+    public List<UserPostLike> getCommentLikes() {
+        return commentLikes;
+    }
+
+    public List<UserPostReport> getCommentReports() {
+        return commentReports;
+    }
+
+    public List<Pathgroup> getPathgroups() {
+        return pathgroups;
+    }
+
+    // endregion
+
+    // region Events
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    // endregion
+
+    // region Helper Methods
+
+    // endregion
 }

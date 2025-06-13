@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 @Table(name = "user_post_reports")
 @IdClass(UserPostReportId.class)
 public class UserPostReport {
+    // region Fields
+
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -37,6 +39,10 @@ public class UserPostReport {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    // endregion
+
+    // region Constructors
+
     protected UserPostReport() {}
 
     public UserPostReport(User user, Post post, String reason, String message) {
@@ -45,6 +51,10 @@ public class UserPostReport {
         this.reason = reason;
         this.message = message;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public User getUser() {
         return user;
@@ -82,8 +92,14 @@ public class UserPostReport {
         return createdAt;
     }
 
+    // endregion
+
+    // region Events
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    // endregion
 }

@@ -2,13 +2,13 @@ package com.pathbook.pathbook_api.entity.id;
 
 import java.util.Objects;
 
-public class PostHasTagId {
+public class PostTagId {
     private Long post;
     private Long tag;
 
-    public PostHasTagId() {}
+    public PostTagId() {}
 
-    public PostHasTagId(Long post, Long tag) {
+    public PostTagId(Long post, Long tag) {
         this.post = post;
         this.tag = tag;
     }
@@ -19,11 +19,11 @@ public class PostHasTagId {
             return true;
         }
 
-        if (!(object instanceof PostHasTagId)) {
+        if (!(object instanceof PostTagId)) {
             return false;
         }
 
-        PostHasTagId that = (PostHasTagId) object;
+        PostTagId that = (PostTagId) object;
         return Objects.equals(post, that.post) && Objects.equals(tag, that.tag);
     }
 

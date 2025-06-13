@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 @Table(name = "user_post_comment_reports")
 @IdClass(UserPostCommentReportId.class)
 public class UserPostCommentReport {
+    // region Fields
+
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -36,6 +38,10 @@ public class UserPostCommentReport {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    // endregion
+
+    // region Constructors
 
     protected UserPostCommentReport() {}
 
@@ -59,12 +65,24 @@ public class UserPostCommentReport {
         this.createdAt = createdAt;
     }
 
+    // endregion
+
+    // region Getters & Setters
+
     public User getUser() {
         return user;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public PostComment getComment() {
         return comment;
+    }
+
+    public void setComment(PostComment comment) {
+        this.comment = comment;
     }
 
     public String getReason() {
@@ -87,8 +105,14 @@ public class UserPostCommentReport {
         return createdAt;
     }
 
+    // endregion
+
+    // region Events
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    // endregion
 }

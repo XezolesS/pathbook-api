@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "post_paths")
 public class PostPath {
+    // region Fields
+
     @OneToOne
     @MapsId
     @JoinColumn(name = "post_id", nullable = false)
@@ -21,6 +23,10 @@ public class PostPath {
     @Column(name = "thumbnail_url", length = 2048)
     private String thumbnailUrl;
 
+    // endregion
+
+    // region Constructors
+
     protected PostPath() {}
 
     public PostPath(Post post, String pathPoints, String thumbnailUrl) {
@@ -28,6 +34,10 @@ public class PostPath {
         this.pathPoints = pathPoints;
         this.thumbnailUrl = thumbnailUrl;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public Post getPost() {
         return post;
@@ -52,4 +62,6 @@ public class PostPath {
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
     }
+
+    // endregion
 }

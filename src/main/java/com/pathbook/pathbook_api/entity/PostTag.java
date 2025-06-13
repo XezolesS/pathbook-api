@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.PostHasTagId;
+import com.pathbook.pathbook_api.entity.id.PostTagId;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.IdClass;
@@ -9,9 +9,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "posts_has_tags")
-@IdClass(PostHasTagId.class)
-public class PostHasTag {
+@Table(name = "post_tags")
+@IdClass(PostTagId.class)
+public class PostTag {
+    // region Fields
+
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
@@ -20,12 +22,20 @@ public class PostHasTag {
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 
-    protected PostHasTag() {}
+    // endregion
 
-    public PostHasTag(Post post, Tag tag) {
+    // region Constructors
+
+    protected PostTag() {}
+
+    public PostTag(Post post, Tag tag) {
         this.post = post;
         this.tag = tag;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public Post getPost() {
         return post;
@@ -42,4 +52,6 @@ public class PostHasTag {
     public void setTag(Tag tag) {
         this.tag = tag;
     }
+
+    // endregion
 }

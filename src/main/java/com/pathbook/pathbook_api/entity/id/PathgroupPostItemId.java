@@ -3,13 +3,13 @@ package com.pathbook.pathbook_api.entity.id;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class PathgroupPostContentId implements Serializable {
+public class PathgroupPostItemId implements Serializable {
     private Long pathgroup;
     private Long post;
 
-    public PathgroupPostContentId() {}
+    public PathgroupPostItemId() {}
 
-    public PathgroupPostContentId(Long pathgroup, Long post) {
+    public PathgroupPostItemId(Long pathgroup, Long post) {
         this.pathgroup = pathgroup;
         this.post = post;
     }
@@ -20,11 +20,11 @@ public class PathgroupPostContentId implements Serializable {
             return true;
         }
 
-        if (!(object instanceof PathgroupPostContentId)) {
+        if (!(object instanceof PathgroupPostItemId)) {
             return false;
         }
 
-        PathgroupPostContentId that = (PathgroupPostContentId) object;
+        PathgroupPostItemId that = (PathgroupPostItemId) object;
         return Objects.equals(pathgroup, that.pathgroup) && Objects.equals(post, that.post);
     }
 

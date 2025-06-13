@@ -12,6 +12,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "post_attachments")
 public class PostAttachment {
+    // region Fields
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -27,6 +29,10 @@ public class PostAttachment {
     @Column(name = "content_url", length = 2048, nullable = false)
     private String contentUrl;
 
+    // endregion
+
+    // region Constructors
+
     protected PostAttachment() {}
 
     public PostAttachment(Post post, String contentType, String contentUrl) {
@@ -34,6 +40,10 @@ public class PostAttachment {
         this.contentType = contentType;
         this.contentUrl = contentUrl;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public Long getId() {
         return id;
@@ -62,4 +72,6 @@ public class PostAttachment {
     public void setContentUrl(String contentUrl) {
         this.contentUrl = contentUrl;
     }
+
+    // endregion
 }

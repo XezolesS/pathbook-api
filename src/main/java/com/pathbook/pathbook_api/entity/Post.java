@@ -22,6 +22,8 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 public class Post {
+    // region Fields
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -45,13 +47,32 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PostPath postPath;
+    private PostPath path;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPostLike> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPostBookmark> bookmarks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPostReport> reports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostAttachment> attachments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostTag> tags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PathgroupPostItem> pathgroupItems = new ArrayList<>();
+
+    // endregion
+
+    // region Constructors
 
     protected Post() {}
 
@@ -60,6 +81,10 @@ public class Post {
         this.title = title;
         this.content = content;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public Long getId() {
         return id;
@@ -97,14 +122,14 @@ public class Post {
         return updatedAt;
     }
 
-    public PostPath getPostPath() {
-        return postPath;
+    public PostPath getPath() {
+        return path;
     }
 
-    public void setPostPath(PostPath postPath) {
-        this.postPath = postPath;
-        if (postPath != null) {
-            postPath.setPost(this);
+    public void setPath(PostPath path) {
+        this.path = path;
+        if (path != null) {
+            path.setPost(this);
         }
     }
 
@@ -112,9 +137,33 @@ public class Post {
         return comments;
     }
 
+    public List<UserPostLike> getLikes() {
+        return likes;
+    }
+
+    public List<UserPostBookmark> getBookmarks() {
+        return bookmarks;
+    }
+
     public List<UserPostReport> getReports() {
         return reports;
     }
+
+    public List<PostAttachment> getAttachments() {
+        return attachments;
+    }
+
+    public List<PostTag> getTags() {
+        return tags;
+    }
+
+    public List<PathgroupPostItem> getPathgroupItems() {
+        return pathgroupItems;
+    }
+
+    // endregion
+
+    // region Events
 
     @PrePersist
     protected void onCreate() {
@@ -127,6 +176,14 @@ public class Post {
         updatedAt = LocalDateTime.now();
     }
 
+    // endregion
+
+    // region Helper Methods
+
+    public boolean hasPath() {
+        return path != null;
+    }
+
     public void addComment(PostComment comment) {
         comments.add(comment);
         comment.setPost(this);
@@ -135,6 +192,39 @@ public class Post {
     public void removeComment(PostComment comment) {
         comments.remove(comment);
         comment.setPost(null);
+    }
+
+    public int getCommentCount() {
+        // TODO: 코멘트 카운트 구현
+        throw new RuntimeException("Not Implemented");
+    }
+
+    public void addLike(UserPostLike like) {
+        likes.add(like);
+        like.setPost(this);
+    }
+
+    public void removeLike(UserPostLike like) {
+        likes.remove(like);
+        like.setPost(null);
+    }
+
+    public int getLikeCount() {
+        return likes.size();
+    }
+
+    public void addBookmark(UserPostBookmark bookmark) {
+        bookmarks.add(bookmark);
+        bookmark.setPost(this);
+    }
+
+    public void removeBookmark(UserPostBookmark bookmark) {
+        bookmarks.remove(bookmark);
+        bookmark.setPost(null);
+    }
+
+    public int getBookmarkCount() {
+        return bookmarks.size();
     }
 
     public void addReport(UserPostReport report) {
@@ -146,4 +236,26 @@ public class Post {
         reports.remove(report);
         report.setPost(null);
     }
+
+    public void addAttachment(PostAttachment attachment) {
+        attachments.add(attachment);
+        attachment.setPost(this);
+    }
+
+    public void removeAttachment(PostAttachment attachment) {
+        attachments.remove(attachment);
+        attachment.setPost(null);
+    }
+
+    public void addPathgroupItem(PathgroupPostItem item) {
+        pathgroupItems.add(item);
+        item.setPost(this);
+    }
+
+    public void removePathgroupItem(PathgroupPostItem item) {
+        pathgroupItems.remove(item);
+        item.setPost(null);
+    }
+
+    // endregion
 }
