@@ -22,8 +22,8 @@ public class UserPostCommentReport {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "reporter_id", nullable = false)
+    private User reporter;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,20 +45,20 @@ public class UserPostCommentReport {
 
     protected UserPostCommentReport() {}
 
-    public UserPostCommentReport(User user, PostComment comment, String reason, String message) {
-        this.user = user;
+    public UserPostCommentReport(User reporter, PostComment comment, String reason, String message) {
+        this.reporter = reporter;
         this.comment = comment;
         this.reason = reason;
         this.message = message;
     }
 
     public UserPostCommentReport(
-            User user,
+            User reporter,
             PostComment comment,
             String reason,
             String message,
             LocalDateTime createdAt) {
-        this.user = user;
+        this.reporter = reporter;
         this.comment = comment;
         this.reason = reason;
         this.message = message;
@@ -69,12 +69,12 @@ public class UserPostCommentReport {
 
     // region Getters & Setters
 
-    public User getUser() {
-        return user;
+    public User getReporter() {
+        return reporter;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setReporter(User reporter) {
+        this.reporter = reporter;
     }
 
     public PostComment getComment() {
