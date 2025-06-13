@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.UserReportId;
+import com.pathbook.pathbook_api.entity.id.PostReportId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +15,9 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_reports")
-@IdClass(UserReportId.class)
-public class UserReport {
+@Table(name = "post_reports")
+@IdClass(PostReportId.class)
+public class PostReport {
     // region Fields
 
     @Id
@@ -27,8 +27,8 @@ public class UserReport {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reportee_id", nullable = false)
-    private User reportee;
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     @Column(name = "reason", columnDefinition = "TINYTEXT", nullable = false)
     private String reason;
@@ -43,11 +43,11 @@ public class UserReport {
 
     // region Constructors
 
-    protected UserReport() {}
+    protected PostReport() {}
 
-    public UserReport(User reporter, User reportee, String reason, String message) {
+    public PostReport(User reporter, Post post, String reason, String message) {
         this.reporter = reporter;
-        this.reportee = reportee;
+        this.post = post;
         this.reason = reason;
         this.message = message;
     }
@@ -64,12 +64,12 @@ public class UserReport {
         this.reporter = reporter;
     }
 
-    public User getReportee() {
-        return reportee;
+    public Post getPost() {
+        return post;
     }
 
-    public void setReportee(User reportee) {
-        this.reportee = reportee;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     public String getReason() {

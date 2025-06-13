@@ -53,13 +53,13 @@ public class Post {
     private List<PostComment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserPostLike> likes = new ArrayList<>();
+    private List<PostLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserPostBookmark> bookmarks = new ArrayList<>();
+    private List<PostBookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserPostReport> reports = new ArrayList<>();
+    private List<PostReport> reports = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostAttachment> attachments = new ArrayList<>();
@@ -137,15 +137,15 @@ public class Post {
         return comments;
     }
 
-    public List<UserPostLike> getLikes() {
+    public List<PostLike> getLikes() {
         return likes;
     }
 
-    public List<UserPostBookmark> getBookmarks() {
+    public List<PostBookmark> getBookmarks() {
         return bookmarks;
     }
 
-    public List<UserPostReport> getReports() {
+    public List<PostReport> getReports() {
         return reports;
     }
 
@@ -199,12 +199,12 @@ public class Post {
         throw new RuntimeException("Not Implemented");
     }
 
-    public void addLike(UserPostLike like) {
+    public void addLike(PostLike like) {
         likes.add(like);
         like.setPost(this);
     }
 
-    public void removeLike(UserPostLike like) {
+    public void removeLike(PostLike like) {
         likes.remove(like);
         like.setPost(null);
     }
@@ -213,12 +213,12 @@ public class Post {
         return likes.size();
     }
 
-    public void addBookmark(UserPostBookmark bookmark) {
+    public void addBookmark(PostBookmark bookmark) {
         bookmarks.add(bookmark);
         bookmark.setPost(this);
     }
 
-    public void removeBookmark(UserPostBookmark bookmark) {
+    public void removeBookmark(PostBookmark bookmark) {
         bookmarks.remove(bookmark);
         bookmark.setPost(null);
     }
@@ -227,12 +227,12 @@ public class Post {
         return bookmarks.size();
     }
 
-    public void addReport(UserPostReport report) {
+    public void addReport(PostReport report) {
         reports.add(report);
         report.setPost(this);
     }
 
-    public void removeReport(UserPostReport report) {
+    public void removeReport(PostReport report) {
         reports.remove(report);
         report.setPost(null);
     }

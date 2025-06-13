@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.UserPostCommentReportId;
+import com.pathbook.pathbook_api.entity.id.PostCommentReportId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +15,9 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_post_comment_reports")
-@IdClass(UserPostCommentReportId.class)
-public class UserPostCommentReport {
+@Table(name = "post_comment_reports")
+@IdClass(PostCommentReportId.class)
+public class PostCommentReport {
     // region Fields
 
     @Id
@@ -43,16 +43,16 @@ public class UserPostCommentReport {
 
     // region Constructors
 
-    protected UserPostCommentReport() {}
+    protected PostCommentReport() {}
 
-    public UserPostCommentReport(User reporter, PostComment comment, String reason, String message) {
+    public PostCommentReport(User reporter, PostComment comment, String reason, String message) {
         this.reporter = reporter;
         this.comment = comment;
         this.reason = reason;
         this.message = message;
     }
 
-    public UserPostCommentReport(
+    public PostCommentReport(
             User reporter,
             PostComment comment,
             String reason,

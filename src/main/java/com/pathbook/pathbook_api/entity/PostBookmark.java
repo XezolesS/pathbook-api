@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.UserPostReportId;
+import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,26 +15,20 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_post_reports")
-@IdClass(UserPostReportId.class)
-public class UserPostReport {
+@Table(name = "post_bookmarks")
+@IdClass(PostBookmarkId.class)
+public class PostBookmark {
     // region Fields
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporter_id", nullable = false)
-    private User reporter;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-
-    @Column(name = "reason", columnDefinition = "TINYTEXT", nullable = false)
-    private String reason;
-
-    @Column(name = "message", columnDefinition = "TEXT")
-    private String message;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -43,25 +37,23 @@ public class UserPostReport {
 
     // region Constructors
 
-    protected UserPostReport() {}
+    protected PostBookmark() {}
 
-    public UserPostReport(User reporter, Post post, String reason, String message) {
-        this.reporter = reporter;
+    public PostBookmark(User user, Post post) {
+        this.user = user;
         this.post = post;
-        this.reason = reason;
-        this.message = message;
     }
 
     // endregion
 
     // region Getters & Setters
 
-    public User getReporter() {
-        return reporter;
+    public User getUser() {
+        return user;
     }
 
-    public void setReporter(User reporter) {
-        this.reporter = reporter;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Post getPost() {
@@ -70,22 +62,6 @@ public class UserPostReport {
 
     public void setPost(Post post) {
         this.post = post;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public LocalDateTime getCreatedAt() {

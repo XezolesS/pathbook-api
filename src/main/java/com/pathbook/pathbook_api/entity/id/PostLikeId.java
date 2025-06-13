@@ -3,13 +3,13 @@ package com.pathbook.pathbook_api.entity.id;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class UserPostBookmarkId implements Serializable {
+public class PostLikeId implements Serializable {
     private String user;
     private Long post;
 
-    public UserPostBookmarkId() {}
+    public PostLikeId() {}
 
-    public UserPostBookmarkId(String user, Long post) {
+    public PostLikeId(String user, Long post) {
         this.user = user;
         this.post = post;
     }
@@ -20,11 +20,11 @@ public class UserPostBookmarkId implements Serializable {
             return true;
         }
 
-        if (!(object instanceof UserPostBookmarkId)) {
+        if (!(object instanceof PostLikeId)) {
             return false;
         }
 
-        UserPostBookmarkId that = (UserPostBookmarkId) object;
+        PostLikeId that = (PostLikeId) object;
         return Objects.equals(user, that.user) && Objects.equals(post, that.post);
     }
 

@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.UserPostLikeId;
+import com.pathbook.pathbook_api.entity.id.PostCommentLikeId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +15,9 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_post_likes")
-@IdClass(UserPostLikeId.class)
-public class UserPostLike {
+@Table(name = "post_comment_likes")
+@IdClass(PostCommentLikeId.class)
+public class PostCommentLike {
     // region Fields
 
     @Id
@@ -27,8 +27,8 @@ public class UserPostLike {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @JoinColumn(name = "comment_id", nullable = false)
+    private PostComment comment;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -37,11 +37,11 @@ public class UserPostLike {
 
     // region Constructors
 
-    protected UserPostLike() {}
+    protected PostCommentLike() {}
 
-    public UserPostLike(User user, Post post) {
+    public PostCommentLike(User user, PostComment comment) {
         this.user = user;
-        this.post = post;
+        this.comment = comment;
     }
 
     // endregion
@@ -56,12 +56,12 @@ public class UserPostLike {
         this.user = user;
     }
 
-    public Post getPost() {
-        return post;
+    public PostComment getComment() {
+        return comment;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
+    public void setComment(PostComment comment) {
+        this.comment = comment;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -77,5 +77,5 @@ public class UserPostLike {
         createdAt = LocalDateTime.now();
     }
 
-    // endregion
+    // endreigon
 }

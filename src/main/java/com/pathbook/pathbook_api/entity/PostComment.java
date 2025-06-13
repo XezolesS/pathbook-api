@@ -55,10 +55,10 @@ public class PostComment {
     private List<PostComment> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserPostCommentLike> likes = new ArrayList<>();
+    private List<PostCommentLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserPostCommentReport> reports = new ArrayList<>();
+    private List<PostCommentReport> reports = new ArrayList<>();
 
     // endregion
 
@@ -124,11 +124,11 @@ public class PostComment {
         return replies;
     }
 
-    public List<UserPostCommentLike> getLikes() {
+    public List<PostCommentLike> getLikes() {
         return likes;
     }
 
-    public List<UserPostCommentReport> getReports() {
+    public List<PostCommentReport> getReports() {
         return reports;
     }
 
@@ -151,12 +151,12 @@ public class PostComment {
 
     // region Helper Methods
 
-    public void addLike(UserPostCommentLike like) {
+    public void addLike(PostCommentLike like) {
         likes.add(like);
         like.setComment(this);
     }
 
-    public void removeLike(UserPostCommentLike like) {
+    public void removeLike(PostCommentLike like) {
         likes.remove(like);
         like.setComment(null);
     }
@@ -165,12 +165,12 @@ public class PostComment {
         return likes.size();
     }
 
-    public void addReport(UserPostCommentReport report) {
+    public void addReport(PostCommentReport report) {
         reports.add(report);
         report.setComment(this);
     }
 
-    public void removeReport(UserPostCommentReport report) {
+    public void removeReport(PostCommentReport report) {
         reports.remove(report);
         report.setComment(null);
     }
