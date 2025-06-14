@@ -13,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping("/proxy")
 public class ProxyController {
-
     @GetMapping("/image")
     public ResponseEntity<?> getImage(@RequestParam String url) {
         try {
@@ -29,5 +28,4 @@ public class ProxyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 }

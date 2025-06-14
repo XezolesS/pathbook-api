@@ -1,12 +1,11 @@
 package com.pathbook.pathbook_api.response;
 
-import java.time.LocalDateTime;
-
 import com.pathbook.pathbook_api.entity.PostLike;
 import com.pathbook.pathbook_api.entity.User;
 
-public class PostLikeResponse {
+import java.time.LocalDateTime;
 
+public class PostLikeResponse {
     private User user;
     private LocalDateTime createdAt;
 
@@ -27,5 +26,4 @@ public class PostLikeResponse {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
 }

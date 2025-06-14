@@ -1,16 +1,15 @@
 package com.pathbook.pathbook_api.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.hibernate.Hibernate;
-
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostLike;
 import com.pathbook.pathbook_api.entity.User;
 
-public class PostResponse {
+import org.hibernate.Hibernate;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class PostResponse {
     private Long id;
     private String authorId;
     private String title;
@@ -31,9 +30,11 @@ public class PostResponse {
 
     private List<PostLikeResponse> mapLikes(List<PostLike> postLikes) {
         return postLikes.stream()
-                .map(likes -> new PostLikeResponse(
-                        Hibernate.unproxy(likes.getUser(), User.class),
-                        likes.getCreatedAt()))
+                .map(
+                        likes ->
+                                new PostLikeResponse(
+                                        Hibernate.unproxy(likes.getUser(), User.class),
+                                        likes.getCreatedAt()))
                 .toList();
     }
 
@@ -64,5 +65,4 @@ public class PostResponse {
     public List<PostLikeResponse> getLikes() {
         return likes;
     }
-
 }

@@ -17,15 +17,13 @@ import java.util.List;
 
 @Service
 public class PostService {
+    @Autowired private UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private PostRepository postRepository;
 
-    @Autowired
-    private PostRepository postRepository;
+    @Autowired private PostLikeRepository postLikeRepository;
 
-    @Autowired
-    private PostLikeRepository postLikeRepository;
+    @Autowired private PostReportService postReportService;
 
     @Transactional(readOnly = true)
     public List<PostResponse> getPostList() {

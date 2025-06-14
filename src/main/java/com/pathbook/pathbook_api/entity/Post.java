@@ -39,7 +39,7 @@ public class Post {
     @Lob
     @Column(name = "content", nullable = false)
     private String content;
-    
+
     @Column(name = "view", nullable = false)
     private Long view;
 

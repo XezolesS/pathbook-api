@@ -1,5 +1,11 @@
 package com.pathbook.pathbook_api.controller;
 
+import com.pathbook.pathbook_api.dto.ImageDto;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.response.UserResponse;
+import com.pathbook.pathbook_api.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,18 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.pathbook.pathbook_api.dto.ImageDto;
-import com.pathbook.pathbook_api.dto.UserPrincipal;
-import com.pathbook.pathbook_api.exception.UserNotFoundException;
-import com.pathbook.pathbook_api.response.UserResponse;
-import com.pathbook.pathbook_api.service.UserService;
-
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
-    @Autowired
-    private UserService userService;
+    @Autowired private UserService userService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUser(@PathVariable String userId) {
@@ -78,9 +76,7 @@ public class UserController {
             @RequestParam MultipartFile file) {
         try {
             userService.updateUserIcon(
-                    userPrincipal.getId(),
-                    file.getBytes(),
-                    file.getContentType());
+                    userPrincipal.getId(), file.getBytes(), file.getContentType());
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (UserNotFoundException e) {
@@ -96,9 +92,7 @@ public class UserController {
             @RequestParam MultipartFile file) {
         try {
             userService.updateUserBanner(
-                    userPrincipal.getId(),
-                    file.getBytes(),
-                    file.getContentType());
+                    userPrincipal.getId(), file.getBytes(), file.getContentType());
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (UserNotFoundException e) {
@@ -107,5 +101,4 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

@@ -1,9 +1,5 @@
 package com.pathbook.pathbook_api.jwt;
 
-import java.util.Date;
-
-import org.springframework.stereotype.Component;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -11,9 +7,12 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.PrematureJwtException;
 
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
 @Component
 public class ResetPasswordJwt extends JwtBase {
-
     private static final String SUBJECT = "reset-password";
 
     private static final long EXPIRATION_SECOND = 60 * 30; // 30 minutes
@@ -51,13 +50,14 @@ public class ResetPasswordJwt extends JwtBase {
     @Override
     public void verify(String token) {
         try {
-            Jws<Claims> jws = Jwts.parser()
-                    .clockSkewSeconds(3 * 60)
-                    .requireSubject(SUBJECT)
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parse(token)
-                    .accept(Jws.CLAIMS);
+            Jws<Claims> jws =
+                    Jwts.parser()
+                            .clockSkewSeconds(3 * 60)
+                            .requireSubject(SUBJECT)
+                            .verifyWith(getSigningKey())
+                            .build()
+                            .parse(token)
+                            .accept(Jws.CLAIMS);
 
             Claims body = jws.getPayload();
             Date now = new Date();
@@ -75,5 +75,4 @@ public class ResetPasswordJwt extends JwtBase {
             throw new JwtException(token, e);
         }
     }
-
 }

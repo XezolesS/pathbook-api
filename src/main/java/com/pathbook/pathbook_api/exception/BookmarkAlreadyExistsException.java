@@ -1,7 +1,6 @@
 package com.pathbook.pathbook_api.exception;
 
 public class BookmarkAlreadyExistsException extends RecordAlreadyExistsException {
-
     private final String userId;
     private final Long postId;
 
@@ -19,5 +18,4 @@ public class BookmarkAlreadyExistsException extends RecordAlreadyExistsException
     public Long getPostId() {
         return postId;
     }
-
 }
