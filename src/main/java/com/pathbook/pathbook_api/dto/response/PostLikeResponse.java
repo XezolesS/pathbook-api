@@ -1,4 +1,4 @@
-package com.pathbook.pathbook_api.response;
+package com.pathbook.pathbook_api.dto.response;
 
 import com.pathbook.pathbook_api.entity.PostLike;
 import com.pathbook.pathbook_api.entity.User;
