@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.PostLikeId;
+import com.pathbook.pathbook_api.entity.id.PathgroupPostItemId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,15 +15,15 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_likes")
-@IdClass(PostLikeId.class)
-public class PostLike {
+@Table(name = "pathgroup_post_items")
+@IdClass(PathgroupPostItemId.class)
+public class PathgroupPostItem {
     // region Fields
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "pathgroup_id", nullable = false)
+    private Pathgroup pathgroup;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,10 +37,10 @@ public class PostLike {
 
     // region Constructors
 
-    protected PostLike() {}
+    protected PathgroupPostItem() {}
 
-    public PostLike(User user, Post post) {
-        this.user = user;
+    public PathgroupPostItem(Pathgroup pathgroup, Post post) {
+        this.pathgroup = pathgroup;
         this.post = post;
     }
 
@@ -48,12 +48,12 @@ public class PostLike {
 
     // region Getters & Setters
 
-    public User getUser() {
-        return user;
+    public Pathgroup getPathgroup() {
+        return pathgroup;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPathgroup(Pathgroup pathgroup) {
+        this.pathgroup = pathgroup;
     }
 
     public Post getPost() {

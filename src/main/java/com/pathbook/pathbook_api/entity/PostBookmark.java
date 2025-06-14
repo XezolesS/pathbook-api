@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.PostLikeId;
+import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +15,9 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_likes")
-@IdClass(PostLikeId.class)
-public class PostLike {
+@Table(name = "post_bookmarks")
+@IdClass(PostBookmarkId.class)
+public class PostBookmark {
     // region Fields
 
     @Id
@@ -37,9 +37,9 @@ public class PostLike {
 
     // region Constructors
 
-    protected PostLike() {}
+    protected PostBookmark() {}
 
-    public PostLike(User user, Post post) {
+    public PostBookmark(User user, Post post) {
         this.user = user;
         this.post = post;
     }

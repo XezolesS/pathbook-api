@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.entity.id.PostReportId;
+import com.pathbook.pathbook_api.entity.id.PostCommentReportId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +15,9 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_reports")
-@IdClass(PostReportId.class)
-public class PostReport {
+@Table(name = "post_comment_reports")
+@IdClass(PostCommentReportId.class)
+public class PostCommentReport {
     // region Fields
 
     @Id
@@ -27,8 +27,8 @@ public class PostReport {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @JoinColumn(name = "comment_id", nullable = false)
+    private PostComment comment;
 
     @Column(name = "reason", columnDefinition = "TINYTEXT", nullable = false)
     private String reason;
@@ -43,13 +43,26 @@ public class PostReport {
 
     // region Constructors
 
-    protected PostReport() {}
+    protected PostCommentReport() {}
 
-    public PostReport(User reporter, Post post, String reason, String message) {
+    public PostCommentReport(User reporter, PostComment comment, String reason, String message) {
         this.reporter = reporter;
-        this.post = post;
+        this.comment = comment;
         this.reason = reason;
         this.message = message;
+    }
+
+    public PostCommentReport(
+            User reporter,
+            PostComment comment,
+            String reason,
+            String message,
+            LocalDateTime createdAt) {
+        this.reporter = reporter;
+        this.comment = comment;
+        this.reason = reason;
+        this.message = message;
+        this.createdAt = createdAt;
     }
 
     // endregion
@@ -64,12 +77,12 @@ public class PostReport {
         this.reporter = reporter;
     }
 
-    public Post getPost() {
-        return post;
+    public PostComment getComment() {
+        return comment;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
+    public void setComment(PostComment comment) {
+        this.comment = comment;
     }
 
     public String getReason() {
