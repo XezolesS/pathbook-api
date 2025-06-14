@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Entity
@@ -68,7 +69,7 @@ public class Post {
     private List<PostAttachment> attachments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostTag> tags = new ArrayList<>();
+    private HashSet<PostTag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PathgroupPostItem> pathgroupItems = new ArrayList<>();
@@ -164,7 +165,7 @@ public class Post {
         return attachments;
     }
 
-    public List<PostTag> getTags() {
+    public HashSet<PostTag> getTags() {
         return tags;
     }
 
