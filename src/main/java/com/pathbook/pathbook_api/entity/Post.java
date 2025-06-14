@@ -39,6 +39,9 @@ public class Post {
     @Lob
     @Column(name = "content", nullable = false)
     private String content;
+    
+    @Column(name = "view", nullable = false)
+    private Long view;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -114,6 +117,14 @@ public class Post {
         this.content = content;
     }
 
+    public Long getView() {
+        return view;
+    }
+
+    public void setView(Long view) {
+        this.view = view;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -179,6 +190,10 @@ public class Post {
     // endregion
 
     // region Helper Methods
+
+    public void increaseView() {
+        view++;
+    }
 
     public boolean hasPath() {
         return path != null;
