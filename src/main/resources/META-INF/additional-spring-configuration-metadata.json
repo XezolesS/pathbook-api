@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "server.allowed-origins",
+      "type": "java.lang.List<java.lang.String>",
+      "description": "List of allowed origins."
+    },
+    {
+      "name": "server.web-address",
+      "type": "java.lang.String",
+      "description": "Address of web application."
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret key for JWT."
+    }
+  ]
+}

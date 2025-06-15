@@ -2,6 +2,7 @@ package com.pathbook.pathbook_api.config;
 
 import com.pathbook.pathbook_api.service.PathbookUserDetailsService;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,6 +44,9 @@ public class SecurityConfig {
         // User
         "/user/{userId}/**",
     };
+
+    @Value("#{'${server.allowed-origins}'.split(',')}")
+    private List<String> allowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -101,8 +105,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         // Make the below setting as * to allow connection from any host
-        corsConfiguration.setAllowedOrigins(
-                List.of("http://localhost:5173", "http://xezoless.tplinkdns.com:22222/"));
+        corsConfiguration.setAllowedOrigins(allowedOrigins);
         corsConfiguration.setAllowedMethods(List.of("GET", "POST"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of("*"));
