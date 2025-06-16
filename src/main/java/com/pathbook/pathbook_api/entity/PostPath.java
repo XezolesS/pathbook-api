@@ -2,6 +2,7 @@ package com.pathbook.pathbook_api.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
@@ -12,16 +13,18 @@ import jakarta.persistence.Table;
 public class PostPath {
     // region Fields
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @Id private Long id;
 
     @Column(name = "path_points", nullable = false, columnDefinition = "LINESTRING")
     private String pathPoints;
 
     @Column(name = "thumbnail_url", length = 2048)
     private String thumbnailUrl;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private Post post;
 
     // endregion
 
@@ -38,6 +41,10 @@ public class PostPath {
     // endregion
 
     // region Getters & Setters
+
+    public Long getId() {
+        return id;
+    }
 
     public Post getPost() {
         return post;

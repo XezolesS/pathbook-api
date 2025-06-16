@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.dto.response;
 
+import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.entity.User;
 
 public class UserResponse {
@@ -14,9 +15,18 @@ public class UserResponse {
         this.userId = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
-        this.verified = user.getIsVerified();
+        this.verified = user.isVerified();
         this.iconUrl = user.getIconUrl();
         this.bannerUrl = user.getBannerUrl();
+    }
+
+    public UserResponse(UserPrincipal userPrincipal) {
+        this.userId = userPrincipal.getId();
+        this.username = userPrincipal.getUsername();
+        this.email = userPrincipal.getEmail();
+        this.verified = userPrincipal.isVerified();
+        this.iconUrl = userPrincipal.getIconUrl();
+        this.bannerUrl = userPrincipal.getBannerUrl();
     }
 
     public String getUserId() {

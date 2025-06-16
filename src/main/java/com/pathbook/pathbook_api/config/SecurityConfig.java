@@ -28,7 +28,7 @@ public class SecurityConfig {
         // Auth
         "/auth/login",
         "/auth/register",
-        "/auth/verify",
+        "/auth/verify-email",
         "/auth/forgot-password",
         "/auth/reset-password",
 
@@ -74,20 +74,17 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
 
-        return new ProviderManager(authenticationProvider);
+        return new ProviderManager(authProvider);
     }
 
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
         return (request, response, authentication) -> {
-            response.setStatus(200);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"message\": \"Logout successful\"}");
-            response.getWriter().flush();
+            response.setStatus(204);
         };
     }
 

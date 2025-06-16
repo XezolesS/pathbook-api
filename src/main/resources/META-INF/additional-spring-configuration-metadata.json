@@ -11,6 +11,16 @@
       "description": "Address of web application."
     },
     {
+      "name": "web-path-verify-email",
+      "type": "java.lang.String",
+      "description": "Path to the page to verify email."
+    },
+    {
+      "name": "web-path-reset-password",
+      "type": "java.lang.String",
+      "description": "Path to the page to reset password."
+    },
+    {
       "name": "jwt.secret",
       "type": "java.lang.String",
       "description": "Secret key for JWT."

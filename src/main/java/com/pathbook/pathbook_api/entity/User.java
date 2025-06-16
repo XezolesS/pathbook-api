@@ -31,6 +31,12 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "login_count")
+    private Integer loginCount;
+
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
@@ -44,10 +50,10 @@ public class User {
     private LocalDateTime accountLockedUntil;
 
     @Column(name = "is_verified", nullable = false)
-    private Boolean isVerified = false;
+    private Boolean verified = false;
 
     @Column(name = "is_enabled", nullable = false)
-    private Boolean isEnabled = true;
+    private Boolean enabled = true;
 
     @Column(name = "banned_until")
     private LocalDateTime bannedUntil;
@@ -151,8 +157,24 @@ public class User {
         return createdAt;
     }
 
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getLoginCount() {
+        return loginCount == null ? 0 : loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
     }
 
     public LocalDateTime getLastLoginAt() {
@@ -172,7 +194,7 @@ public class User {
     }
 
     public Integer getFailedLoginAttempts() {
-        return failedLoginAttempts;
+        return failedLoginAttempts == null ? 0 : failedLoginAttempts;
     }
 
     public void setFailedLoginAttempts(Integer failedLoginAttempts) {
@@ -187,20 +209,20 @@ public class User {
         this.accountLockedUntil = accountLockedUntil;
     }
 
-    public Boolean getIsVerified() {
-        return isVerified;
+    public Boolean isVerified() {
+        return verified;
     }
 
-    public void setIsVerified(Boolean isVerified) {
-        this.isVerified = isVerified;
+    public void setVerified(Boolean isVerified) {
+        this.verified = isVerified;
     }
 
-    public Boolean getIsEnabled() {
-        return isEnabled;
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    public void setIsEnabled(Boolean isEnabled) {
-        this.isEnabled = isEnabled;
+    public void setEnabled(Boolean isEnabled) {
+        this.enabled = isEnabled;
     }
 
     public LocalDateTime getBannedUntil() {
@@ -220,7 +242,7 @@ public class User {
     }
 
     public Integer getBannedCount() {
-        return bannedCount;
+        return bannedCount == null ? 0 : bannedCount;
     }
 
     public void setBannedCount(Integer bannedCount) {
@@ -327,6 +349,22 @@ public class User {
     // endregion
 
     // region Helper Methods
+
+    /** 로그인 횟수를 증가시킵니다. */
+    public void increaseLoginCount() {
+        loginCount++;
+    }
+
+    /** 로그인 시도 실패 횟수를 초기화하고, 계정 잠금을 해제합니다. */
+    public void resetFailedLoginAttempts() {
+        failedLoginAttempts = 0;
+        accountLockedUntil = null;
+    }
+
+    /** 로그인 시도 실패 횟수를 증가시킵니다. */
+    public void increaseFailedLoginAttempts() {
+        failedLoginAttempts++;
+    }
 
     // endregion
 }
