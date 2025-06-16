@@ -55,6 +55,9 @@ public class User {
     @Column(name = "banned_reason", columnDefinition = "TINYTEXT")
     private String bannedReason;
 
+    @Column(name = "banned_count")
+    private Integer bannedCount;
+
     @Column(name = "username", length = 32, nullable = false)
     private String username;
 
@@ -214,6 +217,14 @@ public class User {
 
     public void setBannedReason(String bannedReason) {
         this.bannedReason = bannedReason;
+    }
+
+    public Integer getBannedCount() {
+        return bannedCount;
+    }
+
+    public void setBannedCount(Integer bannedCount) {
+        this.bannedCount = bannedCount;
     }
 
     public String getUsername() {
