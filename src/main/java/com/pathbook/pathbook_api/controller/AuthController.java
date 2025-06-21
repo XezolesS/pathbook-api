@@ -8,7 +8,7 @@ import com.pathbook.pathbook_api.dto.request.LoginRequest;
 import com.pathbook.pathbook_api.dto.request.RegisterRequest;
 import com.pathbook.pathbook_api.dto.request.ResetPasswordRequest;
 import com.pathbook.pathbook_api.dto.response.LoginResponse;
-import com.pathbook.pathbook_api.dto.response.UserResponse;
+import com.pathbook.pathbook_api.dto.response.UserInfoResponse;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.service.AuthService;
 import com.pathbook.pathbook_api.service.UserService;
@@ -103,7 +103,7 @@ public class AuthController {
             User user = userService.fromPrincipal(userPrincipal);
 
             return new ResponseEntity<>(
-                    LoginResponse.success(new UserResponse(user)), HttpStatus.OK);
+                    LoginResponse.success(new UserInfoResponse(user)), HttpStatus.OK);
         } catch (BadCredentialsException ex) {
             // 사용자 로그인 정보 불일치
             authService.handleLoginFail(email);
@@ -162,7 +162,7 @@ public class AuthController {
      * @param requestBody {@link RegisterRequest}
      * @return 생성된 사용자
      * @see {@link RegisterRequest}
-     * @see {@link UserResponse}
+     * @see {@link UserInfoResponse}
      */
     @PostMapping("/register")
     public ResponseEntity<?> postRegister(@RequestBody RegisterRequest requestBody) {
@@ -175,7 +175,7 @@ public class AuthController {
 
         authService.sendVerificationEmail(createdUser);
 
-        return new ResponseEntity<>(new UserResponse(createdUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(new UserInfoResponse(createdUser), HttpStatus.CREATED);
     }
 
     /**
@@ -189,13 +189,13 @@ public class AuthController {
      * @param userPrincipal
      * @return 세션에 로그인 중인 사용자
      * @see {@link UserPrincipal}
-     * @see {@link UserResponse}
+     * @see {@link UserInfoResponse}
      */
     @GetMapping("/me")
     public ResponseEntity<?> getMe(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         User user = userService.fromPrincipal(userPrincipal);
 
-        return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
+        return new ResponseEntity<>(new UserInfoResponse(user), HttpStatus.OK);
     }
 
     /**

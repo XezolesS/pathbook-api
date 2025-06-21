@@ -4,7 +4,7 @@ import com.pathbook.pathbook_api.dto.FileMeta;
 import com.pathbook.pathbook_api.dto.UserInfo;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.response.UserProfileResponse;
-import com.pathbook.pathbook_api.dto.response.UserResponse;
+import com.pathbook.pathbook_api.dto.response.UserInfoResponse;
 import com.pathbook.pathbook_api.entity.File;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
@@ -55,9 +55,9 @@ public class UserService {
      *
      * @param userId
      * @param userData
-     * @return {@link UserResponse} 수정된 사용자 정보
+     * @return {@link UserInfoResponse} 수정된 사용자 정보
      */
-    public UserResponse updateUserData(String userId, UserInfo userData) {
+    public UserInfoResponse updateUserData(String userId, UserInfo userData) {
         User user =
                 userRepository
                         .findById(userId)
@@ -67,7 +67,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return new UserResponse(user);
+        return new UserInfoResponse(user);
     }
 
     /**

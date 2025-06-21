@@ -3,9 +3,9 @@ package com.pathbook.pathbook_api.controller;
 import com.pathbook.pathbook_api.dto.FileMeta;
 import com.pathbook.pathbook_api.dto.UserInfo;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
-import com.pathbook.pathbook_api.dto.request.UserRequest;
+import com.pathbook.pathbook_api.dto.request.UserInfoRequest;
 import com.pathbook.pathbook_api.dto.response.UserProfileResponse;
-import com.pathbook.pathbook_api.dto.response.UserResponse;
+import com.pathbook.pathbook_api.dto.response.UserInfoResponse;
 import com.pathbook.pathbook_api.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +59,8 @@ public class UserController {
     @PutMapping("/update/data")
     public ResponseEntity<?> putUpdateUserData(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody UserRequest requestBody) {
-        UserResponse userResponse =
+            @RequestBody UserInfoRequest requestBody) {
+        UserInfoResponse userResponse =
                 userService.updateUserData(userPrincipal.getId(), (UserInfo) requestBody);
 
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
