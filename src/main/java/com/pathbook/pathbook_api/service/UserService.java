@@ -24,14 +24,35 @@ public class UserService {
     @Autowired private StorageService storageService;
 
     /**
+     * 사용자 ID로부터 엔티티를 반환합니다.
+     *
+     * @param {@link UserInfoDto} userDto
+     * @return {@link User} 엔티티
+     */
+    public User fromUserId(String userId) {
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> UserNotFoundException.withUserId(userId));
+    }
+
+    /**
      * 사용자 인증 정보로부터 엔티티를 반환합니다.
      *
+     * @param {@link UserPrincipal} userPrincipal
      * @return {@link User} 엔티티
      */
     public User fromPrincipal(UserPrincipal userPrincipal) {
-        return userRepository
-                .findById(userPrincipal.getId())
-                .orElseThrow(() -> UserNotFoundException.withUserId(userPrincipal.getId()));
+        return fromUserId(userPrincipal.getId());
+    }
+
+    /**
+     * {@link UserInfoDto}로부터 엔티티를 반환합니다.
+     *
+     * @param {@link UserInfoDto} userDto
+     * @return {@link User} 엔티티
+     */
+    public User fromDto(UserInfoDto userDto) {
+        return fromUserId(userDto.getId());
     }
 
     /**
@@ -41,10 +62,7 @@ public class UserService {
      * @return
      */
     public UserProfileResponse getUserProfile(String userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
+        User user = fromUserId(userId);
 
         return new UserProfileResponse(user);
     }
@@ -57,10 +75,7 @@ public class UserService {
      * @return {@link UserInfoDto} 수정된 사용자 정보
      */
     public UserInfoDto updateUserData(String userId, UserInfoDto userData) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
+        User user = fromUserId(userId);
 
         user.setUserData(userData);
 
@@ -77,10 +92,7 @@ public class UserService {
      * @return {@link FileMetaDto} 수정된 아이콘 정보
      */
     public FileMetaDto updateUserIcon(String userId, MultipartFile iconFile) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
+        User user = fromUserId(userId);
 
         FileMetaDto storedFileMeta = storageService.store(iconFile, userId);
         File storedfileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();
@@ -100,10 +112,7 @@ public class UserService {
      * @return {@link FileMetaDto} 수정된 배너 정보
      */
     public FileMetaDto updateUserBanner(String userId, MultipartFile bannerFile) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
+        User user = fromUserId(userId);
 
         FileMetaDto storedFileMeta = storageService.store(bannerFile, userId);
         File storedfileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();

@@ -36,8 +36,9 @@ public class SecurityConfig {
         "/post/list",
         "/post/p/{postId}",
 
-        // Comment
-        "/comment/list/{postId}",
+        // Post Comment
+        "/post/comment/p/{postId}",
+        "/post/comment/c/{commentId}",
 
         // Proxy
         "/proxy/**",

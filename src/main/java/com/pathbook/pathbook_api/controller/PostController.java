@@ -98,12 +98,11 @@ public class PostController {
      * @param requestBody
      * @return
      */
-    @PutMapping("/edit/{postId}")
+    @PutMapping("/edit")
     public ResponseEntity<?> putEditPost(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long postId,
             @RequestBody PostRequest requestBody) {
-        PostDto editedPost = postService.editPost(userPrincipal.getId(), postId, requestBody);
+        PostDto editedPost = postService.editPost(userPrincipal.getId(), requestBody);
 
         return new ResponseEntity<>(new PostResponse(editedPost), HttpStatus.OK);
     }

@@ -9,11 +9,9 @@ import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
 import com.pathbook.pathbook_api.entity.id.PostLikeId;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
-import com.pathbook.pathbook_api.exception.UserNotFoundException;
 import com.pathbook.pathbook_api.repository.PostBookmarkRepository;
 import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
-import com.pathbook.pathbook_api.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +21,33 @@ import java.util.List;
 
 @Service
 public class PostService {
-    @Autowired private UserRepository userRepository;
+    @Autowired private UserService userService;
 
     @Autowired private PostRepository postRepository;
 
     @Autowired private PostLikeRepository postLikeRepository;
 
     @Autowired private PostBookmarkRepository postBookmarkRepository;
+
+    /**
+     * 포스트 ID로부터 포스트 엔티티를 불러옵니다.
+     *
+     * @param postId
+     * @return {@link Post}
+     */
+    public Post fromPostId(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+    }
+
+    /**
+     * 포스트 ID로부터 포스트 존재 여부를 확인합니다.
+     *
+     * @param postId
+     * @return
+     */
+    public boolean existsByPostId(Long postId) {
+        return postRepository.existsById(postId);
+    }
 
     /**
      * 모든 포스트를 불러옵니다.
@@ -48,10 +66,7 @@ public class PostService {
      * @return {@link PostDto} 포스트 데이터
      */
     public PostDto getPost(Long postId) {
-        Post post =
-                postRepository
-                        .findById(postId)
-                        .orElseThrow(() -> new PostNotFoundException(postId));
+        Post post = fromPostId(postId);
 
         return new PostDto(post);
     }
@@ -64,11 +79,7 @@ public class PostService {
      * @return {@link PostDto} 작성된 포스트
      */
     public PostDto writePost(String authorId, PostDto postData) {
-        User author =
-                userRepository
-                        .findById(authorId)
-                        .orElseThrow(() -> UserNotFoundException.withUserId(authorId));
-
+        User author = userService.fromUserId(authorId);
         Post newPost = new Post(author, postData.getTitle(), postData.getContent());
 
         Post savedPost = postRepository.save(newPost);
@@ -82,19 +93,15 @@ public class PostService {
      * <p>작성자가 아니라면 수정할 수 없습니다.
      *
      * @param authorId
-     * @param postId
      * @param postData
      * @return {@link PostDto} 수정된 포스트
      */
-    public PostDto editPost(String authorId, Long postId, PostDto postData) {
-        Post post =
-                postRepository
-                        .findById(postId)
-                        .orElseThrow(() -> new PostNotFoundException(postId));
+    public PostDto editPost(String authorId, PostDto postData) {
+        Post post = fromPostId(postData.getId());
 
         if (!post.getAuthor().getId().equals(authorId)) {
             throw new UnauthorizedAccessException(
-                    String.format("User %s not owning post %d", authorId, postId));
+                    String.format("User %s not owning post %d", authorId, postData.getId()));
         }
 
         post.setTitle(postData.getTitle());
@@ -114,10 +121,7 @@ public class PostService {
      * @param postId
      */
     public void deletePost(String authorId, Long postId) {
-        Post post =
-                postRepository
-                        .findById(postId)
-                        .orElseThrow(() -> new PostNotFoundException(postId));
+        Post post = fromPostId(postId);
 
         if (!post.getAuthor().getId().equals(authorId)) {
             throw new UnauthorizedAccessException(
@@ -129,15 +133,8 @@ public class PostService {
 
     @Transactional
     public void addPostLike(String userId, Long postId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
-
-        Post post =
-                postRepository
-                        .findById(postId)
-                        .orElseThrow(() -> new PostNotFoundException(postId));
+        User user = userService.fromUserId(userId);
+        Post post = fromPostId(postId);
 
         if (postLikeRepository.existsById(new PostLikeId(userId, postId))) {
             return;
@@ -155,15 +152,8 @@ public class PostService {
 
     @Transactional
     public void addPostBookmark(String userId, Long postId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
-
-        Post post =
-                postRepository
-                        .findById(postId)
-                        .orElseThrow(() -> new PostNotFoundException(postId));
+        User user = userService.fromUserId(userId);
+        Post post = fromPostId(postId);
 
         if (postBookmarkRepository.existsById(new PostBookmarkId(userId, postId))) {
             return;
