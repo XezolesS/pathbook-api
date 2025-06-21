@@ -26,7 +26,7 @@ public class PostResponse {
 
     public PostResponse(Post post) {
         this.id = post.getId();
-        this.author = UserResponse.fromUser(post.getAuthor());
+        this.author = new UserResponse(post.getAuthor());
         this.title = post.getTitle();
         this.content = post.getContent();
         this.view = post.getView();

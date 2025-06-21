@@ -1,12 +1,13 @@
 package com.pathbook.pathbook_api.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.pathbook.pathbook_api.dto.UserData;
 import com.pathbook.pathbook_api.dto.response.UserResponse;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
 import com.pathbook.pathbook_api.repository.UserRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -24,6 +25,10 @@ public class UserService {
                         .findById(userId)
                         .orElseThrow(() -> UserNotFoundException.withUserId(userId));
 
-        return UserResponse.fromUser(user);
+        return new UserResponse(user);
+    }
+
+    public UserResponse updateUserData(String userId, UserData userData) {
+        return null;
     }
 }

@@ -39,9 +39,20 @@ public class UserController {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    
-    @PutMapping("/update-info")
-    public String putUpdateUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody String entity) {
+    /**
+     * 사용자 정보를 수정합니다.
+     * 
+     * <ul>
+     *   <li>엔드포인트: {@code /user/update-data [GET]}
+     *   <li>응답: {@code 200 OK}
+     * </ul>
+     * 
+     * @param userPrincipal
+     * @param entity
+     * @return 수정된 사용자 정보
+     */
+    @PutMapping("/update-data")
+    public String putUpdateUserData(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody String entity) {
         //TODO: process PUT request
         
         return entity;
