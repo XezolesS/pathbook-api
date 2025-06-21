@@ -127,4 +127,36 @@ public class PostController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping("/like/{postId}")
+    public ResponseEntity<?> postLikePost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
+        postService.addPostLike(userPrincipal.getId(), postId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/unlike/{postId}")
+    public ResponseEntity<?> postUnlikePost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
+        postService.removePostLike(userPrincipal.getId(), postId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/bookmark/{postId}")
+    public ResponseEntity<?> postBookmarkPost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
+        postService.addPostBookmark(userPrincipal.getId(), postId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/unbookmark/{postId}")
+    public ResponseEntity<?> postUnbookmarkPost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
+        postService.removePostBookmark(userPrincipal.getId(), postId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

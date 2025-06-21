@@ -2,10 +2,16 @@ package com.pathbook.pathbook_api.service;
 
 import com.pathbook.pathbook_api.dto.PostDto;
 import com.pathbook.pathbook_api.entity.Post;
+import com.pathbook.pathbook_api.entity.PostBookmark;
+import com.pathbook.pathbook_api.entity.PostLike;
 import com.pathbook.pathbook_api.entity.User;
+import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
+import com.pathbook.pathbook_api.entity.id.PostLikeId;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.repository.PostBookmarkRepository;
+import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
 import com.pathbook.pathbook_api.repository.UserRepository;
 
@@ -20,6 +26,10 @@ public class PostService {
     @Autowired private UserRepository userRepository;
 
     @Autowired private PostRepository postRepository;
+
+    @Autowired private PostLikeRepository postLikeRepository;
+
+    @Autowired private PostBookmarkRepository postBookmarkRepository;
 
     /**
      * 모든 포스트를 불러옵니다.
@@ -115,5 +125,57 @@ public class PostService {
         }
 
         postRepository.delete(post);
+    }
+
+    @Transactional
+    public void addPostLike(String userId, Long postId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
+
+        Post post =
+                postRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new PostNotFoundException(postId));
+
+        if (postLikeRepository.existsById(new PostLikeId(userId, postId))) {
+            return;
+        }
+
+        PostLike like = new PostLike(user, post);
+
+        postLikeRepository.save(like);
+    }
+
+    @Transactional
+    public void removePostLike(String userId, Long postId) {
+        postLikeRepository.deleteById(new PostLikeId(userId, postId));
+    }
+
+    @Transactional
+    public void addPostBookmark(String userId, Long postId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> UserNotFoundException.withUserId(userId));
+
+        Post post =
+                postRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new PostNotFoundException(postId));
+
+        if (postBookmarkRepository.existsById(new PostBookmarkId(userId, postId))) {
+            return;
+        }
+
+        PostBookmark bookmark = new PostBookmark(user, post);
+
+        postBookmarkRepository.save(bookmark);
+    }
+
+    @Transactional
+    public void removePostBookmark(String userId, Long postId) {
+        postBookmarkRepository.deleteById(new PostBookmarkId(userId, postId));
     }
 }

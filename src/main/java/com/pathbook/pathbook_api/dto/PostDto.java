@@ -9,7 +9,9 @@ public class PostDto {
     private UserInfoDto author;
     private String title;
     private String content;
-    private Long view;
+    private Long view = 0L;
+    private int likeCount = 0;
+    private int bookmarkCount = 0;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -22,6 +24,8 @@ public class PostDto {
                 entity.getTitle(),
                 entity.getContent(),
                 entity.getView(),
+                entity.getLikeCount(),
+                entity.getBookmarkCount(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }
@@ -33,6 +37,8 @@ public class PostDto {
                 dto.getTitle(),
                 dto.getContent(),
                 dto.getView(),
+                dto.getLikeCount(),
+                dto.getBookmarkCount(),
                 dto.getCreatedAt(),
                 dto.getUpdatedAt());
     }
@@ -43,6 +49,8 @@ public class PostDto {
             String title,
             String content,
             Long view,
+            int likes,
+            int bookmarks,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         this.id = id;
@@ -50,6 +58,8 @@ public class PostDto {
         this.title = title;
         this.content = content;
         this.view = view;
+        this.likeCount = likes;
+        this.bookmarkCount = bookmarks;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -94,19 +104,19 @@ public class PostDto {
         this.view = view;
     }
 
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public int getBookmarkCount() {
+        return bookmarkCount;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
