@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.controller;
 
-import com.pathbook.pathbook_api.dto.UserData;
+import com.pathbook.pathbook_api.dto.UserInfo;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.UserRequest;
 import com.pathbook.pathbook_api.dto.response.UserResponse;
@@ -57,7 +57,7 @@ public class UserController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody UserRequest requestBody) {
         UserResponse userResponse =
-                userService.updateUserData(userPrincipal.getId(), (UserData) requestBody);
+                userService.updateUserData(userPrincipal.getId(), (UserInfo) requestBody);
 
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }

@@ -43,6 +43,10 @@ public class SecurityConfig {
 
         // User
         "/user/get/{userId}",
+
+        // File
+        "/file/list",
+        "/file/f/{filename:.+}",
     };
 
     @Value("#{'${server.allowed-origins}'.split(',')}")

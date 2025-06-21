@@ -1,0 +1,184 @@
+package com.pathbook.pathbook_api.storage;
+
+import com.pathbook.pathbook_api.dto.FileDto;
+import com.pathbook.pathbook_api.dto.FileMeta;
+import com.pathbook.pathbook_api.entity.File;
+import com.pathbook.pathbook_api.exception.StorageException;
+import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
+import com.pathbook.pathbook_api.repository.FileRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.time.LocalDateTime;
+import java.util.stream.Stream;
+
+@Service
+public class FileSystemStorageService implements StorageService {
+    private final Path rootLocation;
+
+    @Autowired private FileRepository fileRepository;
+
+    public FileSystemStorageService(@Autowired StorageProperties properties) {
+        if (properties.getLocation().trim().length() == 0) {
+            throw new StorageException("File upload location cannot be Empty.");
+        }
+
+        this.rootLocation = Paths.get(properties.getLocation());
+    }
+
+    @Override
+    public void init() {
+        try {
+            Files.createDirectories(rootLocation);
+        } catch (IOException ex) {
+            throw new StorageException("Could not initialize storage", ex);
+        }
+    }
+
+    @Override
+    public File store(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new StorageException("Failed to store empty file.");
+        }
+
+        // 파일 이름 해시
+        String originalFilename = file.getOriginalFilename();
+        String ext = getFileExtension(originalFilename);
+        String hashedFilename = null;
+        try {
+            String toHash = originalFilename + LocalDateTime.now().toString();
+
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(toHash.getBytes());
+
+            byte[] digest = md.digest();
+            hashedFilename = String.format("%032x", new BigInteger(1, digest)) + "." + ext;
+        } catch (Exception ex) {
+            throw new StorageException("Failed to hash file name.", ex);
+        }
+
+        // 스토리지에 파일 저장 시도
+        Path destinationFile;
+        try {
+            destinationFile =
+                    this.rootLocation
+                            .resolve(Paths.get(hashedFilename))
+                            .normalize()
+                            .toAbsolutePath();
+
+            // 보안적 이슈 체크
+            if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+                throw new StorageException("Cannot store file outside current directory.");
+            }
+
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException ex) {
+            throw new StorageException("Failed to store file.", ex);
+        }
+
+        // 저장한 파일을 데이터베이스에 인덱싱
+        try {
+            File fileEntity =
+                    new File(
+                            hashedFilename,
+                            originalFilename,
+                            file.getContentType(),
+                            file.getSize());
+
+            return fileRepository.save(fileEntity);
+        } catch (Exception e) {
+            throw new StorageException("File saved but failed to index in database.", e);
+        }
+    }
+
+    @Override
+    public Stream<Path> loadAll() {
+        try {
+            return Files.walk(this.rootLocation, 1)
+                    .filter(path -> !path.equals(this.rootLocation))
+                    .map(this.rootLocation::relativize);
+        } catch (IOException ex) {
+            throw new StorageException("Failed to read stored files", ex);
+        }
+    }
+
+    @Override
+    public FileMeta load(String filename) {
+        FileMeta fileMeta =
+                fileRepository
+                        .findById(filename)
+                        .orElseThrow(() -> new StorageFileNotFoundException(filename));
+
+        return fileMeta;
+    }
+
+    @Override
+    public Path loadAsPath(String filename) {
+        FileMeta fileMeta = load(filename);
+
+        return rootLocation.resolve(fileMeta.getFilename());
+    }
+
+    @Override
+    public FileDto loadFull(String filename) {
+        try {
+            FileMeta fileMeta = load(filename);
+            Path filePath = rootLocation.resolve(fileMeta.getFilename());
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists() && !resource.isReadable()) {
+                throw new StorageFileNotFoundException(filename);
+            }
+
+            return new FileDto(fileMeta, filePath, resource);
+        } catch (MalformedURLException ex) {
+            throw new StorageFileNotFoundException(filename, ex);
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        FileSystemUtils.deleteRecursively(rootLocation.toFile());
+    }
+
+    @Override
+    public void delete(String filename) {
+        Path filePath = null;
+        try {
+            filePath = loadAsPath(filename);
+        } catch (StorageFileNotFoundException ex) {
+            // Skip, Log warning if logger has implemented.
+        }
+
+        if (filePath == null) {
+            return;
+        }
+
+        FileSystemUtils.deleteRecursively(filePath.toFile());
+    }
+
+    private static String getFileExtension(String filename) {
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < filename.length() - 1) {
+            return filename.substring(dotIndex + 1);
+        }
+
+        return "";
+    }
+}

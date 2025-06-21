@@ -1,12 +1,14 @@
 package com.pathbook.pathbook_api.entity;
 
-import com.pathbook.pathbook_api.dto.UserData;
+import com.pathbook.pathbook_api.dto.UserInfo;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -18,7 +20,7 @@ import java.util.Optional;
 
 @Entity
 @Table(name = "users")
-public class User implements UserData {
+public class User implements UserInfo {
     // region Fields
 
     @Id
@@ -79,11 +81,13 @@ public class User implements UserData {
     @Column(name = "bio", columnDefinition = "TINYTEXT")
     private String bio;
 
-    @Column(name = "icon_url", length = 2048)
-    private String iconUrl;
+    @OneToOne
+    @JoinColumn(name = "icon_filename", nullable = true)
+    private File iconFile;
 
-    @Column(name = "banner_url", length = 2048)
-    private String bannerUrl;
+    @OneToOne
+    @JoinColumn(name = "banner_filename", nullable = true)
+    private File bannerFile;
 
     @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserReport> userReports = new ArrayList<>();
@@ -290,22 +294,20 @@ public class User implements UserData {
         this.bio = bio;
     }
 
-    @Override
-    public String getIconUrl() {
-        return iconUrl;
+    public File getIconFile() {
+        return iconFile;
     }
 
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
+    public void setIconFile(File iconFile) {
+        this.iconFile = iconFile;
     }
 
-    @Override
-    public String getBannerUrl() {
-        return bannerUrl;
+    public File getBannerFile() {
+        return bannerFile;
     }
 
-    public void setBannerUrl(String bannerUrl) {
-        this.bannerUrl = bannerUrl;
+    public void setBannerFile(File bannerFile) {
+        this.bannerFile = bannerFile;
     }
 
     public List<UserReport> getUserReports() {
@@ -366,7 +368,7 @@ public class User implements UserData {
      *
      * <p>{@code null}인 값은 무시합니다.
      */
-    public void setUserData(UserData userData) {
+    public void setUserData(UserInfo userData) {
         Optional.ofNullable(userData.getId()).ifPresent(id -> this.id = id);
         Optional.ofNullable(userData.getEmail()).ifPresent(email -> this.email = email);
         Optional.ofNullable(userData.getUsername()).ifPresent(username -> this.username = username);
@@ -374,9 +376,6 @@ public class User implements UserData {
         Optional.ofNullable(userData.getBirthDate())
                 .ifPresent(birthDate -> this.birthDate = birthDate);
         Optional.ofNullable(userData.getBio()).ifPresent(bio -> this.bio = bio);
-        Optional.ofNullable(userData.getIconUrl()).ifPresent(iconUrl -> this.iconUrl = iconUrl);
-        Optional.ofNullable(userData.getBannerUrl())
-                .ifPresent(bannerUrl -> this.bannerUrl = bannerUrl);
     }
 
     /** 로그인 횟수를 증가시킵니다. */

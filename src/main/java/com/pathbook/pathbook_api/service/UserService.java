@@ -1,6 +1,6 @@
 package com.pathbook.pathbook_api.service;
 
-import com.pathbook.pathbook_api.dto.UserData;
+import com.pathbook.pathbook_api.dto.UserInfo;
 import com.pathbook.pathbook_api.dto.response.UserResponse;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
@@ -28,7 +28,7 @@ public class UserService {
         return new UserResponse(user);
     }
 
-    public UserResponse updateUserData(String userId, UserData userData) {
+    public UserResponse updateUserData(String userId, UserInfo userData) {
         User user =
                 userRepository
                         .findById(userId)

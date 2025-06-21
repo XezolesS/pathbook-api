@@ -38,3 +38,6 @@ out/
 
 ### Local ###
 **/*.local
+
+### Storage ###
+/upload-dir

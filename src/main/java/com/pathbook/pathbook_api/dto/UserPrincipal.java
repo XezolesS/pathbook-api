@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserPrincipal implements UserDetails, UserData {
+public class UserPrincipal implements UserDetails, UserInfo {
     // region Fields
 
     private String id;
@@ -48,8 +48,8 @@ public class UserPrincipal implements UserDetails, UserData {
         this.sex = user.getSex();
         this.birthDate = user.getBirthDate();
         this.bio = user.getBio();
-        this.iconUrl = user.getIconUrl();
-        this.bannerUrl = user.getBannerUrl();
+        // this.iconUrl = user.getIconFileId();
+        // this.bannerUrl = user.getBannerFileId();
 
         this.createdAt = user.getCreatedAt();
         this.deletedAt = user.getDeletedAt();
@@ -102,12 +102,10 @@ public class UserPrincipal implements UserDetails, UserData {
         return bio;
     }
 
-    @Override
     public String getIconUrl() {
         return iconUrl;
     }
 
-    @Override
     public String getBannerUrl() {
         return bannerUrl;
     }

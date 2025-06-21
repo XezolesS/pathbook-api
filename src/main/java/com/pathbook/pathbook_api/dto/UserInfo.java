@@ -2,8 +2,8 @@ package com.pathbook.pathbook_api.dto;
 
 import java.time.LocalDate;
 
-/** 사용자의 정보에 대한 인터페이스입니다. */
-public interface UserData {
+/** 사용자의 정보에 대한 인터페이스입니다. private 필드를 만들어 getter 구현을 포함하여야 합니다. */
+public interface UserInfo {
     /**
      * 사용자의 ID입니다.
      *
@@ -45,18 +45,4 @@ public interface UserData {
      * @return Bio
      */
     public String getBio();
-
-    /**
-     * 사용자의 아이콘 사진의 주소입니다.
-     *
-     * @return Icon URL
-     */
-    public String getIconUrl();
-
-    /**
-     * 사용자의 배너 사진의 주소입니다.
-     *
-     * @return Banner URL
-     */
-    public String getBannerUrl();
 }
