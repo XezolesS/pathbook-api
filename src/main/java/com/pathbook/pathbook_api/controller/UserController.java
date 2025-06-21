@@ -1,11 +1,11 @@
 package com.pathbook.pathbook_api.controller;
 
-import com.pathbook.pathbook_api.dto.FileMeta;
-import com.pathbook.pathbook_api.dto.UserInfo;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
+import com.pathbook.pathbook_api.dto.UserInfoDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.UserInfoRequest;
-import com.pathbook.pathbook_api.dto.response.UserProfileResponse;
 import com.pathbook.pathbook_api.dto.response.UserInfoResponse;
+import com.pathbook.pathbook_api.dto.response.UserProfileResponse;
 import com.pathbook.pathbook_api.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +60,10 @@ public class UserController {
     public ResponseEntity<?> putUpdateUserData(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody UserInfoRequest requestBody) {
-        UserInfoResponse userResponse =
-                userService.updateUserData(userPrincipal.getId(), (UserInfo) requestBody);
+        UserInfoDto userInfo =
+                userService.updateUserData(userPrincipal.getId(), (UserInfoDto) requestBody);
 
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return new ResponseEntity<>(new UserInfoResponse(userInfo), HttpStatus.OK);
     }
 
     /**
@@ -82,7 +82,7 @@ public class UserController {
     public ResponseEntity<?> putUpdateUserIcon(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestPart(value = "iconFile", required = true) MultipartFile iconFile) {
-        FileMeta fileMeta = userService.updateUserIcon(userPrincipal.getId(), iconFile);
+        FileMetaDto fileMeta = userService.updateUserIcon(userPrincipal.getId(), iconFile);
 
         return new ResponseEntity<>(fileMeta, HttpStatus.OK);
     }
@@ -103,7 +103,7 @@ public class UserController {
     public ResponseEntity<?> putUpdateUserBanner(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestPart(value = "bannerFile", required = false) MultipartFile bannerFile) {
-        FileMeta fileMeta = userService.updateUserBanner(userPrincipal.getId(), bannerFile);
+        FileMetaDto fileMeta = userService.updateUserBanner(userPrincipal.getId(), bannerFile);
 
         return new ResponseEntity<>(fileMeta, HttpStatus.OK);
     }

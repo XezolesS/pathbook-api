@@ -1,6 +1,5 @@
 package com.pathbook.pathbook_api.dto.response;
 
-import com.pathbook.pathbook_api.dto.UserInfo;
 import com.pathbook.pathbook_api.dto.UserInfoDto;
 import com.pathbook.pathbook_api.entity.User;
 
@@ -8,8 +7,8 @@ import com.pathbook.pathbook_api.entity.User;
 public class UserInfoResponse extends UserInfoDto {
     public UserInfoResponse() {}
 
-    public UserInfoResponse(UserInfo data) {
-        super(data);
+    public UserInfoResponse(UserInfoDto dto) {
+        super(dto);
     }
 
     public UserInfoResponse(User entity) {

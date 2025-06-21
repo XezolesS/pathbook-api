@@ -1,7 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.pathbook.pathbook_api.dto.FileMeta;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

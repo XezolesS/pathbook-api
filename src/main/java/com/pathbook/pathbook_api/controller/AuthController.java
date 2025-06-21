@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.controller;
 
+import com.pathbook.pathbook_api.dto.UserInfoDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.ChangePasswordRequest;
 import com.pathbook.pathbook_api.dto.request.DeleteUserRequest;
@@ -166,16 +167,16 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<?> postRegister(@RequestBody RegisterRequest requestBody) {
-        User createdUser =
+        UserInfoDto createdUserInfo =
                 authService.addUser(
                         requestBody.id(),
                         requestBody.username(),
                         requestBody.email(),
                         requestBody.password());
 
-        authService.sendVerificationEmail(createdUser);
+        authService.sendVerificationEmail(createdUserInfo.getEmail(), requestBody.password());
 
-        return new ResponseEntity<>(new UserInfoResponse(createdUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(new UserInfoResponse(createdUserInfo), HttpStatus.CREATED);
     }
 
     /**

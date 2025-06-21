@@ -1,8 +1,9 @@
 package com.pathbook.pathbook_api.controller;
 
 import com.pathbook.pathbook_api.dto.FileDto;
-import com.pathbook.pathbook_api.dto.FileMeta;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.dto.response.FileMetaResponse;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
 import com.pathbook.pathbook_api.service.UserService;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("file")
@@ -78,16 +77,9 @@ public class FileController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam MultipartFile file) {
         User user = userService.fromPrincipal(userPrincipal);
-        FileMeta storedFileMeta = storageService.store(file, user);
-        String fileUrl = resolveFileUrlEndpoint(storedFileMeta.getFilename());
+        FileMetaDto storedFileMeta = storageService.store(file, user);
 
-        return new ResponseEntity<>(
-                Map.of(
-                        "message",
-                        "You successfully uploaded " + file.getOriginalFilename() + "!",
-                        "url",
-                        fileUrl),
-                HttpStatus.OK);
+        return new ResponseEntity<>(new FileMetaResponse(storedFileMeta), HttpStatus.OK);
     }
 
     public static String resolveFileUrlEndpoint(String filename) {

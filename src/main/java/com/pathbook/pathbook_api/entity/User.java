@@ -1,7 +1,7 @@
 package com.pathbook.pathbook_api.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.pathbook.pathbook_api.dto.UserInfo;
+import com.pathbook.pathbook_api.dto.UserInfoDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -365,14 +365,15 @@ public class User {
      *
      * <p>{@code null}인 값은 무시합니다.
      */
-    public void setUserData(UserInfo userData) {
-        Optional.ofNullable(userData.getId()).ifPresent(id -> this.id = id);
-        Optional.ofNullable(userData.getEmail()).ifPresent(email -> this.email = email);
-        Optional.ofNullable(userData.getUsername()).ifPresent(username -> this.username = username);
-        Optional.ofNullable(userData.getSex()).ifPresent(sex -> this.sex = sex);
-        Optional.ofNullable(userData.getBirthDate())
+    public void setUserData(UserInfoDto userInfoDto) {
+        Optional.ofNullable(userInfoDto.getId()).ifPresent(id -> this.id = id);
+        Optional.ofNullable(userInfoDto.getEmail()).ifPresent(email -> this.email = email);
+        Optional.ofNullable(userInfoDto.getUsername())
+                .ifPresent(username -> this.username = username);
+        Optional.ofNullable(userInfoDto.getSex()).ifPresent(sex -> this.sex = sex);
+        Optional.ofNullable(userInfoDto.getBirthDate())
                 .ifPresent(birthDate -> this.birthDate = birthDate);
-        Optional.ofNullable(userData.getBio()).ifPresent(bio -> this.bio = bio);
+        Optional.ofNullable(userInfoDto.getBio()).ifPresent(bio -> this.bio = bio);
     }
 
     /** 로그인 횟수를 증가시킵니다. */

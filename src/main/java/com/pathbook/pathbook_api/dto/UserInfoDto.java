@@ -4,7 +4,7 @@ import com.pathbook.pathbook_api.entity.User;
 
 import java.time.LocalDate;
 
-public class UserInfoDto implements UserInfo {
+public class UserInfoDto {
     private String id;
     private String email;
     private String username;
@@ -24,14 +24,14 @@ public class UserInfoDto implements UserInfo {
                 entity.getBio());
     }
 
-    public UserInfoDto(UserInfo data) {
+    public UserInfoDto(UserInfoDto dto) {
         this(
-                data.getId(),
-                data.getEmail(),
-                data.getUsername(),
-                data.getSex(),
-                data.getBirthDate(),
-                data.getBio());
+                dto.getId(),
+                dto.getEmail(),
+                dto.getUsername(),
+                dto.getSex(),
+                dto.getBirthDate(),
+                dto.getBio());
     }
 
     public UserInfoDto(
@@ -44,7 +44,6 @@ public class UserInfoDto implements UserInfo {
         this.bio = bio;
     }
 
-    @Override
     public String getId() {
         return id;
     }
@@ -53,7 +52,6 @@ public class UserInfoDto implements UserInfo {
         this.id = id;
     }
 
-    @Override
     public String getEmail() {
         return email;
     }
@@ -62,7 +60,6 @@ public class UserInfoDto implements UserInfo {
         this.email = email;
     }
 
-    @Override
     public String getUsername() {
         return username;
     }
@@ -71,7 +68,6 @@ public class UserInfoDto implements UserInfo {
         this.username = username;
     }
 
-    @Override
     public String getSex() {
         return sex;
     }
@@ -80,7 +76,6 @@ public class UserInfoDto implements UserInfo {
         this.sex = sex;
     }
 
-    @Override
     public LocalDate getBirthDate() {
         return birthDate;
     }
@@ -89,7 +84,6 @@ public class UserInfoDto implements UserInfo {
         this.birthDate = birthDate;
     }
 
-    @Override
     public String getBio() {
         return bio;
     }

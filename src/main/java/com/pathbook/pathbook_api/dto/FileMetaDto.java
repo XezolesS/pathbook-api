@@ -4,7 +4,7 @@ import com.pathbook.pathbook_api.entity.File;
 
 import java.time.LocalDateTime;
 
-public class FileMetaDto implements FileMeta {
+public class FileMetaDto {
     private String filename;
     private String ownerId;
     private String originalFilename;
@@ -24,14 +24,14 @@ public class FileMetaDto implements FileMeta {
                 entity.getCreatedAt());
     }
 
-    public FileMetaDto(FileMeta data) {
+    public FileMetaDto(FileMetaDto dto) {
         this(
-                data.getFilename(),
-                data.getOwnerId(),
-                data.getOriginalFilename(),
-                data.getContentType(),
-                data.getSize(),
-                data.getCreatedAt());
+                dto.getFilename(),
+                dto.getOwnerId(),
+                dto.getOriginalFilename(),
+                dto.getContentType(),
+                dto.getSize(),
+                dto.getCreatedAt());
     }
 
     public FileMetaDto(
@@ -49,7 +49,6 @@ public class FileMetaDto implements FileMeta {
         this.createdAt = createdAt;
     }
 
-    @Override
     public String getFilename() {
         return filename;
     }
@@ -58,7 +57,6 @@ public class FileMetaDto implements FileMeta {
         this.filename = filename;
     }
 
-    @Override
     public String getOwnerId() {
         return ownerId;
     }
@@ -67,7 +65,6 @@ public class FileMetaDto implements FileMeta {
         this.ownerId = ownerId;
     }
 
-    @Override
     public String getOriginalFilename() {
         return originalFilename;
     }
@@ -76,7 +73,6 @@ public class FileMetaDto implements FileMeta {
         this.originalFilename = originalFilename;
     }
 
-    @Override
     public String getContentType() {
         return contentType;
     }
@@ -85,7 +81,6 @@ public class FileMetaDto implements FileMeta {
         this.contentType = contentType;
     }
 
-    @Override
     public Long getSize() {
         return size;
     }
@@ -94,7 +89,6 @@ public class FileMetaDto implements FileMeta {
         this.size = size;
     }
 
-    @Override
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

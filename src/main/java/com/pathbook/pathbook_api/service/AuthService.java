@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.service;
 
+import com.pathbook.pathbook_api.dto.UserInfoDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.EmailMismatchException;
@@ -139,10 +140,11 @@ public class AuthService {
      * @param username
      * @param email
      * @param password
+     * @return {@link UserInfoDto} 추가된 사용자의 정보를 반환합니다.
      * @throws UserAlreadyExistsException {@code userId}, {@code email}이 중복되는 사용자가 있는 경우 예외 발생
      */
     @Transactional
-    public User addUser(String userId, String username, String email, String password) {
+    public UserInfoDto addUser(String userId, String username, String email, String password) {
         if (userRepository.existsById(userId)) {
             throw UserAlreadyExistsException.withUserId(userId);
         }
@@ -154,7 +156,7 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(password);
         User user = new User(userId, email, encodedPassword, username);
 
-        return userRepository.save(user);
+        return new UserInfoDto(userRepository.save(user));
     }
 
     /**
@@ -174,17 +176,7 @@ public class AuthService {
             throw new PasswordMismatchException(user.getId());
         }
 
-        sendVerificationEmail(user);
-    }
-
-    /**
-     * 사용자 인증을 위한 이메일을 전송합니다.
-     *
-     * @param user
-     */
-    public void sendVerificationEmail(User user) {
         String userId = user.getId();
-        String email = user.getEmail();
 
         String token = emailVerificationJwt.setUserId(userId).setEmail(email).buildToken();
         String url = String.format("%s%s?token=%s", webAddress, webPathVerifyEmail, token);

@@ -10,7 +10,7 @@ public class FileDto extends FileMetaDto {
 
     public FileDto() {}
 
-    public FileDto(FileMeta fileMeta, Path absoultePath, Resource resource) {
+    public FileDto(FileMetaDto fileMeta, Path absoultePath, Resource resource) {
         super(fileMeta);
         this.absolutePath = absoultePath;
         this.resource = resource;

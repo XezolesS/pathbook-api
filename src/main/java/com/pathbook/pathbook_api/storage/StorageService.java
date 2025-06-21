@@ -1,7 +1,7 @@
 package com.pathbook.pathbook_api.storage;
 
 import com.pathbook.pathbook_api.dto.FileDto;
-import com.pathbook.pathbook_api.dto.FileMeta;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
 import com.pathbook.pathbook_api.entity.User;
 
 import org.springframework.core.io.Resource;
@@ -27,7 +27,7 @@ public interface StorageService {
      * @param ownerId 소유자 Id
      * @return 저장된 파일의 메타데이터
      */
-    FileMeta store(MultipartFile file, String ownerId);
+    FileMetaDto store(MultipartFile file, String ownerId);
 
     /**
      * 파일을 스토리지에 저장합니다.
@@ -38,7 +38,7 @@ public interface StorageService {
      * @param owner {@link User} 소유자 엔티티
      * @return 저장된 파일의 메타데이터
      */
-    FileMeta store(MultipartFile file, User owner);
+    FileMetaDto store(MultipartFile file, User owner);
 
     /**
      * 스토리지에 있는 모든 파일들의 경로를 반환합니다.
@@ -53,7 +53,7 @@ public interface StorageService {
      * @param filename 파일 이름
      * @return 파일 메타데이터
      */
-    FileMeta load(String filename);
+    FileMetaDto load(String filename);
 
     /**
      * 스토리지에서 {@code filename}와 일치하는 파일의 경로를 불러옵니다.

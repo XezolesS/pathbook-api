@@ -1,10 +1,9 @@
 package com.pathbook.pathbook_api.service;
 
-import com.pathbook.pathbook_api.dto.FileMeta;
-import com.pathbook.pathbook_api.dto.UserInfo;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
+import com.pathbook.pathbook_api.dto.UserInfoDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.response.UserProfileResponse;
-import com.pathbook.pathbook_api.dto.response.UserInfoResponse;
 import com.pathbook.pathbook_api.entity.File;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
@@ -55,9 +54,9 @@ public class UserService {
      *
      * @param userId
      * @param userData
-     * @return {@link UserInfoResponse} 수정된 사용자 정보
+     * @return {@link UserInfoDto} 수정된 사용자 정보
      */
-    public UserInfoResponse updateUserData(String userId, UserInfo userData) {
+    public UserInfoDto updateUserData(String userId, UserInfoDto userData) {
         User user =
                 userRepository
                         .findById(userId)
@@ -67,7 +66,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return new UserInfoResponse(user);
+        return new UserInfoDto(user);
     }
 
     /**
@@ -75,24 +74,18 @@ public class UserService {
      *
      * @param userId
      * @param iconFile
-     * @return {@link FileMeta} 수정된 아이콘 정보
+     * @return {@link FileMetaDto} 수정된 아이콘 정보
      */
-    public FileMeta updateUserIcon(String userId, MultipartFile iconFile) {
+    public FileMetaDto updateUserIcon(String userId, MultipartFile iconFile) {
         User user =
                 userRepository
                         .findById(userId)
                         .orElseThrow(() -> UserNotFoundException.withUserId(userId));
 
-        FileMeta storedFileMeta = storageService.store(iconFile, userId);
+        FileMetaDto storedFileMeta = storageService.store(iconFile, userId);
+        File storedfileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();
 
-        File fileEntity;
-        if (storedFileMeta instanceof File) {
-            fileEntity = (File) storedFileMeta;
-        } else {
-            fileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();
-        }
-
-        user.setIconFile(fileEntity);
+        user.setIconFile(storedfileEntity);
 
         userRepository.save(user);
 
@@ -104,24 +97,18 @@ public class UserService {
      *
      * @param userId
      * @param bannerFile
-     * @return {@link FileMeta} 수정된 배너 정보
+     * @return {@link FileMetaDto} 수정된 배너 정보
      */
-    public FileMeta updateUserBanner(String userId, MultipartFile bannerFile) {
+    public FileMetaDto updateUserBanner(String userId, MultipartFile bannerFile) {
         User user =
                 userRepository
                         .findById(userId)
                         .orElseThrow(() -> UserNotFoundException.withUserId(userId));
 
-        FileMeta storedFileMeta = storageService.store(bannerFile, userId);
+        FileMetaDto storedFileMeta = storageService.store(bannerFile, userId);
+        File storedfileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();
 
-        File fileEntity;
-        if (storedFileMeta instanceof File) {
-            fileEntity = (File) storedFileMeta;
-        } else {
-            fileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();
-        }
-
-        user.setBannerFile(fileEntity);
+        user.setBannerFile(storedfileEntity);
 
         userRepository.save(user);
 

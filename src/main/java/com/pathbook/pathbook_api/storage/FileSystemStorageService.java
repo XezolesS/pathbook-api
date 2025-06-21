@@ -1,7 +1,6 @@
 package com.pathbook.pathbook_api.storage;
 
 import com.pathbook.pathbook_api.dto.FileDto;
-import com.pathbook.pathbook_api.dto.FileMeta;
 import com.pathbook.pathbook_api.dto.FileMetaDto;
 import com.pathbook.pathbook_api.entity.File;
 import com.pathbook.pathbook_api.entity.User;
@@ -56,7 +55,7 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public FileMeta store(MultipartFile file, String ownerId) {
+    public FileMetaDto store(MultipartFile file, String ownerId) {
         // 소유자 검증, owner == null 이면 무시
         User owner = null;
         if (ownerId != null) {
@@ -70,7 +69,7 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public FileMeta store(MultipartFile file, User owner) {
+    public FileMetaDto store(MultipartFile file, User owner) {
         if (file.isEmpty()) {
             throw new StorageException("Failed to store empty file.");
         }
@@ -140,7 +139,7 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public FileMeta load(String filename) {
+    public FileMetaDto load(String filename) {
         File file =
                 fileRepository
                         .findById(filename)
@@ -151,7 +150,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public Path loadAsPath(String filename) {
-        FileMeta fileMeta = load(filename);
+        FileMetaDto fileMeta = load(filename);
 
         return rootLocation.resolve(fileMeta.getFilename());
     }
@@ -159,7 +158,7 @@ public class FileSystemStorageService implements StorageService {
     @Override
     public FileDto loadFull(String filename) {
         try {
-            FileMeta fileMeta = load(filename);
+            FileMetaDto fileMeta = load(filename);
             Path filePath = rootLocation.resolve(fileMeta.getFilename());
             Resource resource = new UrlResource(filePath.toUri());
 
