@@ -1,8 +1,10 @@
 package com.pathbook.pathbook_api.controller;
 
+import com.pathbook.pathbook_api.dto.FileMeta;
 import com.pathbook.pathbook_api.dto.UserInfo;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.UserRequest;
+import com.pathbook.pathbook_api.dto.response.UserProfileResponse;
 import com.pathbook.pathbook_api.dto.response.UserResponse;
 import com.pathbook.pathbook_api.service.UserService;
 
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
@@ -23,28 +27,28 @@ public class UserController {
     @Autowired private UserService userService;
 
     /**
-     * 사용자 정보를 불러옵니다.
+     * 사용자 프로필 정보를 불러옵니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code /user/get/{userId} [GET]}
+     *   <li>엔드포인트: {@code /user/profile/{userId} [GET]}
      *   <li>응답: {@code 200 OK}
      * </ul>
      *
      * @param userId
      * @return
      */
-    @GetMapping("/get/{userId}")
-    public ResponseEntity<?> getUser(@PathVariable String userId) {
-        UserResponse userResponse = userService.getUser(userId);
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<?> getUserProfile(@PathVariable String userId) {
+        UserProfileResponse userProfileResponse = userService.getUserProfile(userId);
 
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return new ResponseEntity<>(userProfileResponse, HttpStatus.OK);
     }
 
     /**
      * 사용자 정보를 수정합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code /user/update-data [GET]}
+     *   <li>엔드포인트: {@code /user/update/data [PUT]}
      *   <li>응답: {@code 200 OK}
      * </ul>
      *
@@ -52,7 +56,7 @@ public class UserController {
      * @param entity
      * @return 수정된 사용자 정보
      */
-    @PutMapping("/update-data")
+    @PutMapping("/update/data")
     public ResponseEntity<?> putUpdateUserData(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody UserRequest requestBody) {
@@ -60,5 +64,47 @@ public class UserController {
                 userService.updateUserData(userPrincipal.getId(), (UserInfo) requestBody);
 
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    }
+
+    /**
+     * 사용자의 아이콘을 수정합니다.
+     *
+     * <ul>
+     *   <li>엔드포인트: {@code /user/update/icon [PUT]}
+     *   <li>응답: {@code 200 OK}
+     * </ul>
+     *
+     * @param userPrincipal
+     * @param entity
+     * @return 업로드 된 아이콘
+     */
+    @PutMapping("/update/icon")
+    public ResponseEntity<?> putUpdateUserIcon(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestPart(value = "iconFile", required = true) MultipartFile iconFile) {
+        FileMeta fileMeta = userService.updateUserIcon(userPrincipal.getId(), iconFile);
+
+        return new ResponseEntity<>(fileMeta, HttpStatus.OK);
+    }
+
+    /**
+     * 사용자의 배너를 수정합니다.
+     *
+     * <ul>
+     *   <li>엔드포인트: {@code /user/update/icon [PUT]}
+     *   <li>응답: {@code 200 OK}
+     * </ul>
+     *
+     * @param userPrincipal
+     * @param entity
+     * @return 업로드 된 아이콘
+     */
+    @PutMapping("/update/banner")
+    public ResponseEntity<?> putUpdateUserBanner(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestPart(value = "bannerFile", required = false) MultipartFile bannerFile) {
+        FileMeta fileMeta = userService.updateUserBanner(userPrincipal.getId(), bannerFile);
+
+        return new ResponseEntity<>(fileMeta, HttpStatus.OK);
     }
 }

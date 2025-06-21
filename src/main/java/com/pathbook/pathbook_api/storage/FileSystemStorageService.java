@@ -2,10 +2,13 @@ package com.pathbook.pathbook_api.storage;
 
 import com.pathbook.pathbook_api.dto.FileDto;
 import com.pathbook.pathbook_api.dto.FileMeta;
+import com.pathbook.pathbook_api.dto.UserInfo;
 import com.pathbook.pathbook_api.entity.File;
+import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.StorageException;
 import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
 import com.pathbook.pathbook_api.repository.FileRepository;
+import com.pathbook.pathbook_api.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -32,6 +35,8 @@ public class FileSystemStorageService implements StorageService {
 
     @Autowired private FileRepository fileRepository;
 
+    @Autowired private UserRepository userRepository;
+
     public FileSystemStorageService(@Autowired StorageProperties properties) {
         if (properties.getLocation().trim().length() == 0) {
             throw new StorageException("File upload location cannot be Empty.");
@@ -50,9 +55,17 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public File store(MultipartFile file) {
+    public FileMeta store(MultipartFile file, UserInfo owner) {
         if (file.isEmpty()) {
             throw new StorageException("Failed to store empty file.");
+        }
+
+        // 소유자 검증, owner == null 이거나 데이터베이스에 없는 경우에는 무시
+        User userEntity;
+        if (owner instanceof User) {
+            userEntity = (User) owner;
+        } else {
+            userEntity = userRepository.findById(owner.getId()).get();
         }
 
         // 파일 이름 해시
@@ -99,7 +112,8 @@ public class FileSystemStorageService implements StorageService {
                             hashedFilename,
                             originalFilename,
                             file.getContentType(),
-                            file.getSize());
+                            file.getSize(),
+                            userEntity);
 
             return fileRepository.save(fileEntity);
         } catch (Exception e) {

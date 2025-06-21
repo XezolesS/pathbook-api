@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.pathbook.pathbook_api.dto.UserInfo;
 
 import jakarta.persistence.CascadeType;
@@ -83,10 +84,12 @@ public class User implements UserInfo {
 
     @OneToOne
     @JoinColumn(name = "icon_filename", nullable = true)
+    @JsonManagedReference
     private File iconFile;
 
     @OneToOne
     @JoinColumn(name = "banner_filename", nullable = true)
+    @JsonManagedReference
     private File bannerFile;
 
     @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)

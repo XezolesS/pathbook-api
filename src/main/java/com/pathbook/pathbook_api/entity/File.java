@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pathbook.pathbook_api.dto.FileMeta;
 
 import jakarta.persistence.Column;
@@ -32,7 +33,7 @@ public class File implements FileMeta {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @ManyToOne private User owner;
+    @ManyToOne @JsonBackReference private User owner;
 
     // endregion
 
@@ -41,10 +42,16 @@ public class File implements FileMeta {
     protected File() {}
 
     public File(String filename, String originalFilename, String contentType, Long size) {
+        this(filename, originalFilename, contentType, size, null);
+    }
+
+    public File(
+            String filename, String originalFilename, String contentType, Long size, User owner) {
         this.filename = filename;
         this.originalFilename = originalFilename;
         this.contentType = contentType;
         this.size = size;
+        this.owner = owner;
     }
 
     // endregion
@@ -94,6 +101,19 @@ public class File implements FileMeta {
 
     public User getOwner() {
         return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    @Override
+    public String getOwnerId() {
+        if (owner == null) {
+            return null;
+        }
+
+        return owner.getId();
     }
 
     // endregion

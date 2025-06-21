@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class FileMetaDto implements FileMeta {
     private String filename;
-    private UserInfo owner;
+    private String ownerId;
     private String originalFilename;
     private String contentType;
     private Long size;
@@ -15,7 +15,7 @@ public class FileMetaDto implements FileMeta {
     public FileMetaDto(FileMeta data) {
         this(
                 data.getFilename(),
-                data.getOwner(),
+                data.getOwnerId(),
                 data.getOriginalFilename(),
                 data.getContentType(),
                 data.getSize(),
@@ -24,13 +24,13 @@ public class FileMetaDto implements FileMeta {
 
     public FileMetaDto(
             String filename,
-            UserInfo owner,
+            String ownerId,
             String originalFilename,
             String contentType,
             Long size,
             LocalDateTime createdAt) {
         this.filename = filename;
-        this.owner = owner;
+        this.ownerId = ownerId;
         this.originalFilename = originalFilename;
         this.contentType = contentType;
         this.size = size;
@@ -47,12 +47,12 @@ public class FileMetaDto implements FileMeta {
     }
 
     @Override
-    public UserInfo getOwner() {
-        return owner;
+    public String getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(UserInfo owner) {
-        this.owner = owner;
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     @Override

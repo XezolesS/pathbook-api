@@ -16,11 +16,11 @@ public interface FileMeta {
     public String getFilename();
 
     /**
-     * 파일의 소유자입니다.
+     * 파일 소유자의 ID입니다.
      *
-     * @return owner
+     * @return ownerId
      */
-    public UserInfo getOwner();
+    public String getOwnerId();
 
     /**
      * 파일의 원래 이름입니다.

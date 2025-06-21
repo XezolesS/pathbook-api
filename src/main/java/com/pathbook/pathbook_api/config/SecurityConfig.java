@@ -42,7 +42,7 @@ public class SecurityConfig {
         "/proxy/**",
 
         // User
-        "/user/get/{userId}",
+        "/user/profile/{userId}",
 
         // File
         "/file/list",

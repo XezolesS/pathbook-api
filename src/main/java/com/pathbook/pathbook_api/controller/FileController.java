@@ -2,6 +2,7 @@ package com.pathbook.pathbook_api.controller;
 
 import com.pathbook.pathbook_api.dto.FileDto;
 import com.pathbook.pathbook_api.dto.FileMeta;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
 import com.pathbook.pathbook_api.storage.StorageService;
 
@@ -11,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,15 +70,11 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> postUploadFile(@RequestParam MultipartFile file) {
-        FileMeta storedFileMeta = storageService.store(file);
-
-        String fileUrl =
-                MvcUriComponentsBuilder.fromMethodName(
-                                FileController.class, "serveFile", storedFileMeta.getFilename())
-                        .build()
-                        .toUri()
-                        .toString();
+    public ResponseEntity<?> postUploadFile(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam MultipartFile file) {
+        FileMeta storedFileMeta = storageService.store(file, userPrincipal);
+        String fileUrl = resolveFileUrlEndpoint(storedFileMeta.getFilename());
 
         return new ResponseEntity<>(
                 Map.of(
@@ -85,5 +83,12 @@ public class FileController {
                         "url",
                         fileUrl),
                 HttpStatus.OK);
+    }
+
+    public static String resolveFileUrlEndpoint(String filename) {
+        return MvcUriComponentsBuilder.fromMethodName(FileController.class, "getFile", filename)
+                .build()
+                .toUri()
+                .toString();
     }
 }
