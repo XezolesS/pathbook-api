@@ -6,35 +6,22 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserPrincipal implements UserDetails, UserInfo {
+public class UserPrincipal implements UserDetails {
     // region Fields
 
     private String id;
     private String email;
     private String password;
-    private String username;
-    private String sex;
-    private LocalDate birthDate;
-    private String bio;
-    private String iconUrl;
-    private String bannerUrl;
-
-    private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
-    private LocalDateTime lastLoginAt;
-    private String lastLoginIp;
-    private int failedLoginAttempts;
     private LocalDateTime accountLockedUntil;
     private boolean verified;
     private boolean enabled;
     private LocalDateTime bannedUntil;
     private String bannedReason;
-    private int bannedCount;
 
     // endregion
 
@@ -44,37 +31,19 @@ public class UserPrincipal implements UserDetails, UserInfo {
         this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
-        this.username = user.getUsername();
-        this.sex = user.getSex();
-        this.birthDate = user.getBirthDate();
-        this.bio = user.getBio();
-        // this.iconUrl = user.getIconFileId();
-        // this.bannerUrl = user.getBannerFileId();
-
-        this.createdAt = user.getCreatedAt();
         this.deletedAt = user.getDeletedAt();
-        this.lastLoginAt = user.getLastLoginAt();
-        this.lastLoginIp = user.getLastLoginIp();
-        this.failedLoginAttempts = user.getFailedLoginAttempts();
         this.accountLockedUntil = user.getAccountLockedUntil();
         this.verified = user.isVerified();
         this.enabled = user.isEnabled();
         this.bannedUntil = user.getBannedUntil();
         this.bannedReason = user.getBannedReason();
-        this.bannedCount = user.getBannedCount();
     }
 
     // endregion
 
     // region Getters
-    @Override
     public String getId() {
         return id;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
     }
 
     @Override
@@ -84,50 +53,11 @@ public class UserPrincipal implements UserDetails, UserInfo {
 
     @Override
     public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getSex() {
-        return sex;
-    }
-
-    @Override
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    @Override
-    public String getBio() {
-        return bio;
-    }
-
-    public String getIconUrl() {
-        return iconUrl;
-    }
-
-    public String getBannerUrl() {
-        return bannerUrl;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+        return email;
     }
 
     public LocalDateTime getDeletedAt() {
         return deletedAt;
-    }
-
-    public LocalDateTime getLastLoginAt() {
-        return lastLoginAt;
-    }
-
-    public String getLastLoginIp() {
-        return lastLoginIp;
-    }
-
-    public int getFailedLoginAttempts() {
-        return failedLoginAttempts;
     }
 
     public LocalDateTime getAccountLockedUntil() {
@@ -144,10 +74,6 @@ public class UserPrincipal implements UserDetails, UserInfo {
 
     public String getBannedReason() {
         return bannedReason;
-    }
-
-    public int getBannedCount() {
-        return bannedCount;
     }
 
     // endregion

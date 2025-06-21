@@ -11,6 +11,7 @@ import com.pathbook.pathbook_api.dto.response.LoginResponse;
 import com.pathbook.pathbook_api.dto.response.UserResponse;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.service.AuthService;
+import com.pathbook.pathbook_api.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,6 +45,8 @@ public class AuthController {
     @Autowired private AuthenticationManager authManager;
 
     @Autowired private AuthService authService;
+
+    @Autowired private UserService userService;
 
     /**
      * 로그인 요청을 처리합니다.
@@ -97,8 +100,10 @@ public class AuthController {
                     (UserPrincipal)
                             SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+            User user = userService.fromPrincipal(userPrincipal);
+
             return new ResponseEntity<>(
-                    LoginResponse.success(new UserResponse(userPrincipal)), HttpStatus.OK);
+                    LoginResponse.success(new UserResponse(user)), HttpStatus.OK);
         } catch (BadCredentialsException ex) {
             // 사용자 로그인 정보 불일치
             authService.handleLoginFail(email);
@@ -188,7 +193,9 @@ public class AuthController {
      */
     @GetMapping("/me")
     public ResponseEntity<?> getMe(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return new ResponseEntity<>(new UserResponse(userPrincipal), HttpStatus.OK);
+        User user = userService.fromPrincipal(userPrincipal);
+
+        return new ResponseEntity<>(new UserResponse(user), HttpStatus.OK);
     }
 
     /**

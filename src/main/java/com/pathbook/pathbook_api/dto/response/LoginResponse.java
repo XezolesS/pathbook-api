@@ -7,16 +7,16 @@ import java.time.LocalDateTime;
 public record LoginResponse(
         LoginResultStatus status,
         String message,
-        UserResponse userResponse,
+        UserResponse user,
         LocalDateTime lockedUntil,
         LocalDateTime bannedUntil,
         String bannedReason,
         LocalDateTime deletedAt) {
-    public static LoginResponse success(UserResponse userResponse) {
+    public static LoginResponse success(UserResponse user) {
         return new LoginResponse(
                 LoginResultStatus.SUCCESS,
                 "Login successful",
-                userResponse,
+                user,
                 null,
                 null,
                 null,
