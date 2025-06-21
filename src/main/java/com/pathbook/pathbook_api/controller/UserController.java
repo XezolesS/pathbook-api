@@ -3,13 +3,18 @@ package com.pathbook.pathbook_api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.response.UserResponse;
 import com.pathbook.pathbook_api.service.UserService;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/user")
@@ -32,5 +37,13 @@ public class UserController {
         UserResponse userResponse = userService.getUser(userId);
 
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    }
+
+    
+    @PutMapping("/update-info")
+    public String putUpdateUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody String entity) {
+        //TODO: process PUT request
+        
+        return entity;
     }
 }

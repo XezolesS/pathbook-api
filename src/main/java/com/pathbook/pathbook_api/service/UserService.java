@@ -24,6 +24,6 @@ public class UserService {
                         .findById(userId)
                         .orElseThrow(() -> UserNotFoundException.withUserId(userId));
 
-        return new UserResponse(user);
+        return UserResponse.fromUser(user);
     }
 }

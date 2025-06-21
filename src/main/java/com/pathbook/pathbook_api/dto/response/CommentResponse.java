@@ -18,7 +18,7 @@ public class CommentResponse {
     public CommentResponse(PostComment comment) {
         this.commentId = comment.getId();
         this.postId = comment.getPost().getId();
-        this.author = new UserResponse(comment.getAuthor());
+        this.author = UserResponse.fromUser(comment.getAuthor());
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();

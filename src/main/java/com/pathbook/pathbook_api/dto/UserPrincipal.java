@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal implements UserDetails, UserData {
     // region Fields
 
     private String id;
@@ -67,10 +67,12 @@ public class UserPrincipal implements UserDetails {
     // endregion
 
     // region Getters
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public String getEmail() {
         return email;
     }
@@ -85,22 +87,27 @@ public class UserPrincipal implements UserDetails {
         return username;
     }
 
+    @Override
     public String getSex() {
         return sex;
     }
 
+    @Override
     public LocalDate getBirthDate() {
         return birthDate;
     }
 
+    @Override
     public String getBio() {
         return bio;
     }
 
+    @Override
     public String getIconUrl() {
         return iconUrl;
     }
 
+    @Override
     public String getBannerUrl() {
         return bannerUrl;
     }

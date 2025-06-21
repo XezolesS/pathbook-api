@@ -98,7 +98,8 @@ public class AuthController {
                             SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
             return new ResponseEntity<>(
-                    LoginResponse.success(new UserResponse(userPrincipal)), HttpStatus.OK);
+                    LoginResponse.success(UserResponse.fromUserPrincipal(userPrincipal)),
+                    HttpStatus.OK);
         } catch (BadCredentialsException ex) {
             // 사용자 로그인 정보 불일치
             authService.handleLoginFail(email);
@@ -170,7 +171,7 @@ public class AuthController {
 
         authService.sendVerificationEmail(createdUser);
 
-        return new ResponseEntity<>(new UserResponse(createdUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(UserResponse.fromUser(createdUser), HttpStatus.CREATED);
     }
 
     /**
@@ -188,7 +189,7 @@ public class AuthController {
      */
     @GetMapping("/me")
     public ResponseEntity<?> getMe(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return new ResponseEntity<>(new UserResponse(userPrincipal), HttpStatus.OK);
+        return new ResponseEntity<>(UserResponse.fromUserPrincipal(userPrincipal), HttpStatus.OK);
     }
 
     /**

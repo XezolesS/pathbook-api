@@ -1,55 +1,53 @@
 package com.pathbook.pathbook_api.dto.response;
 
+import com.pathbook.pathbook_api.dto.UserData;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.entity.User;
 
-public class UserResponse {
-    private String userId;
-    private String username;
-    private String email;
-    private boolean verified;
-    private String iconUrl;
-    private String bannerUrl;
+import java.time.LocalDate;
 
-    public UserResponse(User user) {
-        this.userId = user.getId();
-        this.username = user.getUsername();
-        this.email = user.getEmail();
-        this.verified = user.isVerified();
-        this.iconUrl = user.getIconUrl();
-        this.bannerUrl = user.getBannerUrl();
+public record UserResponse(
+        String userId,
+        String email,
+        String username,
+        String getSex,
+        LocalDate getBirthDate,
+        String getBio,
+        String iconUrl,
+        String bannerUrl) {
+    public static UserResponse fromUserDataLike(UserData userData) {
+        return new UserResponse(
+                userData.getId(),
+                userData.getEmail(),
+                userData.getUsername(),
+                userData.getSex(),
+                userData.getBirthDate(),
+                userData.getBio(),
+                userData.getIconUrl(),
+                userData.getBannerUrl());
     }
 
-    public UserResponse(UserPrincipal userPrincipal) {
-        this.userId = userPrincipal.getId();
-        this.username = userPrincipal.getUsername();
-        this.email = userPrincipal.getEmail();
-        this.verified = userPrincipal.isVerified();
-        this.iconUrl = userPrincipal.getIconUrl();
-        this.bannerUrl = userPrincipal.getBannerUrl();
+    public static UserResponse fromUser(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getSex(),
+                user.getBirthDate(),
+                user.getBio(),
+                user.getIconUrl(),
+                user.getBannerUrl());
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public boolean isVerified() {
-        return verified;
-    }
-
-    public String getIconUrl() {
-        return iconUrl;
-    }
-
-    public String getBannerUrl() {
-        return bannerUrl;
+    public static UserResponse fromUserPrincipal(UserPrincipal userPrincipal) {
+        return new UserResponse(
+                userPrincipal.getId(),
+                userPrincipal.getEmail(),
+                userPrincipal.getUsername(),
+                userPrincipal.getSex(),
+                userPrincipal.getBirthDate(),
+                userPrincipal.getBio(),
+                userPrincipal.getIconUrl(),
+                userPrincipal.getBannerUrl());
     }
 }

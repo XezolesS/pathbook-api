@@ -1,5 +1,7 @@
 package com.pathbook.pathbook_api.entity;
 
+import com.pathbook.pathbook_api.dto.UserData;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +17,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserData {
     // region Fields
 
     @Id
@@ -129,6 +131,7 @@ public class User {
 
     // region Getters & Setters
 
+    @Override
     public String getId() {
         return id;
     }
@@ -137,6 +140,7 @@ public class User {
         this.id = id;
     }
 
+    @Override
     public String getEmail() {
         return email;
     }
@@ -249,6 +253,7 @@ public class User {
         this.bannedCount = bannedCount;
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
@@ -257,6 +262,7 @@ public class User {
         this.username = username;
     }
 
+    @Override
     public String getSex() {
         return sex;
     }
@@ -265,6 +271,7 @@ public class User {
         this.sex = sex;
     }
 
+    @Override
     public LocalDate getBirthDate() {
         return birthDate;
     }
@@ -273,6 +280,7 @@ public class User {
         this.birthDate = birthDate;
     }
 
+    @Override
     public String getBio() {
         return bio;
     }
@@ -281,6 +289,7 @@ public class User {
         this.bio = bio;
     }
 
+    @Override
     public String getIconUrl() {
         return iconUrl;
     }
@@ -289,6 +298,7 @@ public class User {
         this.iconUrl = iconUrl;
     }
 
+    @Override
     public String getBannerUrl() {
         return bannerUrl;
     }
