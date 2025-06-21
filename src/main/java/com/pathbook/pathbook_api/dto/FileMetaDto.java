@@ -1,5 +1,7 @@
 package com.pathbook.pathbook_api.dto;
 
+import com.pathbook.pathbook_api.entity.File;
+
 import java.time.LocalDateTime;
 
 public class FileMetaDto implements FileMeta {
@@ -11,6 +13,16 @@ public class FileMetaDto implements FileMeta {
     private LocalDateTime createdAt;
 
     public FileMetaDto() {}
+
+    public FileMetaDto(File entity) {
+        this(
+                entity.getFilename(),
+                entity.getOwnerId(),
+                entity.getOriginalFilename(),
+                entity.getContentType(),
+                entity.getSize(),
+                entity.getCreatedAt());
+    }
 
     public FileMetaDto(FileMeta data) {
         this(

@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @Entity
 @Table(name = "users")
-public class User implements UserInfo {
+public class User {
     // region Fields
 
     @Id
@@ -139,7 +139,6 @@ public class User implements UserInfo {
 
     // region Getters & Setters
 
-    @Override
     public String getId() {
         return id;
     }
@@ -148,7 +147,6 @@ public class User implements UserInfo {
         this.id = id;
     }
 
-    @Override
     public String getEmail() {
         return email;
     }
@@ -261,7 +259,6 @@ public class User implements UserInfo {
         this.bannedCount = bannedCount;
     }
 
-    @Override
     public String getUsername() {
         return username;
     }
@@ -270,7 +267,6 @@ public class User implements UserInfo {
         this.username = username;
     }
 
-    @Override
     public String getSex() {
         return sex;
     }
@@ -279,7 +275,6 @@ public class User implements UserInfo {
         this.sex = sex;
     }
 
-    @Override
     public LocalDate getBirthDate() {
         return birthDate;
     }
@@ -288,7 +283,6 @@ public class User implements UserInfo {
         this.birthDate = birthDate;
     }
 
-    @Override
     public String getBio() {
         return bio;
     }

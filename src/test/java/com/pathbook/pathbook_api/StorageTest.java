@@ -60,7 +60,7 @@ public class StorageTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.url", Matchers.containsString("test.txt")));
 
-        then(storageService).should().store(multipartFile);
+        then(storageService).should().store(multipartFile, "mockuser");
     }
 
     @Test

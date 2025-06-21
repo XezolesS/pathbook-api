@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "files")
-public class File implements FileMeta {
+public class File {
     // region Fields
 
     @Id
@@ -58,7 +58,6 @@ public class File implements FileMeta {
 
     // region Getters & Setters
 
-    @Override
     public String getFilename() {
         return filename;
     }
@@ -67,7 +66,6 @@ public class File implements FileMeta {
         this.filename = id;
     }
 
-    @Override
     public String getOriginalFilename() {
         return originalFilename;
     }
@@ -76,7 +74,6 @@ public class File implements FileMeta {
         this.originalFilename = originalFilename;
     }
 
-    @Override
     public String getContentType() {
         return contentType;
     }
@@ -85,7 +82,6 @@ public class File implements FileMeta {
         this.contentType = contentType;
     }
 
-    @Override
     public Long getSize() {
         return size;
     }
@@ -94,7 +90,6 @@ public class File implements FileMeta {
         this.size = size;
     }
 
-    @Override
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -107,7 +102,6 @@ public class File implements FileMeta {
         this.owner = owner;
     }
 
-    @Override
     public String getOwnerId() {
         if (owner == null) {
             return null;

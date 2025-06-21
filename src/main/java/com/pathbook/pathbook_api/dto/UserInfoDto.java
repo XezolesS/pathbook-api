@@ -1,5 +1,7 @@
 package com.pathbook.pathbook_api.dto;
 
+import com.pathbook.pathbook_api.entity.User;
+
 import java.time.LocalDate;
 
 public class UserInfoDto implements UserInfo {
@@ -11,6 +13,16 @@ public class UserInfoDto implements UserInfo {
     private String bio;
 
     public UserInfoDto() {}
+
+    public UserInfoDto(User entity) {
+        this(
+                entity.getId(),
+                entity.getEmail(),
+                entity.getUsername(),
+                entity.getSex(),
+                entity.getBirthDate(),
+                entity.getBio());
+    }
 
     public UserInfoDto(UserInfo data) {
         this(

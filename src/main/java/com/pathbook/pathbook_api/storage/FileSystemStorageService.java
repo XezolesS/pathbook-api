@@ -2,11 +2,12 @@ package com.pathbook.pathbook_api.storage;
 
 import com.pathbook.pathbook_api.dto.FileDto;
 import com.pathbook.pathbook_api.dto.FileMeta;
-import com.pathbook.pathbook_api.dto.UserInfo;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
 import com.pathbook.pathbook_api.entity.File;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.StorageException;
 import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
+import com.pathbook.pathbook_api.exception.UserNotFoundException;
 import com.pathbook.pathbook_api.repository.FileRepository;
 import com.pathbook.pathbook_api.repository.UserRepository;
 
@@ -55,17 +56,23 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public FileMeta store(MultipartFile file, UserInfo owner) {
-        if (file.isEmpty()) {
-            throw new StorageException("Failed to store empty file.");
+    public FileMeta store(MultipartFile file, String ownerId) {
+        // 소유자 검증, owner == null 이면 무시
+        User owner = null;
+        if (ownerId != null) {
+            owner =
+                    userRepository
+                            .findById(ownerId)
+                            .orElseThrow(() -> UserNotFoundException.withUserId(ownerId));
         }
 
-        // 소유자 검증, owner == null 이거나 데이터베이스에 없는 경우에는 무시
-        User userEntity;
-        if (owner instanceof User) {
-            userEntity = (User) owner;
-        } else {
-            userEntity = userRepository.findById(owner.getId()).get();
+        return store(file, owner);
+    }
+
+    @Override
+    public FileMeta store(MultipartFile file, User owner) {
+        if (file.isEmpty()) {
+            throw new StorageException("Failed to store empty file.");
         }
 
         // 파일 이름 해시
@@ -113,9 +120,9 @@ public class FileSystemStorageService implements StorageService {
                             originalFilename,
                             file.getContentType(),
                             file.getSize(),
-                            userEntity);
+                            owner);
 
-            return fileRepository.save(fileEntity);
+            return new FileMetaDto(fileRepository.save(fileEntity));
         } catch (Exception e) {
             throw new StorageException("File saved but failed to index in database.", e);
         }
@@ -134,12 +141,12 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public FileMeta load(String filename) {
-        FileMeta fileMeta =
+        File file =
                 fileRepository
                         .findById(filename)
                         .orElseThrow(() -> new StorageFileNotFoundException(filename));
 
-        return fileMeta;
+        return new FileMetaDto(file);
     }
 
     @Override

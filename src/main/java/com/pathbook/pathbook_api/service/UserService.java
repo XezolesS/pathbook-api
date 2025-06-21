@@ -83,7 +83,7 @@ public class UserService {
                         .findById(userId)
                         .orElseThrow(() -> UserNotFoundException.withUserId(userId));
 
-        FileMeta storedFileMeta = storageService.store(iconFile, user);
+        FileMeta storedFileMeta = storageService.store(iconFile, userId);
 
         File fileEntity;
         if (storedFileMeta instanceof File) {
@@ -112,7 +112,7 @@ public class UserService {
                         .findById(userId)
                         .orElseThrow(() -> UserNotFoundException.withUserId(userId));
 
-        FileMeta storedFileMeta = storageService.store(bannerFile, user);
+        FileMeta storedFileMeta = storageService.store(bannerFile, userId);
 
         File fileEntity;
         if (storedFileMeta instanceof File) {
