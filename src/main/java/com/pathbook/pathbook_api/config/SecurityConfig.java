@@ -42,7 +42,7 @@ public class SecurityConfig {
         "/proxy/**",
 
         // User
-        "/user/{userId}/**",
+        "/user/get/{userId}",
     };
 
     @Value("#{'${server.allowed-origins}'.split(',')}")

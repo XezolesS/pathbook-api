@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "users")
@@ -359,6 +360,24 @@ public class User implements UserData {
     // endregion
 
     // region Helper Methods
+
+    /**
+     * 사용자 데이터 정보를 설정합니다.
+     *
+     * <p>{@code null}인 값은 무시합니다.
+     */
+    public void setUserData(UserData userData) {
+        Optional.ofNullable(userData.getId()).ifPresent(id -> this.id = id);
+        Optional.ofNullable(userData.getEmail()).ifPresent(email -> this.email = email);
+        Optional.ofNullable(userData.getUsername()).ifPresent(username -> this.username = username);
+        Optional.ofNullable(userData.getSex()).ifPresent(sex -> this.sex = sex);
+        Optional.ofNullable(userData.getBirthDate())
+                .ifPresent(birthDate -> this.birthDate = birthDate);
+        Optional.ofNullable(userData.getBio()).ifPresent(bio -> this.bio = bio);
+        Optional.ofNullable(userData.getIconUrl()).ifPresent(iconUrl -> this.iconUrl = iconUrl);
+        Optional.ofNullable(userData.getBannerUrl())
+                .ifPresent(bannerUrl -> this.bannerUrl = bannerUrl);
+    }
 
     /** 로그인 횟수를 증가시킵니다. */
     public void increaseLoginCount() {
