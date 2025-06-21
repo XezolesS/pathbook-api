@@ -1,6 +1,7 @@
 package com.pathbook.pathbook_api.handler;
 
 import com.pathbook.pathbook_api.exception.PasswordMismatchException;
+import com.pathbook.pathbook_api.exception.PostNotFoundException;
 import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
 import com.pathbook.pathbook_api.exception.UserAlreadyExistsException;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
@@ -84,6 +85,21 @@ public class GlobalExceptionHandler {
         String userId = ex.getUserId();
         if (userId != null) {
             problemDetail.setProperty("userid", userId);
+        }
+
+        return new ResponseEntity<>(problemDetail, status);
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handlePostNotFound(PostNotFoundException ex) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ProblemDetail problemDetail =
+                initProblemDetail(status, "/post-not-found", "Post not found");
+        problemDetail.setDetail(ex.getLocalizedMessage());
+
+        Long postId = ex.getPostId();
+        if (postId != null) {
+            problemDetail.setProperty("filename", postId);
         }
 
         return new ResponseEntity<>(problemDetail, status);

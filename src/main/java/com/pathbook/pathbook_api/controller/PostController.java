@@ -1,102 +1,130 @@
-// package com.pathbook.pathbook_api.controller;
+package com.pathbook.pathbook_api.controller;
 
-// import com.pathbook.pathbook_api.dto.PostReportRequest;
-// import com.pathbook.pathbook_api.dto.UserPrincipal;
-// import com.pathbook.pathbook_api.exception.PostNotFoundException;
-// import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
-// import com.pathbook.pathbook_api.request.PostRequest;
-// import com.pathbook.pathbook_api.response.PostResponse;
-// import com.pathbook.pathbook_api.service.PostReportService;
-// import com.pathbook.pathbook_api.service.PostService;
+import com.pathbook.pathbook_api.dto.PostDto;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.dto.request.PostRequest;
+import com.pathbook.pathbook_api.dto.response.PostResponse;
+import com.pathbook.pathbook_api.service.PostService;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.security.core.annotation.AuthenticationPrincipal;
-// import org.springframework.stereotype.Controller;
-// import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-// import java.util.List;
+import java.util.List;
+import java.util.stream.Collectors;
 
-// @Controller
-// @RequestMapping("/post")
-// public class PostController {
-//     @Autowired private PostService postService;
+@Controller
+@RequestMapping("/post")
+public class PostController {
+    @Autowired private PostService postService;
 
-//     @Autowired private PostReportService postReportService;
+    /**
+     * 포스트를 여러개 불러옵니다.
+     *
+     * <ul>
+     *   <li>엔드포인트: {@code /post/list [GET]}
+     *   <li>응답: {@code 200 OK}
+     * </ul>
+     *
+     * @return
+     */
+    @GetMapping("/list")
+    public ResponseEntity<?> getPostList() {
+        List<PostDto> postList = postService.getPostList();
 
-//     @GetMapping("/list")
-//     public ResponseEntity<?> getPostList() {
-//         List<PostResponse> postList = postService.getPostList();
-//         return ResponseEntity.ok(postList);
-//     }
+        return new ResponseEntity<>(
+                postList.stream().map(PostResponse::new).collect(Collectors.toList()),
+                HttpStatus.OK);
+    }
 
-//     @GetMapping("/{postId}")
-//     public ResponseEntity<?> getPost(@PathVariable Long postId) {
-//         try {
-//             PostResponse post = postService.getPost(postId);
-//             return ResponseEntity.ok(post);
-//         } catch (PostNotFoundException e) {
-//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
-//         }
-//     }
+    /**
+     * 포스트를 불러옵니다.
+     *
+     * <ul>
+     *   <li>엔드포인트: {@code /post/p/{postId} [GET]}
+     *   <li>응답: {@code 200 OK}
+     * </ul>
+     *
+     * @param postId
+     * @return
+     */
+    @GetMapping("/p/{postId}")
+    public ResponseEntity<?> getPost(@PathVariable Long postId) {
+        PostDto post = postService.getPost(postId);
 
-//     @PostMapping("/write")
-//     public ResponseEntity<?> writePost(
-//             @AuthenticationPrincipal UserPrincipal user, @RequestBody PostRequest request) {
-//         PostResponse resultPost =
-//                 postService.writePost(user.getId(), request.title(), request.content());
-//         return ResponseEntity.status(HttpStatus.CREATED).body(resultPost);
-//     }
+        return new ResponseEntity<>(new PostResponse(post), HttpStatus.OK);
+    }
 
-//     @PutMapping("/update/{postId}")
-//     public ResponseEntity<?> updatePost(
-//             @AuthenticationPrincipal UserPrincipal user,
-//             @PathVariable Long postId,
-//             @RequestBody PostRequest request) {
-//         try {
-//             PostResponse resultPost =
-//                     postService.updatePost(
-//                             postId, user.getId(), request.title(), request.content());
-//             return ResponseEntity.ok(resultPost);
-//         } catch (PostNotFoundException e) {
-//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
-//         } catch (UnauthorizedAccessException e) {
-//             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e);
-//         }
-//     }
+    /**
+     * 포스트를 새로 작성합니다.
+     *
+     * <ul>
+     *   <li>엔드포인트: {@code /post/write [POST]}
+     *   <li>응답: {@code 201 Created}
+     * </ul>
+     *
+     * @param userPrincipal
+     * @param requestBody
+     * @return
+     */
+    @PostMapping("/write")
+    public ResponseEntity<?> postWritePost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody PostRequest requestBody) {
+        PostDto savedPost = postService.writePost(userPrincipal.getId(), requestBody);
 
-//     @DeleteMapping("/delete/{postId}")
-//     public ResponseEntity<?> deletePost(
-//             @AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
-//         try {
-//             postService.deletePost(user.getId(), postId);
-//             return ResponseEntity.ok().build();
-//         } catch (PostNotFoundException e) {
-//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
-//         } catch (UnauthorizedAccessException e) {
-//             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e);
-//         }
-//     }
+        return new ResponseEntity<>(new PostResponse(savedPost), HttpStatus.CREATED);
+    }
 
-//     @PostMapping("/like/{postId}")
-//     public ResponseEntity<?> likePost(
-//             @AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
-//         postService.likePost(user.getId(), postId);
-//         return ResponseEntity.ok().build();
-//     }
+    /**
+     * 포스트를 수정합니다.
+     *
+     * <ul>
+     *   <li>엔드포인트: {@code /post/edit/{postId} [PUT]}
+     *   <li>응답: {@code 200 OK}
+     * </ul>
+     *
+     * @param userPrincipal
+     * @param postId
+     * @param requestBody
+     * @return
+     */
+    @PutMapping("/edit/{postId}")
+    public ResponseEntity<?> putEditPost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long postId,
+            @RequestBody PostRequest requestBody) {
+        PostDto editedPost = postService.editPost(userPrincipal.getId(), postId, requestBody);
 
-//     @PostMapping("/unlike/{postId}")
-//     public ResponseEntity<?> unlikePost(
-//             @AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
-//         postService.unlikePost(user.getId(), postId);
-//         return ResponseEntity.ok().build();
-//     }
+        return new ResponseEntity<>(new PostResponse(editedPost), HttpStatus.OK);
+    }
 
-//     @PostMapping("/report/{postId}")
-//     public ResponseEntity<?> reportPost(@RequestBody PostReportRequest request) {
-//         postReportService.reportPost(
-//                 request.postId(), request.reporterId(), request.reason(), request.detailReason());
-//         return ResponseEntity.ok("Post Reported successfully.");
-//     }
-// }
+    /**
+     * 포스트를 삭제합니다.
+     *
+     * <ul>
+     *   <li>엔드포인트: {@code /post/delete/{postId} [DELETE]}
+     *   <li>응답: {@code 204 No Content}
+     * </ul>
+     *
+     * @param userPrincipal
+     * @param postId
+     * @return
+     */
+    @DeleteMapping("/delete/{postId}")
+    public ResponseEntity<?> deleteDeletePost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
+        postService.deletePost(userPrincipal.getId(), postId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}

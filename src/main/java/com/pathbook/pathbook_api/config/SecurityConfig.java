@@ -33,7 +33,8 @@ public class SecurityConfig {
         "/auth/reset-password",
 
         // Post
-        "/post/{id}",
+        "/post/list",
+        "/post/p/{postId}",
 
         // Comment
         "/comment/list/{postId}",

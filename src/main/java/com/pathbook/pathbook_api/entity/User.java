@@ -83,12 +83,12 @@ public class User {
     private String bio;
 
     @OneToOne
-    @JoinColumn(name = "icon_filename", nullable = true)
+    @JoinColumn(name = "icon_filename", referencedColumnName = "filename", nullable = true)
     @JsonManagedReference
     private File iconFile;
 
     @OneToOne
-    @JoinColumn(name = "banner_filename", nullable = true)
+    @JoinColumn(name = "banner_filename", referencedColumnName = "filename", nullable = true)
     @JsonManagedReference
     private File bannerFile;
 

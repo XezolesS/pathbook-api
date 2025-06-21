@@ -4,7 +4,7 @@ public class PostNotFoundException extends RecordNotFoundException {
     private final Long postId;
 
     public PostNotFoundException(Long postId) {
-        super(String.format("Post %d not found", postId));
+        super(String.format("Post not found with ID: %d", postId));
 
         this.postId = postId;
     }

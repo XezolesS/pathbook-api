@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
@@ -43,7 +44,7 @@ public class Post {
     private String content;
 
     @Column(name = "view", nullable = false)
-    private Long view;
+    private Long view = 0L;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -71,7 +72,7 @@ public class Post {
     private List<PostAttachment> attachments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private HashSet<PostTag> tags = new HashSet<>();
+    private Set<PostTag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PathgroupPostItem> pathgroupItems = new ArrayList<>();
@@ -167,7 +168,7 @@ public class Post {
         return attachments;
     }
 
-    public HashSet<PostTag> getTags() {
+    public Set<PostTag> getTags() {
         return tags;
     }
 

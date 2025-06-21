@@ -1,95 +1,119 @@
-// package com.pathbook.pathbook_api.service;
+package com.pathbook.pathbook_api.service;
 
-// import com.pathbook.pathbook_api.entity.Post;
-// import com.pathbook.pathbook_api.entity.User;
-// import com.pathbook.pathbook_api.exception.PostNotFoundException;
-// import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
-// import com.pathbook.pathbook_api.exception.UserNotFoundException;
-// import com.pathbook.pathbook_api.repository.PostLikeRepository;
-// import com.pathbook.pathbook_api.repository.PostRepository;
-// import com.pathbook.pathbook_api.repository.UserRepository;
-// import com.pathbook.pathbook_api.response.PostResponse;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Service;
-// import org.springframework.transaction.annotation.Transactional;
+import com.pathbook.pathbook_api.dto.PostDto;
+import com.pathbook.pathbook_api.entity.Post;
+import com.pathbook.pathbook_api.entity.User;
+import com.pathbook.pathbook_api.exception.PostNotFoundException;
+import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.repository.PostRepository;
+import com.pathbook.pathbook_api.repository.UserRepository;
 
-// import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-// @Service
-// public class PostService {
-//     @Autowired private UserRepository userRepository;
+import java.util.List;
 
-//     @Autowired private PostRepository postRepository;
+@Service
+public class PostService {
+    @Autowired private UserRepository userRepository;
 
-//     @Autowired private PostLikeRepository postLikeRepository;
+    @Autowired private PostRepository postRepository;
 
-//     @Autowired private PostReportService postReportService;
+    /**
+     * 모든 포스트를 불러옵니다.
+     *
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<PostDto> getPostList() {
+        return postRepository.findAll().stream().map(PostDto::new).toList();
+    }
 
-//     @Transactional(readOnly = true)
-//     public List<PostResponse> getPostList() {
-//         return postRepository.findAll().stream()
-//                 .map(PostResponse::new)
-//                 .toList();
-//     }
+    /**
+     * 포스트를 불러옵니다.
+     *
+     * @param postId
+     * @return {@link PostDto} 포스트 데이터
+     */
+    public PostDto getPost(Long postId) {
+        Post post =
+                postRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new PostNotFoundException(postId));
 
-//     @Transactional(readOnly = true)
-//     public PostResponse getPost(Integer postId) {
-//         Post post = postRepository.findById(postId)
-//                 .orElseThrow(() -> new PostNotFoundException(postId));
-//         return new PostResponse(post);
-//     }
+        return new PostDto(post);
+    }
 
-//     @Transactional
-//     public PostResponse createPost(String authorId, String title, String content) {
-//         User author = userRepository.findById(authorId)
-//                 .orElseThrow(() -> new UserNotFoundException(authorId));
-//         Post post = new Post(author, title, content);
-//         return new PostResponse(postRepository.save(post));
-//     }
+    /**
+     * 포스트를 새로 작성합니다.
+     *
+     * @param authorId
+     * @param postData
+     * @return {@link PostDto} 작성된 포스트
+     */
+    public PostDto writePost(String authorId, PostDto postData) {
+        User author =
+                userRepository
+                        .findById(authorId)
+                        .orElseThrow(() -> UserNotFoundException.withUserId(authorId));
 
-//     @Transactional
-//     public PostResponse updatePost(Integer postId, String authorId, String title, String content) {
-//         Post post = postRepository.findById(postId)
-//                 .orElseThrow(() -> new PostNotFoundException(postId));
+        Post newPost = new Post(author, postData.getTitle(), postData.getContent());
 
-//         if (!post.getAuthor().getId().equals(authorId)) {
-//             throw new UnauthorizedAccessException("게시글 수정 권한이 없습니다");
-//         }
+        Post savedPost = postRepository.save(newPost);
 
-//         post.setTitle(title);
-//         post.setContent(content);
-//         post.setUpdatedAt(java.time.LocalDateTime.now());
+        return new PostDto(savedPost);
+    }
 
-//         return new PostResponse(postRepository.save(post));
-//     }
+    /**
+     * 포스트를 수정합니다.
+     *
+     * <p>작성자가 아니라면 수정할 수 없습니다.
+     *
+     * @param authorId
+     * @param postId
+     * @param postData
+     * @return {@link PostDto} 수정된 포스트
+     */
+    public PostDto editPost(String authorId, Long postId, PostDto postData) {
+        Post post =
+                postRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new PostNotFoundException(postId));
 
-//     @Transactional
-//     public void deletePost(String authorId, Integer postId) {
-//         Post post = postRepository.findById(postId)
-//                 .orElseThrow(() -> new PostNotFoundException(postId));
+        if (!post.getAuthor().getId().equals(authorId)) {
+            throw new UnauthorizedAccessException(
+                    String.format("User %s not owning post %d", authorId, postId));
+        }
 
-//         if (!post.getAuthor().getId().equals(authorId)) {
-//             throw new UnauthorizedAccessException("게시글 삭제 권한이 없습니다");
-//         }
+        post.setTitle(postData.getTitle());
+        post.setContent(postData.getContent());
 
-//         postRepository.delete(post);
-//     }
+        Post editedPost = postRepository.save(post);
 
-//     @Transactional
-//     public void likePost(String userId, Integer postId) {
-//         User user = userRepository.findById(userId)
-//                 .orElseThrow(() -> new UserNotFoundException(userId));
-//         Post post = postRepository.findById(postId)
-//                 .orElseThrow(() -> new PostNotFoundException(postId));
-//         postLikeRepository.save(new PostLike(user, post));
-//     }
+        return new PostDto(editedPost);
+    }
 
-//     @Transactional
-//     public void unlikePost(String userId, Integer postId) {
-//         User user = userRepository.findById(userId)
-//                 .orElseThrow(() -> new UserNotFoundException(userId));
-//         Post post = postRepository.findById(postId)
-//                 .orElseThrow(() -> new PostNotFoundException(postId));
-//         postLikeRepository.deleteByUserAndPost(user, post);
-//     }
-// }
+    /**
+     * 포스트를 삭제합니다.
+     *
+     * <p>작성자가 아니라면 삭제할 수 없습니다.
+     *
+     * @param authorId
+     * @param postId
+     */
+    public void deletePost(String authorId, Long postId) {
+        Post post =
+                postRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new PostNotFoundException(postId));
+
+        if (!post.getAuthor().getId().equals(authorId)) {
+            throw new UnauthorizedAccessException(
+                    String.format("User %s not owning post %d", authorId, postId));
+        }
+
+        postRepository.delete(post);
+    }
+}
