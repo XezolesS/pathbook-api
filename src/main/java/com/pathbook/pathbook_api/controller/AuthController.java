@@ -49,7 +49,7 @@ public class AuthController {
      * 로그인 요청을 처리합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/login [POST]}
+     *   <li>엔드포인트: {@code /auth/login [POST]}
      *   <li>응답: {@code 200 OK}
      * </ul>
      *
@@ -150,7 +150,7 @@ public class AuthController {
      * <p>사용자 추가 후 이메일 인증을 위한 이메일을 송신합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/register [POST]}
+     *   <li>엔드포인트: {@code /auth/register [POST]}
      *   <li>응답: {@code 201 Created}
      * </ul>
      *
@@ -177,7 +177,7 @@ public class AuthController {
      * 로그인 중인 세션으로부터 사용자 정보를 반환합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/me [GET]}
+     *   <li>엔드포인트: {@code /auth/me [GET]}
      *   <li>응답: {@code 200 OK}
      * </ul>
      *
@@ -195,7 +195,7 @@ public class AuthController {
      * 이메일 인증을 위한 이메일을 송신합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/send-verification-email [POST]}
+     *   <li>엔드포인트: {@code /auth/send-verification-email [POST]}
      *   <li>응답: {@code 204 NO_CONTENT}
      * </ul>
      *
@@ -213,7 +213,7 @@ public class AuthController {
      * 이메일을 인증합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/verify-email [POST]}
+     *   <li>엔드포인트: {@code /auth/verify-email [POST]}
      *   <li>응답: {@code 204 NO_CONTENT}
      * </ul>
      *
@@ -232,7 +232,7 @@ public class AuthController {
      * 비밀번호 재설정 요청을 처리합니다. 비밀번호 재설정이 가능한 URL을 이메일로 전송합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/forgot-password [POST]}
+     *   <li>엔드포인트: {@code /auth/forgot-password [POST]}
      *   <li>응답: {@code 204 NO_CONTENT}
      * </ul>
      *
@@ -251,7 +251,7 @@ public class AuthController {
      * 비밀번호를 재설정합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/reset-password [PUT]}
+     *   <li>엔드포인트: {@code /auth/reset-password [PUT]}
      *   <li>응답: {@code 204 NO_CONTENT}
      * </ul>
      *
@@ -270,7 +270,7 @@ public class AuthController {
      * 사용자의 비밀번호를 변경합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/change-password [PUT]}
+     *   <li>엔드포인트: {@code /auth/change-password [PUT]}
      *   <li>응답: {@code 204 NO_CONTENT}
      * </ul>
      *
@@ -295,7 +295,7 @@ public class AuthController {
      * <p>삭제 후 세션 연결을 종료합니다.
      *
      * <ul>
-     *   <li>엔드포인트: {@code auth/delete-user [DELETE]}
+     *   <li>엔드포인트: {@code /auth/delete-user [DELETE]}
      *   <li>응답: {@code 204 NO_CONTENT}
      * </ul>
      *
