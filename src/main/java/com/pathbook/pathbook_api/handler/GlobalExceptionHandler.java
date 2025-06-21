@@ -1,29 +1,19 @@
 package com.pathbook.pathbook_api.handler;
 
-import com.pathbook.pathbook_api.exception.PasswordMismatchException;
-import com.pathbook.pathbook_api.exception.PostNotFoundException;
-import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
-import com.pathbook.pathbook_api.exception.UserAlreadyExistsException;
-import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.exception.RecordAlreadyExistsException;
+import com.pathbook.pathbook_api.exception.RecordNotFoundException;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.URI;
-import java.time.Instant;
-
 @RestControllerAdvice
-public class GlobalExceptionHandler {
-    @Value("${server.address}")
-    private String serverAddress;
-
-    @Value("${server.port}")
-    private int serverPort;
+@Order(Ordered.LOWEST_PRECEDENCE)
+public class GlobalExceptionHandler extends BaseExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGlobalException(Exception ex) {
@@ -35,100 +25,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(problemDetail, status);
     }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ProblemDetail> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+    @ExceptionHandler(RecordAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleRecordAlreadyExists(
+            RecordAlreadyExistsException ex) {
         HttpStatus status = HttpStatus.CONFLICT;
         ProblemDetail problemDetail =
-                initProblemDetail(status, "/user-already-exists", "User already exists");
+                initProblemDetail(status, "/record-already-exists", "Record already exists");
         problemDetail.setDetail(ex.getLocalizedMessage());
-
-        String userId = ex.getUserId();
-        if (userId != null) {
-            problemDetail.setProperty("userid", userId);
-        }
-
-        String email = ex.getEmail();
-        if (email != null) {
-            problemDetail.setProperty("email", email);
-        }
 
         return new ResponseEntity<>(problemDetail, status);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ProblemDetail> handleUserNotFound(UserNotFoundException ex) {
+    @ExceptionHandler(RecordNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleRecordNotFound(RecordNotFoundException ex) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ProblemDetail problemDetail =
-                initProblemDetail(status, "/user-not-found", "User not found");
+                initProblemDetail(status, "/record-not-found", "Record not found");
         problemDetail.setDetail(ex.getLocalizedMessage());
 
-        String userId = ex.getUserId();
-        if (userId != null) {
-            problemDetail.setProperty("userid", userId);
-        }
-
-        String email = ex.getEmail();
-        if (email != null) {
-            problemDetail.setProperty("email", email);
-        }
-
         return new ResponseEntity<>(problemDetail, status);
-    }
-
-    @ExceptionHandler(PasswordMismatchException.class)
-    public ResponseEntity<ProblemDetail> handlePasswordMismatch(PasswordMismatchException ex) {
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
-        ProblemDetail problemDetail =
-                initProblemDetail(status, "/password-mismatch", "Password mismatch");
-        problemDetail.setDetail(ex.getLocalizedMessage());
-
-        String userId = ex.getUserId();
-        if (userId != null) {
-            problemDetail.setProperty("userid", userId);
-        }
-
-        return new ResponseEntity<>(problemDetail, status);
-    }
-
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ProblemDetail> handlePostNotFound(PostNotFoundException ex) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        ProblemDetail problemDetail =
-                initProblemDetail(status, "/post-not-found", "Post not found");
-        problemDetail.setDetail(ex.getLocalizedMessage());
-
-        Long postId = ex.getPostId();
-        if (postId != null) {
-            problemDetail.setProperty("filename", postId);
-        }
-
-        return new ResponseEntity<>(problemDetail, status);
-    }
-
-    @ExceptionHandler(StorageFileNotFoundException.class)
-    public ResponseEntity<ProblemDetail> handleStorageFileNotFound(
-            StorageFileNotFoundException ex) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        ProblemDetail problemDetail =
-                initProblemDetail(status, "/file-not-found", "File not found");
-        problemDetail.setDetail(ex.getLocalizedMessage());
-
-        String filename = ex.getFilename();
-        if (filename != null) {
-            problemDetail.setProperty("filename", filename);
-        }
-
-        return new ResponseEntity<>(problemDetail, status);
-    }
-
-    private ProblemDetail initProblemDetail(HttpStatusCode status, String type, String title) {
-        String serverUrl = String.format("%s:%d", serverAddress, serverPort);
-
-        ProblemDetail problemDetail = ProblemDetail.forStatus(status);
-        problemDetail.setType(URI.create(serverUrl + type));
-        problemDetail.setTitle(title);
-        problemDetail.setProperty("timestamp", Instant.now());
-
-        return problemDetail;
     }
 }

@@ -1,7 +1,7 @@
 package com.pathbook.pathbook_api.exception;
 
 /** 사용자를 찾을 수 없는 경우 예외를 발생시킵니다. */
-public class UserNotFoundException extends RecordAlreadyExistsException {
+public class UserNotFoundException extends RecordNotFoundException {
     private final String userId;
     private final String email;
 
