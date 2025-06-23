@@ -14,6 +14,8 @@ import com.pathbook.pathbook_api.entity.PostBookmark;
 import com.pathbook.pathbook_api.entity.PostComment;
 import com.pathbook.pathbook_api.entity.PostLike;
 import com.pathbook.pathbook_api.entity.PostPath;
+import com.pathbook.pathbook_api.entity.PostTag;
+import com.pathbook.pathbook_api.entity.Tag;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
 import com.pathbook.pathbook_api.entity.id.PostLikeId;
@@ -26,6 +28,8 @@ import com.pathbook.pathbook_api.repository.PostBookmarkRepository;
 import com.pathbook.pathbook_api.repository.PostCommentRepository;
 import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
+import com.pathbook.pathbook_api.repository.PostTagRepository;
+import com.pathbook.pathbook_api.repository.TagRepository;
 import com.pathbook.pathbook_api.storage.StorageService;
 
 import org.locationtech.jts.geom.LineString;
@@ -39,7 +43,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -56,6 +63,10 @@ public class PostService {
     @Autowired private PostBookmarkRepository postBookmarkRepository;
 
     @Autowired private PostAttachmentRepository postAttachmentRepository;
+
+    @Autowired private PostTagRepository postTagRepository;
+
+    @Autowired private TagRepository tagRepository;
 
     @Autowired private FileRepository fileRepository;
 
@@ -109,7 +120,19 @@ public class PostService {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return postRepository.findPostSummaries(pageable);
+        Page<PostSummaryDto> postSummaries = postRepository.findPostSummaries(pageable);
+
+        // 태그 반환 (N+1 Query)
+        for (PostSummaryDto postSummary : postSummaries) {
+            List<PostTag> tags = postTagRepository.findByPostId(postSummary.getId());
+            postSummary.setTags(
+                    tags.stream()
+                            .map(PostTag::getTag)
+                            .map(Tag::getName)
+                            .collect(Collectors.toSet()));
+        }
+
+        return postSummaries;
     }
 
     /**
@@ -123,6 +146,7 @@ public class PostService {
      * @param bookmarkFetchOption 북마크 조회 방식
      * @return {@link PostDto} 포스트 데이터
      */
+    @Transactional(readOnly = true)
     public PostDto getPost(
             Long postId,
             FetchOption commentFetchOption,
@@ -131,9 +155,13 @@ public class PostService {
         Post post = fromPostId(postId);
         PostPath postPath = post.getPath();
         List<PostAttachment> postAttachment = post.getAttachments();
+        Set<PostTag> postTags = post.getTags();
 
         PostDto postDto =
-                new PostDto(post).withPathEntity(postPath).withAttachmentEntities(postAttachment);
+                new PostDto(post)
+                        .withPathEntity(postPath)
+                        .withAttachmentEntities(postAttachment)
+                        .withTagEntities(postTags);
 
         // 댓글
         switch (commentFetchOption) {
@@ -213,8 +241,8 @@ public class PostService {
         }
 
         // 첨부파일 저장
-        List<PostAttachment> newPostAttachments = new ArrayList<>();
         if (attachments != null && attachments.length > 0) {
+            List<PostAttachment> newPostAttachments = new ArrayList<>();
             List<FileMetaDto> newAttachmentDtos = storageService.storeAll(attachments, author);
             List<File> newAttachments =
                     fileRepository.findAllById(
@@ -227,16 +255,34 @@ public class PostService {
             newPost.setAttachments(newPostAttachments);
         }
 
+        // 태그 저장
+        if (postData.getTags() != null) {
+            Set<PostTag> newTags = new HashSet<>();
+
+            for (String tagName : postData.getTags()) {
+                Tag tag =
+                        tagRepository
+                                .findByName(tagName)
+                                .orElseGet(() -> tagRepository.save(new Tag(tagName)));
+
+                newTags.add(new PostTag(newPost, tag));
+            }
+
+            newPost.setTags(newTags);
+        }
+
         // DB 저장
         Post savedPost = postRepository.save(newPost);
 
         // 반환
         PostPath savedPostPath = savedPost.getPath();
         List<PostAttachment> savedPostAttachment = savedPost.getAttachments();
+        Set<PostTag> savedPostTags = savedPost.getTags();
 
         return new PostDto(savedPost)
                 .withPathEntity(savedPostPath)
-                .withAttachmentEntities(savedPostAttachment);
+                .withAttachmentEntities(savedPostAttachment)
+                .withTagEntities(savedPostTags);
     }
 
     /**
@@ -298,15 +344,34 @@ public class PostService {
             post.setAttachments(newPostAttachments);
         }
 
+        // 태그 저장
+        post.setTags(null);
+        if (postData.getTags() != null) {
+            Set<PostTag> newTags = new HashSet<>();
+
+            for (String tagName : postData.getTags()) {
+                Tag tag =
+                        tagRepository
+                                .findByName(tagName)
+                                .orElseGet(() -> tagRepository.save(new Tag(tagName)));
+
+                newTags.add(new PostTag(post, tag));
+            }
+
+            post.setTags(newTags);
+        }
+
         Post editedPost = postRepository.save(post);
 
         // 반환
         PostPath savedPostPath = editedPost.getPath();
         List<PostAttachment> savedPostAttachment = editedPost.getAttachments();
+        Set<PostTag> savedPostTags = editedPost.getTags();
 
         return new PostDto(editedPost)
                 .withPathEntity(savedPostPath)
-                .withAttachmentEntities(savedPostAttachment);
+                .withAttachmentEntities(savedPostAttachment)
+                .withTagEntities(savedPostTags);
     }
 
     /**

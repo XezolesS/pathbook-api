@@ -4,6 +4,7 @@ import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.repository.PostRepository;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * 포스트 정보를 위한 Projection DTO.
@@ -16,6 +17,7 @@ public class PostSummaryDto {
     private UserInfoDto author;
     private String title;
     private String content;
+    private Set<String> tags;
     private Long view = 0L;
     private long likeCount = 0;
     private long bookmarkCount = 0;
@@ -31,6 +33,7 @@ public class PostSummaryDto {
                 dto.author,
                 dto.title,
                 dto.content,
+                dto.tags,
                 dto.view,
                 dto.likeCount,
                 dto.bookmarkCount,
@@ -55,6 +58,7 @@ public class PostSummaryDto {
                 new UserInfoDto(author),
                 title,
                 content,
+                null,
                 view,
                 likeCount,
                 bookmarkCount,
@@ -68,6 +72,7 @@ public class PostSummaryDto {
             UserInfoDto author,
             String title,
             String content,
+            Set<String> tags,
             Long view,
             long likeCount,
             long bookmarkCount,
@@ -78,6 +83,7 @@ public class PostSummaryDto {
         this.author = new UserInfoDto(author);
         this.title = title;
         this.content = content;
+        this.tags = tags;
         this.view = view;
         this.likeCount = likeCount;
         this.bookmarkCount = bookmarkCount;
@@ -100,6 +106,14 @@ public class PostSummaryDto {
 
     public String getContent() {
         return content;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     public Long getView() {

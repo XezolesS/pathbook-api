@@ -4,10 +4,14 @@ import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostAttachment;
 import com.pathbook.pathbook_api.entity.PostComment;
 import com.pathbook.pathbook_api.entity.PostPath;
+import com.pathbook.pathbook_api.entity.PostTag;
+import com.pathbook.pathbook_api.entity.Tag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PostDto {
     // region Fields
@@ -18,6 +22,7 @@ public class PostDto {
     private String content;
     private PostPathDto path;
     private List<FileMetaDto> attachments;
+    private Set<String> tags;
     private Long view = 0L;
     private long likeCount = 0;
     private long bookmarkCount = 0;
@@ -40,6 +45,7 @@ public class PostDto {
                 entity.getContent(),
                 null,
                 null,
+                null,
                 entity.getView(),
                 0,
                 0,
@@ -57,6 +63,7 @@ public class PostDto {
                 dto.content,
                 dto.path,
                 dto.attachments,
+                dto.tags,
                 dto.view,
                 dto.likeCount,
                 dto.bookmarkCount,
@@ -67,7 +74,7 @@ public class PostDto {
     }
 
     public PostDto(Long id, UserInfoDto author, String title, String content, Long view) {
-        this(id, author, title, content, null, null, view, 0, 0, 0, null, null, null);
+        this(id, author, title, content, null, null, null, view, 0, 0, 0, null, null, null);
     }
 
     protected PostDto(
@@ -77,6 +84,7 @@ public class PostDto {
             String content,
             PostPathDto path,
             List<FileMetaDto> attachments,
+            Set<String> tags,
             Long view,
             long likeCount,
             long bookmarkCount,
@@ -90,6 +98,7 @@ public class PostDto {
         this.content = content;
         this.path = path;
         this.attachments = attachments;
+        this.tags = tags;
         this.view = view;
         this.likeCount = likeCount;
         this.bookmarkCount = bookmarkCount;
@@ -149,6 +158,14 @@ public class PostDto {
 
     public void setAttachments(List<FileMetaDto> attachments) {
         this.attachments = attachments;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     public Long getView() {
@@ -217,6 +234,14 @@ public class PostDto {
                         attachments.stream().map(PostAttachment::getFile).toList()));
     }
 
+    public PostDto withTagEntities(Set<PostTag> entities) {
+        return withTags(
+                entities.stream()
+                        .map(PostTag::getTag)
+                        .map(Tag::getName)
+                        .collect(Collectors.toSet()));
+    }
+
     public PostDto withCommentEntities(List<PostComment> comments) {
         return withComments(PostCommentDto.fromEntities(comments));
     }
@@ -228,6 +253,11 @@ public class PostDto {
 
     public PostDto withAttachments(List<FileMetaDto> attachments) {
         setAttachments(attachments);
+        return this;
+    }
+
+    public PostDto withTags(Set<String> tags) {
+        setTags(tags);
         return this;
     }
 

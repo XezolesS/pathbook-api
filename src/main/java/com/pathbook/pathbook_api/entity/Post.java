@@ -92,7 +92,11 @@ public class Post {
             orphanRemoval = true)
     private List<PostAttachment> attachments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private Set<PostTag> tags = new HashSet<>();
 
     @OneToMany(
@@ -211,6 +215,18 @@ public class Post {
 
     public Set<PostTag> getTags() {
         return tags;
+    }
+
+    public void setTags(Set<PostTag> tags) {
+        this.tags.clear();
+
+        if (tags != null) {
+            for (PostTag tag : tags) {
+                tag.setPost(this);
+            }
+
+            this.tags.addAll(tags);
+        }
     }
 
     public List<PathgroupPostItem> getPathgroupItems() {
