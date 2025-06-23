@@ -1,9 +1,11 @@
 package com.pathbook.pathbook_api.repository;
 
-import com.pathbook.pathbook_api.dto.PostDto;
+import com.pathbook.pathbook_api.dto.PostSummaryDto;
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.User;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -28,5 +30,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             LEFT JOIN PostComment c ON c.post = p
             GROUP BY p.id
             """)
-    List<PostDto> findAllWithCounts();
+    Page<PostSummaryDto> findPostSummaries(Pageable pagable);
 }

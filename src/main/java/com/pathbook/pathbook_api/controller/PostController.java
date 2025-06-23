@@ -2,13 +2,16 @@ package com.pathbook.pathbook_api.controller;
 
 import com.pathbook.pathbook_api.dto.FetchOption;
 import com.pathbook.pathbook_api.dto.PostDto;
+import com.pathbook.pathbook_api.dto.PostSortOption;
+import com.pathbook.pathbook_api.dto.PostSummaryDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.PostRequest;
 import com.pathbook.pathbook_api.dto.response.PostResponse;
-import com.pathbook.pathbook_api.service.PostCommentService;
+import com.pathbook.pathbook_api.dto.response.PostSummaryResponse;
 import com.pathbook.pathbook_api.service.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,15 +25,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/post")
 public class PostController {
     @Autowired private PostService postService;
-
-    @Autowired private PostCommentService postCommentService;
 
     /**
      * 포스트를 여러개 불러옵니다.
@@ -43,11 +43,18 @@ public class PostController {
      * @return
      */
     @GetMapping("/list")
-    public ResponseEntity<?> getPostList() {
-        List<PostDto> postList = postService.getPostList();
+    public ResponseEntity<?> getPostList(
+            @RequestParam(name = "p", required = false) Integer pageParam,
+            @RequestParam(name = "s", required = false) Integer sizeParam,
+            @RequestParam(name = "sort", required = false) String sortOptionParam) {
+        int page = pageParam == null ? 0 : pageParam;
+        int size = sizeParam == null ? 10 : sizeParam;
+        PostSortOption sortOption = PostSortOption.fromString(sortOptionParam);
+
+        Page<PostSummaryDto> postList = postService.getPostSummaries(page, size, sortOption);
 
         return new ResponseEntity<>(
-                postList.stream().map(PostResponse::new).collect(Collectors.toList()),
+                postList.map(PostSummaryResponse::new),
                 HttpStatus.OK);
     }
 

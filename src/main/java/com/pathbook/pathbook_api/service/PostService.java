@@ -3,6 +3,8 @@ package com.pathbook.pathbook_api.service;
 import com.pathbook.pathbook_api.dto.FetchOption;
 import com.pathbook.pathbook_api.dto.PostCommentDto;
 import com.pathbook.pathbook_api.dto.PostDto;
+import com.pathbook.pathbook_api.dto.PostSortOption;
+import com.pathbook.pathbook_api.dto.PostSummaryDto;
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostBookmark;
 import com.pathbook.pathbook_api.entity.PostComment;
@@ -18,6 +20,10 @@ import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,13 +62,36 @@ public class PostService {
     }
 
     /**
-     * 모든 포스트를 불러옵니다.
+     * 포스트의 요약 정보를 페이지 단위로 불러옵니다.
      *
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @param sortOption {@link PostSortOption}
      * @return
      */
     @Transactional(readOnly = true)
-    public List<PostDto> getPostList() {
-        return postRepository.findAllWithCounts();
+    public Page<PostSummaryDto> getPostSummaries(int page, int size, PostSortOption sortOption) {
+        // 더 고차원적인 정렬 옵션은 Criteria API, QueryDSL 등 외부 라이브러리 사용
+
+        Sort sort;
+        switch (sortOption) {
+            case VIEW_DESC:
+                sort = Sort.by("view").descending();
+                break;
+            case LIKE_DESC:
+                sort = Sort.by("likeCount").descending();
+                break;
+            case BOOKMARK_DESC:
+                sort = Sort.by("bookmarkCount").descending();
+                break;
+            default:
+                sort = Sort.by("updatedAt").descending();
+                break;
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return postRepository.findPostSummaries(pageable);
     }
 
     /**
