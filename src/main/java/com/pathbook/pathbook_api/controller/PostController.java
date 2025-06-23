@@ -8,6 +8,7 @@ import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.PostRequest;
 import com.pathbook.pathbook_api.dto.response.PostResponse;
 import com.pathbook.pathbook_api.dto.response.PostSummaryResponse;
+import com.pathbook.pathbook_api.service.PostCommentService;
 import com.pathbook.pathbook_api.service.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.stream.Collectors;
-
 @Controller
 @RequestMapping("/post")
 public class PostController {
     @Autowired private PostService postService;
+
+    @Autowired private PostCommentService postCommentService;
 
     /**
      * 포스트를 여러개 불러옵니다.
@@ -53,9 +54,7 @@ public class PostController {
 
         Page<PostSummaryDto> postList = postService.getPostSummaries(page, size, sortOption);
 
-        return new ResponseEntity<>(
-                postList.map(PostSummaryResponse::new),
-                HttpStatus.OK);
+        return new ResponseEntity<>(postList.map(PostSummaryResponse::new), HttpStatus.OK);
     }
 
     /**
@@ -82,6 +81,10 @@ public class PostController {
         PostDto post =
                 postService.getPost(
                         postId, commentFetchOption, likeFetchOption, bookmarkFetchOption);
+
+        if (commentFetchOption == FetchOption.FULL) {
+            post.setComments(postCommentService.buildCommentTreeFromDto(post.getComments()));
+        }
 
         return new ResponseEntity<>(new PostResponse(post), HttpStatus.OK);
     }
