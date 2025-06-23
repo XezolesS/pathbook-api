@@ -132,7 +132,8 @@ public class PostService {
         PostPath postPath = post.getPath();
         List<PostAttachment> postAttachment = post.getAttachments();
 
-        PostDto postDto = new PostDto(post, postPath, postAttachment);
+        PostDto postDto =
+                new PostDto(post).withPathEntity(postPath).withAttachmentEntities(postAttachment);
 
         // 댓글
         switch (commentFetchOption) {
@@ -229,17 +230,13 @@ public class PostService {
         // DB 저장
         Post savedPost = postRepository.save(newPost);
 
-        /*
-        if (attachments != null && attachments.length > 0) {
-            postAttachmentRepository.saveAll(newPostAttachments);
-        }
-        */
-
         // 반환
         PostPath savedPostPath = savedPost.getPath();
         List<PostAttachment> savedPostAttachment = savedPost.getAttachments();
 
-        return new PostDto(savedPost, savedPostPath, savedPostAttachment);
+        return new PostDto(savedPost)
+                .withPathEntity(savedPostPath)
+                .withAttachmentEntities(savedPostAttachment);
     }
 
     /**
@@ -307,7 +304,9 @@ public class PostService {
         PostPath savedPostPath = editedPost.getPath();
         List<PostAttachment> savedPostAttachment = editedPost.getAttachments();
 
-        return new PostDto(editedPost, savedPostPath, savedPostAttachment);
+        return new PostDto(editedPost)
+                .withPathEntity(savedPostPath)
+                .withAttachmentEntities(savedPostAttachment);
     }
 
     /**

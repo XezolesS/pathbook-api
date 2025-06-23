@@ -2,6 +2,7 @@ package com.pathbook.pathbook_api.dto;
 
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostAttachment;
+import com.pathbook.pathbook_api.entity.PostComment;
 import com.pathbook.pathbook_api.entity.PostPath;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto {
+    // region Fields
+
     private Long id;
     private UserInfoDto author;
     private String title;
@@ -23,25 +26,20 @@ public class PostDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // endregion
+
+    // region Constructors
+
     public PostDto() {}
 
     public PostDto(Post entity) {
-        this(entity, null, null);
-    }
-
-    public PostDto(Post entity, PostPath path) {
-        this(entity, path, null);
-    }
-
-    public PostDto(Post entity, PostPath path, List<PostAttachment> attachments) {
         this(
                 entity.getId(),
                 new UserInfoDto(entity.getAuthor()),
                 entity.getTitle(),
                 entity.getContent(),
-                new PostPathDto(path),
-                FileMetaDto.fromEntities(
-                        attachments.stream().map(PostAttachment::getFile).toList()),
+                null,
+                null,
                 entity.getView(),
                 0,
                 0,
@@ -72,28 +70,7 @@ public class PostDto {
         this(id, author, title, content, null, null, view, 0, 0, 0, null, null, null);
     }
 
-    public PostDto(
-            Long id,
-            UserInfoDto author,
-            String title,
-            String content,
-            PostPathDto path,
-            Long view) {
-        this(id, author, title, content, path, null, view, 0, 0, 0, null, null, null);
-    }
-
-    public PostDto(
-            Long id,
-            UserInfoDto author,
-            String title,
-            String content,
-            PostPathDto path,
-            List<FileMetaDto> attachments,
-            Long view) {
-        this(id, author, title, content, path, attachments, view, 0, 0, 0, null, null, null);
-    }
-
-    public PostDto(
+    protected PostDto(
             Long id,
             UserInfoDto author,
             String title,
@@ -121,6 +98,10 @@ public class PostDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public Long getId() {
         return id;
@@ -221,4 +202,39 @@ public class PostDto {
     public void addComment(PostCommentDto comment) {
         comments.add(comment);
     }
+
+    // endregion
+
+    // region Factory Methods
+
+    public PostDto withPathEntity(PostPath path) {
+        return withPath(new PostPathDto(path));
+    }
+
+    public PostDto withAttachmentEntities(List<PostAttachment> attachments) {
+        return withAttachments(
+                FileMetaDto.fromEntities(
+                        attachments.stream().map(PostAttachment::getFile).toList()));
+    }
+
+    public PostDto withCommentEntities(List<PostComment> comments) {
+        return withComments(PostCommentDto.fromEntities(comments));
+    }
+
+    public PostDto withPath(PostPathDto path) {
+        setPath(path);
+        return this;
+    }
+
+    public PostDto withAttachments(List<FileMetaDto> attachments) {
+        setAttachments(attachments);
+        return this;
+    }
+
+    public PostDto withComments(List<PostCommentDto> comments) {
+        setComments(comments);
+        return this;
+    }
+
+    // endregion
 }
