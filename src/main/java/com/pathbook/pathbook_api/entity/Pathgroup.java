@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "post_paths")
+@Table(name = "pathgroups")
 public class Pathgroup {
     // region Fields
 
@@ -36,7 +36,7 @@ public class Pathgroup {
     private String title;
 
     @Lob
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @Column(name = "created_at")

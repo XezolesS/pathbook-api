@@ -1,10 +1,15 @@
 package com.pathbook.pathbook_api.entity;
 
+import com.pathbook.pathbook_api.dto.UserInfoDto;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -12,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "users")
@@ -31,6 +37,12 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "login_count")
+    private Integer loginCount;
+
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
@@ -44,16 +56,19 @@ public class User {
     private LocalDateTime accountLockedUntil;
 
     @Column(name = "is_verified", nullable = false)
-    private Boolean isVerified = false;
+    private Boolean verified = false;
 
     @Column(name = "is_enabled", nullable = false)
-    private Boolean isEnabled = true;
+    private Boolean enabled = true;
 
     @Column(name = "banned_until")
     private LocalDateTime bannedUntil;
 
     @Column(name = "banned_reason", columnDefinition = "TINYTEXT")
     private String bannedReason;
+
+    @Column(name = "banned_count")
+    private Integer bannedCount;
 
     @Column(name = "username", length = 32, nullable = false)
     private String username;
@@ -67,40 +82,82 @@ public class User {
     @Column(name = "bio", columnDefinition = "TINYTEXT")
     private String bio;
 
-    @Column(name = "icon_url", length = 2048)
-    private String iconUrl;
+    @OneToOne
+    @JoinColumn(name = "icon_filename", referencedColumnName = "filename", nullable = true)
+    private File iconFile;
 
-    @Column(name = "banner_url", length = 2048)
-    private String bannerUrl;
+    @OneToOne
+    @JoinColumn(name = "banner_filename", referencedColumnName = "filename", nullable = true)
+    private File bannerFile;
 
-    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "reporter",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<UserReport> userReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reportee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "reportee",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<UserReport> reported = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(
+            mappedBy = "author",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = false)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = false)
     private List<PostLike> postLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = false)
     private List<PostBookmark> postBookmarks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "reporter",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostReport> postReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(
+            mappedBy = "author",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = false)
     private List<PostComment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = false)
     private List<PostLike> commentLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "reporter",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostReport> commentReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "author",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<Pathgroup> pathgroups = new ArrayList<>();
 
     // endregion
@@ -148,8 +205,24 @@ public class User {
         return createdAt;
     }
 
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getLoginCount() {
+        return loginCount == null ? 0 : loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
     }
 
     public LocalDateTime getLastLoginAt() {
@@ -169,7 +242,7 @@ public class User {
     }
 
     public Integer getFailedLoginAttempts() {
-        return failedLoginAttempts;
+        return failedLoginAttempts == null ? 0 : failedLoginAttempts;
     }
 
     public void setFailedLoginAttempts(Integer failedLoginAttempts) {
@@ -184,20 +257,20 @@ public class User {
         this.accountLockedUntil = accountLockedUntil;
     }
 
-    public Boolean getIsVerified() {
-        return isVerified;
+    public Boolean isVerified() {
+        return verified;
     }
 
-    public void setIsVerified(Boolean isVerified) {
-        this.isVerified = isVerified;
+    public void setVerified(Boolean isVerified) {
+        this.verified = isVerified;
     }
 
-    public Boolean getIsEnabled() {
-        return isEnabled;
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    public void setIsEnabled(Boolean isEnabled) {
-        this.isEnabled = isEnabled;
+    public void setEnabled(Boolean isEnabled) {
+        this.enabled = isEnabled;
     }
 
     public LocalDateTime getBannedUntil() {
@@ -214,6 +287,14 @@ public class User {
 
     public void setBannedReason(String bannedReason) {
         this.bannedReason = bannedReason;
+    }
+
+    public Integer getBannedCount() {
+        return bannedCount == null ? 0 : bannedCount;
+    }
+
+    public void setBannedCount(Integer bannedCount) {
+        this.bannedCount = bannedCount;
     }
 
     public String getUsername() {
@@ -248,20 +329,20 @@ public class User {
         this.bio = bio;
     }
 
-    public String getIconUrl() {
-        return iconUrl;
+    public File getIconFile() {
+        return iconFile;
     }
 
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
+    public void setIconFile(File iconFile) {
+        this.iconFile = iconFile;
     }
 
-    public String getBannerUrl() {
-        return bannerUrl;
+    public File getBannerFile() {
+        return bannerFile;
     }
 
-    public void setBannerUrl(String bannerUrl) {
-        this.bannerUrl = bannerUrl;
+    public void setBannerFile(File bannerFile) {
+        this.bannerFile = bannerFile;
     }
 
     public List<UserReport> getUserReports() {
@@ -316,6 +397,38 @@ public class User {
     // endregion
 
     // region Helper Methods
+
+    /**
+     * 사용자 데이터 정보를 설정합니다.
+     *
+     * <p>{@code null}인 값은 무시합니다.
+     */
+    public void setUserData(UserInfoDto userInfoDto) {
+        Optional.ofNullable(userInfoDto.getId()).ifPresent(id -> this.id = id);
+        Optional.ofNullable(userInfoDto.getEmail()).ifPresent(email -> this.email = email);
+        Optional.ofNullable(userInfoDto.getUsername())
+                .ifPresent(username -> this.username = username);
+        Optional.ofNullable(userInfoDto.getSex()).ifPresent(sex -> this.sex = sex);
+        Optional.ofNullable(userInfoDto.getBirthDate())
+                .ifPresent(birthDate -> this.birthDate = birthDate);
+        Optional.ofNullable(userInfoDto.getBio()).ifPresent(bio -> this.bio = bio);
+    }
+
+    /** 로그인 횟수를 증가시킵니다. */
+    public void increaseLoginCount() {
+        loginCount++;
+    }
+
+    /** 로그인 시도 실패 횟수를 초기화하고, 계정 잠금을 해제합니다. */
+    public void resetFailedLoginAttempts() {
+        failedLoginAttempts = 0;
+        accountLockedUntil = null;
+    }
+
+    /** 로그인 시도 실패 횟수를 증가시킵니다. */
+    public void increaseFailedLoginAttempts() {
+        failedLoginAttempts++;
+    }
 
     // endregion
 }

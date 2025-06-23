@@ -2,6 +2,7 @@ package com.pathbook.pathbook_api.config;
 
 import com.pathbook.pathbook_api.service.PathbookUserDetailsService;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,22 +28,31 @@ public class SecurityConfig {
         // Auth
         "/auth/login",
         "/auth/register",
-        "/auth/verify",
+        "/auth/verify-email",
         "/auth/forgot-password",
         "/auth/reset-password",
 
         // Post
-        "/post/{id}",
+        "/post/list",
+        "/post/p/{postId}",
 
-        // Comment
-        "/comment/list/{postId}",
+        // Post Comment
+        "/post/comment/p/{postId}",
+        "/post/comment/c/{commentId}",
 
         // Proxy
         "/proxy/**",
 
         // User
-        "/user/{userId}/**",
+        "/user/profile/{userId}",
+
+        // File
+        "/file/list",
+        "/file/f/{filename:.+}",
     };
+
+    @Value("#{'${server.allowed-origins}'.split(',')}")
+    private List<String> allowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -70,20 +80,17 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
 
-        return new ProviderManager(authenticationProvider);
+        return new ProviderManager(authProvider);
     }
 
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
         return (request, response, authentication) -> {
-            response.setStatus(200);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"message\": \"Logout successful\"}");
-            response.getWriter().flush();
+            response.setStatus(204);
         };
     }
 
@@ -101,8 +108,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         // Make the below setting as * to allow connection from any host
-        corsConfiguration.setAllowedOrigins(
-                List.of("http://localhost:5173", "http://xezoless.tplinkdns.com:22222/"));
+        corsConfiguration.setAllowedOrigins(allowedOrigins);
         corsConfiguration.setAllowedMethods(List.of("GET", "POST"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of("*"));

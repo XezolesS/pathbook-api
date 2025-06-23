@@ -38,4 +38,9 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
 	annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+}
+
+tasks.named("compileJava") {
+    inputs.files(tasks.named("processResources"))
 }

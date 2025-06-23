@@ -1,41 +1,41 @@
-package com.pathbook.pathbook_api.service;
+// package com.pathbook.pathbook_api.service;
 
-import com.pathbook.pathbook_api.entity.Bookmark;
-import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
-import com.pathbook.pathbook_api.exception.BookmarkNotFoundException;
-import com.pathbook.pathbook_api.repository.BookmarkRepository;
+// import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Service;
+// import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+// import com.pathbook.pathbook_api.entity.Bookmark;
+// import com.pathbook.pathbook_api.exception.BookmarkAlreadyExistsException;
+// import com.pathbook.pathbook_api.exception.BookmarkNotFoundException;
+// import com.pathbook.pathbook_api.repository.BookmarkRepository;
 
-@Service
-public class BookmarkService {
-    @Autowired private BookmarkRepository bookmarkRepository;
+// @Service
+// public class BookmarkService {
+//     @Autowired private BookmarkRepository bookmarkRepository;
 
-    @Transactional
-    public Bookmark addBookmark(String userId, Long postId) {
-        // TODO: Validate User and Post by Id
-        if (bookmarkRepository.existsByUserIdAndPostId(userId, postId)) {
-            throw new BookmarkAlreadyExistsException(userId, postId);
-        }
+//     @Transactional
+//     public Bookmark addBookmark(String userId, Long postId) {
+//         // TODO: Validate User and Post by Id
+//         if (bookmarkRepository.existsByUserIdAndPostId(userId, postId)) {
+//             throw new BookmarkAlreadyExistsException(userId, postId);
+//         }
 
-        Bookmark bookmark = new Bookmark(userId, postId);
-        return bookmarkRepository.save(bookmark);
-    }
+//         Bookmark bookmark = new Bookmark(userId, postId);
+//         return bookmarkRepository.save(bookmark);
+//     }
 
-    @Transactional
-    public void deleteBookmark(String userId, Long postId) {
-        if (!bookmarkRepository.existsByUserIdAndPostId(userId, postId)) {
-            throw new BookmarkNotFoundException(userId, postId);
-        }
+//     @Transactional
+//     public void deleteBookmark(String userId, Long postId) {
+//         if (!bookmarkRepository.existsByUserIdAndPostId(userId, postId)) {
+//             throw new BookmarkNotFoundException(userId, postId);
+//         }
 
-        bookmarkRepository.deleteByUserIdAndPostId(userId, postId);
-    }
+//         bookmarkRepository.deleteByUserIdAndPostId(userId, postId);
+//     }
 
-    public List<Bookmark> getBookmarksByUserId(String userId) {
-        return bookmarkRepository.findAllByUserId(userId);
-    }
-}
+//     public List<Bookmark> getBookmarksByUserId(String userId) {
+//         return bookmarkRepository.findAllByUserId(userId);
+//     }
+// }

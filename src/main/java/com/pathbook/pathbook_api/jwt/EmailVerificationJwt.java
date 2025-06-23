@@ -1,90 +1,38 @@
 package com.pathbook.pathbook_api.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.PrematureJwtException;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-
+/**
+ * 사용자 이메일 검증에 사용되는 JWT 입니다.
+ *
+ * <ul>
+ *   <li>Subject: {@code verify-email}
+ *   <li>유효시간: 2시간
+ * </ul>
+ */
 @Component
 public class EmailVerificationJwt extends JwtBase {
-    private static final String SUBJECT = "verify-email";
-
-    private static final long EXPIRATION_SECOND = 60 * 60 * 2; // 2 hours
-
-    private String userId;
-    private String email;
+    public static final String USER_ID = "user_id";
+    public static final String EMAIL = "email";
 
     public EmailVerificationJwt() {
-        super();
+        super("verify-email", 60 * 60 * 2);
     }
 
     public EmailVerificationJwt setUserId(String userId) {
-        this.userId = userId;
-        return this;
+        return (EmailVerificationJwt) setClaim(USER_ID, userId);
     }
 
     public String getUserId() {
-        return userId;
+        return (String) getClaim(USER_ID);
     }
 
     public EmailVerificationJwt setEmail(String email) {
-        this.email = email;
-        return this;
+        return (EmailVerificationJwt) setClaim(EMAIL, email);
     }
 
     public String getEmail() {
-        return email;
-    }
-
-    @Override
-    public String buildToken() {
-        Long currentTimeMs = System.currentTimeMillis();
-
-        return Jwts.builder()
-                .subject(SUBJECT)
-                // .audience("") // Server address?
-                .claim("uid", userId)
-                .claim("email", email)
-                .expiration(new Date(currentTimeMs + 1000 * EXPIRATION_SECOND))
-                .notBefore(new Date(currentTimeMs))
-                .issuedAt(new Date(currentTimeMs))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    @Override
-    public void verify(String token) {
-        try {
-            Jws<Claims> jws =
-                    Jwts.parser()
-                            .clockSkewSeconds(3 * 60)
-                            .requireSubject(SUBJECT)
-                            .verifyWith(getSigningKey())
-                            .build()
-                            .parse(token)
-                            .accept(Jws.CLAIMS);
-
-            Claims body = jws.getPayload();
-            Date now = new Date();
-
-            if (isExpired(body, now)) {
-                throw new ExpiredJwtException(jws.getHeader(), body, "Token has expired");
-            }
-
-            if (isNotBefore(body, now)) {
-                throw new PrematureJwtException(jws.getHeader(), body, "Token cannot be used yet");
-            }
-
-            this.userId = body.get("uid", String.class);
-            this.email = body.get("email", String.class);
-        } catch (JwtException e) {
-            throw new JwtException(token, e);
-        }
+        return (String) getClaim(EMAIL);
     }
 }

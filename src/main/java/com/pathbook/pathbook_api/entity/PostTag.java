@@ -3,6 +3,7 @@ package com.pathbook.pathbook_api.entity;
 import com.pathbook.pathbook_api.entity.id.PostTagId;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -15,10 +16,12 @@ public class PostTag {
     // region Fields
 
     @ManyToOne
+    @Id
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne
+    @Id
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 

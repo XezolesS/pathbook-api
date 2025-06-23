@@ -1,82 +1,126 @@
 package com.pathbook.pathbook_api.service;
 
-import com.pathbook.pathbook_api.dto.ImageDto;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
+import com.pathbook.pathbook_api.dto.UserInfoDto;
+import com.pathbook.pathbook_api.dto.UserPrincipal;
+import com.pathbook.pathbook_api.dto.response.UserProfileResponse;
+import com.pathbook.pathbook_api.entity.File;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.exception.UserNotFoundException;
+import com.pathbook.pathbook_api.repository.FileRepository;
 import com.pathbook.pathbook_api.repository.UserRepository;
-import com.pathbook.pathbook_api.response.UserResponse;
+import com.pathbook.pathbook_api.storage.StorageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
     @Autowired private UserRepository userRepository;
 
-    public UserResponse getUser(String userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(
-                                () ->
-                                        new UserNotFoundException(
-                                                "Cannot find user with id: " + userId));
+    @Autowired private FileRepository fileRepository;
 
-        return new UserResponse(
-                user.getId(), user.getUsername(), user.getEmail(), user.isVerified());
+    @Autowired private StorageService storageService;
+
+    /**
+     * 사용자 ID로부터 엔티티를 반환합니다.
+     *
+     * @param {@link UserInfoDto} userDto
+     * @return {@link User} 엔티티
+     */
+    public User fromUserId(String userId) {
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> UserNotFoundException.withUserId(userId));
     }
 
-    public ImageDto getUserIcon(String userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(
-                                () ->
-                                        new UserNotFoundException(
-                                                "Cannot find user with id: " + userId));
-
-        return new ImageDto(user.getIcon(), user.getIconContentType());
+    /**
+     * 사용자 인증 정보로부터 엔티티를 반환합니다.
+     *
+     * @param {@link UserPrincipal} userPrincipal
+     * @return {@link User} 엔티티
+     */
+    public User fromPrincipal(UserPrincipal userPrincipal) {
+        return fromUserId(userPrincipal.getId());
     }
 
-    public ImageDto getUserBanner(String userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(
-                                () ->
-                                        new UserNotFoundException(
-                                                "Cannot find user with id: " + userId));
-
-        return new ImageDto(user.getBanner(), user.getBannerContentType());
+    /**
+     * {@link UserInfoDto}로부터 엔티티를 반환합니다.
+     *
+     * @param {@link UserInfoDto} userDto
+     * @return {@link User} 엔티티
+     */
+    public User fromDto(UserInfoDto userDto) {
+        return fromUserId(userDto.getId());
     }
 
-    public void updateUserIcon(String userId, byte[] iconBytes, String iconContentType) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(
-                                () ->
-                                        new UserNotFoundException(
-                                                "Cannot find user with id: " + userId));
+    /**
+     * 사용자 프로필 정보를 반환합니다.
+     *
+     * @param userId
+     * @return
+     */
+    public UserProfileResponse getUserProfile(String userId) {
+        User user = fromUserId(userId);
 
-        user.setIcon(iconBytes);
-        user.setIconContentType(iconContentType);
+        return new UserProfileResponse(user);
+    }
+
+    /**
+     * 사용자의 프로필 정보를 수정합니다.
+     *
+     * @param userId
+     * @param userData
+     * @return {@link UserInfoDto} 수정된 사용자 정보
+     */
+    public UserInfoDto updateUserData(String userId, UserInfoDto userData) {
+        User user = fromUserId(userId);
+
+        user.setUserData(userData);
 
         userRepository.save(user);
+
+        return new UserInfoDto(user);
     }
 
-    public void updateUserBanner(String userId, byte[] bannerBytes, String bannerContentType) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(
-                                () ->
-                                        new UserNotFoundException(
-                                                "Cannot find user with id: " + userId));
+    /**
+     * 사용자의 프로필 아이콘을 수정합니다.
+     *
+     * @param userId
+     * @param iconFile
+     * @return {@link FileMetaDto} 수정된 아이콘 정보
+     */
+    public FileMetaDto updateUserIcon(String userId, MultipartFile iconFile) {
+        User user = fromUserId(userId);
 
-        user.setBanner(bannerBytes);
-        user.setBannerContentType(bannerContentType);
+        FileMetaDto storedFileMeta = storageService.store(iconFile, userId);
+        File storedfileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();
+
+        user.setIconFile(storedfileEntity);
 
         userRepository.save(user);
+
+        return storedFileMeta;
+    }
+
+    /**
+     * 사용자의 프로필 배너를 수정합니다.
+     *
+     * @param userId
+     * @param bannerFile
+     * @return {@link FileMetaDto} 수정된 배너 정보
+     */
+    public FileMetaDto updateUserBanner(String userId, MultipartFile bannerFile) {
+        User user = fromUserId(userId);
+
+        FileMetaDto storedFileMeta = storageService.store(bannerFile, userId);
+        File storedfileEntity = fileRepository.findById(storedFileMeta.getFilename()).get();
+
+        user.setBannerFile(storedfileEntity);
+
+        userRepository.save(user);
+
+        return storedFileMeta;
     }
 }
