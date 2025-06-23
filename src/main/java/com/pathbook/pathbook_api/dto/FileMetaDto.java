@@ -26,12 +26,12 @@ public class FileMetaDto {
 
     public FileMetaDto(FileMetaDto dto) {
         this(
-                dto.getFilename(),
-                dto.getOwnerId(),
-                dto.getOriginalFilename(),
-                dto.getContentType(),
-                dto.getSize(),
-                dto.getCreatedAt());
+                dto.filename,
+                dto.ownerId,
+                dto.originalFilename,
+                dto.contentType,
+                dto.size,
+                dto.createdAt);
     }
 
     public FileMetaDto(

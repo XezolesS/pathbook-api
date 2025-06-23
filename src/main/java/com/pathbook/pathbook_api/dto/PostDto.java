@@ -38,17 +38,17 @@ public class PostDto {
 
     public PostDto(PostDto dto) {
         this(
-                dto.getId(),
-                dto.getAuthor(),
-                dto.getTitle(),
-                dto.getContent(),
-                dto.getView(),
-                dto.getLikeCount(),
-                dto.getBookmarkCount(),
-                dto.getCommentCount(),
-                dto.getComments(),
-                dto.getCreatedAt(),
-                dto.getUpdatedAt());
+                dto.id,
+                dto.author,
+                dto.title,
+                dto.content,
+                dto.view,
+                dto.likeCount,
+                dto.bookmarkCount,
+                dto.commentCount,
+                dto.comments,
+                dto.createdAt,
+                dto.updatedAt);
     }
 
     public PostDto(Long id, UserInfoDto author, String title, String content, Long view) {

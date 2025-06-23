@@ -37,16 +37,16 @@ public class PostCommentDto {
 
     public PostCommentDto(PostCommentDto dto) {
         this(
-                dto.getId(),
-                dto.getParentId(),
-                dto.getPostId(),
-                dto.getAuthor(),
-                dto.getContent(),
-                dto.getLikeCount(),
-                dto.getReplyCount(),
-                dto.getReplies(),
-                dto.getCreatedAt(),
-                dto.getUpdatedAt());
+                dto.id,
+                dto.parentId,
+                dto.postId,
+                dto.author,
+                dto.content,
+                dto.likeCount,
+                dto.replyCount,
+                dto.replies,
+                dto.createdAt,
+                dto.updatedAt);
     }
 
     public PostCommentDto(Long id, Long parentId, Long postId, UserInfoDto author, String content) {

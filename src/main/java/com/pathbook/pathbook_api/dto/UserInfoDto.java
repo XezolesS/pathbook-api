@@ -25,13 +25,7 @@ public class UserInfoDto {
     }
 
     public UserInfoDto(UserInfoDto dto) {
-        this(
-                dto.getId(),
-                dto.getEmail(),
-                dto.getUsername(),
-                dto.getSex(),
-                dto.getBirthDate(),
-                dto.getBio());
+        this(dto.id, dto.email, dto.username, dto.sex, dto.birthDate, dto.bio);
     }
 
     public UserInfoDto(
