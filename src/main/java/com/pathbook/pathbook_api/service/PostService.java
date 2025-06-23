@@ -131,6 +131,12 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    /**
+     * 포스트에 좋아요를 추가합니다.
+     *
+     * @param userId
+     * @param postId
+     */
     @Transactional
     public void addPostLike(String userId, Long postId) {
         User user = userService.fromUserId(userId);
@@ -145,11 +151,25 @@ public class PostService {
         postLikeRepository.save(like);
     }
 
+    /**
+     * 포스트에 좋아요를 삭제합니다.
+     *
+     * <p>없는 경우 무시합니다.
+     *
+     * @param userId
+     * @param postId
+     */
     @Transactional
     public void removePostLike(String userId, Long postId) {
         postLikeRepository.deleteById(new PostLikeId(userId, postId));
     }
 
+    /**
+     * 포스트에 북마크를 추가합니다.
+     *
+     * @param userId
+     * @param postId
+     */
     @Transactional
     public void addPostBookmark(String userId, Long postId) {
         User user = userService.fromUserId(userId);
@@ -164,6 +184,14 @@ public class PostService {
         postBookmarkRepository.save(bookmark);
     }
 
+    /**
+     * 포스트에 북마크를 삭제합니다.
+     *
+     * <p>없는 경우 무시합니다.
+     *
+     * @param userId
+     * @param postId
+     */
     @Transactional
     public void removePostBookmark(String userId, Long postId) {
         postBookmarkRepository.deleteById(new PostBookmarkId(userId, postId));

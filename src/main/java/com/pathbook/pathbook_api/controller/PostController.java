@@ -127,6 +127,18 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 포스트에 좋아요를 추가합니다.
+     * 
+     * <ul>
+     *   <li>엔드포인트: {@code /post/like/{postId} [POST]}
+     *   <li>응답: {@code 204 No Content}
+     * </ul>
+     * 
+     * @param userPrincipal
+     * @param postId
+     * @return
+     */
     @PostMapping("/like/{postId}")
     public ResponseEntity<?> postLikePost(
             @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
@@ -135,14 +147,38 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/unlike/{postId}")
-    public ResponseEntity<?> postUnlikePost(
+    /**
+     * 포스트에 좋아요를 삭제합니다.
+     * 
+     * <ul>
+     *   <li>엔드포인트: {@code /post/unlike/{postId} [DELETE]}
+     *   <li>응답: {@code 204 No Content}
+     * </ul>
+     * 
+     * @param userPrincipal
+     * @param postId
+     * @return
+     */
+    @DeleteMapping("/unlike/{postId}")
+    public ResponseEntity<?> deleteUnlikePost(
             @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
         postService.removePostLike(userPrincipal.getId(), postId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 포스트에 북마크를 추가합니다.
+     * 
+     * <ul>
+     *   <li>엔드포인트: {@code /post/bookmark/{postId} [POST]}
+     *   <li>응답: {@code 204 No Content}
+     * </ul>
+     * 
+     * @param userPrincipal
+     * @param postId
+     * @return
+     */
     @PostMapping("/bookmark/{postId}")
     public ResponseEntity<?> postBookmarkPost(
             @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
@@ -151,8 +187,20 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/unbookmark/{postId}")
-    public ResponseEntity<?> postUnbookmarkPost(
+    /**
+     * 포스트에 북마크를 삭제합니다.
+     * 
+     * <ul>
+     *   <li>엔드포인트: {@code /post/bookmark/{postId} [DELETE]}
+     *   <li>응답: {@code 204 No Content}
+     * </ul>
+     * 
+     * @param userPrincipal
+     * @param postId
+     * @return
+     */
+    @DeleteMapping("/unbookmark/{postId}")
+    public ResponseEntity<?> deleteUnbookmarkPost(
             @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
         postService.removePostBookmark(userPrincipal.getId(), postId);
 
