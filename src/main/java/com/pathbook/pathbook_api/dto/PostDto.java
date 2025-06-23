@@ -2,19 +2,27 @@ package com.pathbook.pathbook_api.dto;
 
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostAttachment;
+import com.pathbook.pathbook_api.entity.PostComment;
 import com.pathbook.pathbook_api.entity.PostPath;
+import com.pathbook.pathbook_api.entity.PostTag;
+import com.pathbook.pathbook_api.entity.Tag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PostDto {
+    // region Fields
+
     private Long id;
     private UserInfoDto author;
     private String title;
     private String content;
     private PostPathDto path;
     private List<FileMetaDto> attachments;
+    private Set<String> tags;
     private Long view = 0L;
     private long likeCount = 0;
     private long bookmarkCount = 0;
@@ -23,25 +31,21 @@ public class PostDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // endregion
+
+    // region Constructors
+
     public PostDto() {}
 
     public PostDto(Post entity) {
-        this(entity, null, null);
-    }
-
-    public PostDto(Post entity, PostPath path) {
-        this(entity, path, null);
-    }
-
-    public PostDto(Post entity, PostPath path, List<PostAttachment> attachments) {
         this(
                 entity.getId(),
                 new UserInfoDto(entity.getAuthor()),
                 entity.getTitle(),
                 entity.getContent(),
-                new PostPathDto(path),
-                FileMetaDto.fromEntities(
-                        attachments.stream().map(PostAttachment::getFile).toList()),
+                null,
+                null,
+                null,
                 entity.getView(),
                 0,
                 0,
@@ -59,6 +63,7 @@ public class PostDto {
                 dto.content,
                 dto.path,
                 dto.attachments,
+                dto.tags,
                 dto.view,
                 dto.likeCount,
                 dto.bookmarkCount,
@@ -69,37 +74,17 @@ public class PostDto {
     }
 
     public PostDto(Long id, UserInfoDto author, String title, String content, Long view) {
-        this(id, author, title, content, null, null, view, 0, 0, 0, null, null, null);
+        this(id, author, title, content, null, null, null, view, 0, 0, 0, null, null, null);
     }
 
-    public PostDto(
-            Long id,
-            UserInfoDto author,
-            String title,
-            String content,
-            PostPathDto path,
-            Long view) {
-        this(id, author, title, content, path, null, view, 0, 0, 0, null, null, null);
-    }
-
-    public PostDto(
+    protected PostDto(
             Long id,
             UserInfoDto author,
             String title,
             String content,
             PostPathDto path,
             List<FileMetaDto> attachments,
-            Long view) {
-        this(id, author, title, content, path, attachments, view, 0, 0, 0, null, null, null);
-    }
-
-    public PostDto(
-            Long id,
-            UserInfoDto author,
-            String title,
-            String content,
-            PostPathDto path,
-            List<FileMetaDto> attachments,
+            Set<String> tags,
             Long view,
             long likeCount,
             long bookmarkCount,
@@ -113,6 +98,7 @@ public class PostDto {
         this.content = content;
         this.path = path;
         this.attachments = attachments;
+        this.tags = tags;
         this.view = view;
         this.likeCount = likeCount;
         this.bookmarkCount = bookmarkCount;
@@ -121,6 +107,10 @@ public class PostDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    // endregion
+
+    // region Getters & Setters
 
     public Long getId() {
         return id;
@@ -168,6 +158,14 @@ public class PostDto {
 
     public void setAttachments(List<FileMetaDto> attachments) {
         this.attachments = attachments;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     public Long getView() {
@@ -221,4 +219,52 @@ public class PostDto {
     public void addComment(PostCommentDto comment) {
         comments.add(comment);
     }
+
+    // endregion
+
+    // region Factory Methods
+
+    public PostDto withPathEntity(PostPath path) {
+        return withPath(new PostPathDto(path));
+    }
+
+    public PostDto withAttachmentEntities(List<PostAttachment> attachments) {
+        return withAttachments(
+                FileMetaDto.fromEntities(
+                        attachments.stream().map(PostAttachment::getFile).toList()));
+    }
+
+    public PostDto withTagEntities(Set<PostTag> entities) {
+        return withTags(
+                entities.stream()
+                        .map(PostTag::getTag)
+                        .map(Tag::getName)
+                        .collect(Collectors.toSet()));
+    }
+
+    public PostDto withCommentEntities(List<PostComment> comments) {
+        return withComments(PostCommentDto.fromEntities(comments));
+    }
+
+    public PostDto withPath(PostPathDto path) {
+        setPath(path);
+        return this;
+    }
+
+    public PostDto withAttachments(List<FileMetaDto> attachments) {
+        setAttachments(attachments);
+        return this;
+    }
+
+    public PostDto withTags(Set<String> tags) {
+        setTags(tags);
+        return this;
+    }
+
+    public PostDto withComments(List<PostCommentDto> comments) {
+        setComments(comments);
+        return this;
+    }
+
+    // endregion
 }
