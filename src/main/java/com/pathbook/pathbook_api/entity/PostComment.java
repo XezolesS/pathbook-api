@@ -67,7 +67,12 @@ public class PostComment {
     protected PostComment() {}
 
     public PostComment(Post post, User author, String content) {
+        this(post, null, author, content);
+    }
+
+    public PostComment(Post post, PostComment parent, User author, String content) {
         this.post = post;
+        this.parent = parent;
         this.author = author;
         this.content = content;
     }

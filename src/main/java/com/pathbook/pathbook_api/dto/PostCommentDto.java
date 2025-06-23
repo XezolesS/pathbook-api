@@ -3,6 +3,9 @@ package com.pathbook.pathbook_api.dto;
 import com.pathbook.pathbook_api.entity.PostComment;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PostCommentDto {
     private Long id;
@@ -11,6 +14,7 @@ public class PostCommentDto {
     private UserInfoDto author;
     private String content;
     private int likeCount = 0;
+    private List<PostCommentDto> replies;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -24,6 +28,7 @@ public class PostCommentDto {
                 new UserInfoDto(entity.getAuthor()),
                 entity.getContent(),
                 entity.getLikeCount(),
+                PostCommentDto.fromEntities(entity.getReplies()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }
@@ -36,6 +41,7 @@ public class PostCommentDto {
                 dto.getAuthor(),
                 dto.getContent(),
                 dto.getLikeCount(),
+                dto.getReplies(),
                 dto.getCreatedAt(),
                 dto.getUpdatedAt());
     }
@@ -47,6 +53,7 @@ public class PostCommentDto {
             UserInfoDto author,
             String content,
             int likes,
+            List<PostCommentDto> replies,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         this.id = id;
@@ -55,6 +62,7 @@ public class PostCommentDto {
         this.author = author;
         this.content = content;
         this.likeCount = likes;
+        this.replies = replies == null ? new ArrayList<>() : replies;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -103,11 +111,33 @@ public class PostCommentDto {
         return likeCount;
     }
 
+    public List<PostCommentDto> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<PostCommentDto> replies) {
+        this.replies = replies;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public static List<PostCommentDto> fromEntities(List<PostComment> entities) {
+        if (entities == null) {
+            return new ArrayList<>();
+        }
+
+        return entities.stream()
+                .map(PostCommentDto::new)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public void addReply(PostCommentDto reply) {
+        replies.add(reply);
     }
 }

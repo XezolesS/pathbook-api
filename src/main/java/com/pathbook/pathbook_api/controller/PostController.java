@@ -4,6 +4,7 @@ import com.pathbook.pathbook_api.dto.PostDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.PostRequest;
 import com.pathbook.pathbook_api.dto.response.PostResponse;
+import com.pathbook.pathbook_api.service.PostCommentService;
 import com.pathbook.pathbook_api.service.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/post")
 public class PostController {
     @Autowired private PostService postService;
+
+    @Autowired private PostCommentService postCommentService;
 
     /**
      * 포스트를 여러개 불러옵니다.
@@ -60,6 +63,7 @@ public class PostController {
     @GetMapping("/p/{postId}")
     public ResponseEntity<?> getPost(@PathVariable Long postId) {
         PostDto post = postService.getPost(postId);
+        post.setComments(postCommentService.buildCommentTreeFromDto(post.getComments()));
 
         return new ResponseEntity<>(new PostResponse(post), HttpStatus.OK);
     }
@@ -129,12 +133,12 @@ public class PostController {
 
     /**
      * 포스트에 좋아요를 추가합니다.
-     * 
+     *
      * <ul>
      *   <li>엔드포인트: {@code /post/like/{postId} [POST]}
      *   <li>응답: {@code 204 No Content}
      * </ul>
-     * 
+     *
      * @param userPrincipal
      * @param postId
      * @return
@@ -149,12 +153,12 @@ public class PostController {
 
     /**
      * 포스트에 좋아요를 삭제합니다.
-     * 
+     *
      * <ul>
      *   <li>엔드포인트: {@code /post/unlike/{postId} [DELETE]}
      *   <li>응답: {@code 204 No Content}
      * </ul>
-     * 
+     *
      * @param userPrincipal
      * @param postId
      * @return
@@ -169,12 +173,12 @@ public class PostController {
 
     /**
      * 포스트에 북마크를 추가합니다.
-     * 
+     *
      * <ul>
      *   <li>엔드포인트: {@code /post/bookmark/{postId} [POST]}
      *   <li>응답: {@code 204 No Content}
      * </ul>
-     * 
+     *
      * @param userPrincipal
      * @param postId
      * @return
@@ -189,12 +193,12 @@ public class PostController {
 
     /**
      * 포스트에 북마크를 삭제합니다.
-     * 
+     *
      * <ul>
      *   <li>엔드포인트: {@code /post/bookmark/{postId} [DELETE]}
      *   <li>응답: {@code 204 No Content}
      * </ul>
-     * 
+     *
      * @param userPrincipal
      * @param postId
      * @return

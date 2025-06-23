@@ -3,6 +3,8 @@ package com.pathbook.pathbook_api.dto;
 import com.pathbook.pathbook_api.entity.Post;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostDto {
     private Long id;
@@ -12,6 +14,7 @@ public class PostDto {
     private Long view = 0L;
     private int likeCount = 0;
     private int bookmarkCount = 0;
+    private List<PostCommentDto> comments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -26,6 +29,7 @@ public class PostDto {
                 entity.getView(),
                 entity.getLikeCount(),
                 entity.getBookmarkCount(),
+                PostCommentDto.fromEntities(entity.getComments()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }
@@ -39,6 +43,7 @@ public class PostDto {
                 dto.getView(),
                 dto.getLikeCount(),
                 dto.getBookmarkCount(),
+                dto.getComments(),
                 dto.getCreatedAt(),
                 dto.getUpdatedAt());
     }
@@ -51,6 +56,7 @@ public class PostDto {
             Long view,
             int likes,
             int bookmarks,
+            List<PostCommentDto> comments,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         this.id = id;
@@ -60,6 +66,7 @@ public class PostDto {
         this.view = view;
         this.likeCount = likes;
         this.bookmarkCount = bookmarks;
+        this.comments = comments == null ? new ArrayList<>() : comments;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -112,11 +119,23 @@ public class PostDto {
         return bookmarkCount;
     }
 
+    public List<PostCommentDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<PostCommentDto> comments) {
+        this.comments = comments;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void addComment(PostCommentDto comment) {
+        comments.add(comment);
     }
 }

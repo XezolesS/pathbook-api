@@ -16,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PostCommentService {
@@ -77,7 +80,18 @@ public class PostCommentService {
         User author = userService.fromUserId(authorId);
         Post post = postService.fromPostId(postCommentData.getPostId());
 
-        PostComment newPostComment = new PostComment(post, author, postCommentData.getContent());
+        // 부모 댓글이 있는 경우 불러오기
+        Long parentId = postCommentData.getParentId();
+        PostComment parent = null;
+        if (parentId != null) {
+            parent =
+                    postCommentRepository
+                            .findById(postCommentData.getParentId())
+                            .orElseThrow(() -> new PostCommentNotFoundException(parentId));
+        }
+
+        PostComment newPostComment =
+                new PostComment(post, parent, author, postCommentData.getContent());
 
         PostComment savedPostComment = postCommentRepository.save(newPostComment);
 
@@ -156,5 +170,80 @@ public class PostCommentService {
     @Transactional
     public void removePostCommentLike(String userId, Long commentId) {
         postCommentLikeRepository.deleteById(new PostCommentLikeId(userId, commentId));
+    }
+
+    /**
+     * {@link PostComment} 엔티티 리스트로부터 코멘트를 트리형식으로 매핑합니다.
+     *
+     * <p>{@link PostCommentDto}가 노드 역할을 하며, 각 인스턴스에 자식 {@link PostCommentDto}가 포함됩니다.
+     *
+     * @param commentEntities
+     * @return {@link PostCommentDto} 루트 노드 리스트
+     */
+    public List<PostCommentDto> buildCommentTreeFromEntities(List<PostComment> commentEntities) {
+        Map<Long, PostCommentDto> commentMap = new HashMap<>();
+        List<PostCommentDto> roots = new ArrayList<>();
+
+        for (PostComment comment : commentEntities) {
+            commentMap.put(comment.getId(), new PostCommentDto(comment));
+        }
+
+        for (PostComment comment : commentEntities) {
+            PostCommentDto commentDto = new PostCommentDto(commentMap.get(comment.getId()));
+            Long parentId = comment.getParent().getId();
+
+            if (parentId == null) {
+                roots.add(commentDto);
+            } else {
+                PostCommentDto parent = commentMap.get(parentId);
+
+                if (parent == null) {
+                    throw new PostCommentNotFoundException(parentId);
+                }
+
+                parent.addReply(commentDto);
+            }
+        }
+
+        return roots;
+    }
+
+    /**
+     * {@link PostCommentDto} DTO 리스트로부터 코멘트를 트리형식으로 매핑합니다.
+     *
+     * <p>{@link PostCommentDto}가 노드 역할을 하며, 각 인스턴스에 자식 {@link PostCommentDto}가 포함됩니다.
+     *
+     * @param commentEntities
+     * @return {@link PostCommentDto} 루트 노드 리스트
+     */
+    public List<PostCommentDto> buildCommentTreeFromDto(List<PostCommentDto> commentDtos) {
+        Map<Long, PostCommentDto> commentMap = new HashMap<>();
+        List<PostCommentDto> roots = new ArrayList<>();
+
+        for (PostCommentDto comment : commentDtos) {
+            commentMap.put(comment.getId(), comment);
+
+            if (comment.getReplies() != null && comment.getReplies().size() > 0) {
+                comment.getReplies().clear();
+            }
+        }
+
+        for (PostCommentDto comment : commentDtos) {
+            Long parentId = comment.getParentId();
+
+            if (parentId == null) {
+                roots.add(comment);
+            } else {
+                PostCommentDto parent = commentMap.get(parentId);
+
+                if (parent == null) {
+                    throw new PostCommentNotFoundException(parentId);
+                }
+
+                parent.addReply(comment);
+            }
+        }
+
+        return roots;
     }
 }
