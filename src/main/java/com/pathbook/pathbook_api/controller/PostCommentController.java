@@ -125,4 +125,44 @@ public class PostCommentController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    /**
+     * 댓글에 좋아요를 추가합니다.
+     * 
+     * <ul>
+     *   <li>엔드포인트: {@code /post/comment/like/{commentId} [POST]}
+     *   <li>응답: {@code 204 No Content}
+     * </ul>
+     * 
+     * @param userPrincipal
+     * @param commentId
+     * @return
+     */
+    @PostMapping("/like/{commentId}")
+    public ResponseEntity<?> postLikePost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
+        postCommentService.addPostCommentLike(userPrincipal.getId(), commentId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * 댓글에 좋아요를 삭제합니다.
+     * 
+     * <ul>
+     *   <li>엔드포인트: {@code /post/comment/unlike/{commentId} [DELETE]}
+     *   <li>응답: {@code 204 No Content}
+     * </ul>
+     * 
+     * @param userPrincipal
+     * @param commentId
+     * @return
+     */
+    @DeleteMapping("/unlike/{commentId}")
+    public ResponseEntity<?> deleteUnlikePost(
+            @AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
+        postCommentService.removePostCommentLike(userPrincipal.getId(), commentId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

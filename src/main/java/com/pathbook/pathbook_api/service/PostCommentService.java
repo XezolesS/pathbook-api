@@ -3,14 +3,18 @@ package com.pathbook.pathbook_api.service;
 import com.pathbook.pathbook_api.dto.PostCommentDto;
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostComment;
+import com.pathbook.pathbook_api.entity.PostCommentLike;
 import com.pathbook.pathbook_api.entity.User;
+import com.pathbook.pathbook_api.entity.id.PostCommentLikeId;
 import com.pathbook.pathbook_api.exception.PostCommentNotFoundException;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.repository.PostCommentLikeRepository;
 import com.pathbook.pathbook_api.repository.PostCommentRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +25,8 @@ public class PostCommentService {
     @Autowired private PostService postService;
 
     @Autowired private PostCommentRepository postCommentRepository;
+
+    @Autowired private PostCommentLikeRepository postCommentLikeRepository;
 
     /**
      * 댓글의 ID로부터 댓글 엔티티를 불러옵니다.
@@ -117,5 +123,38 @@ public class PostCommentService {
         }
 
         postCommentRepository.delete(postComment);
+    }
+
+    /**
+     * 댓글에 좋아요를 추가합니다.
+     *
+     * @param userId
+     * @param commentId
+     */
+    @Transactional
+    public void addPostCommentLike(String userId, Long commentId) {
+        User user = userService.fromUserId(userId);
+        PostComment postComment = fromCommentId(commentId);
+
+        if (postCommentLikeRepository.existsById(new PostCommentLikeId(userId, commentId))) {
+            return;
+        }
+
+        PostCommentLike like = new PostCommentLike(user, postComment);
+
+        postCommentLikeRepository.save(like);
+    }
+
+    /**
+     * 댓글에 좋아요를 삭제합니다.
+     *
+     * <p>없는 경우 무시합니다.
+     *
+     * @param userId
+     * @param commentId
+     */
+    @Transactional
+    public void removePostCommentLike(String userId, Long commentId) {
+        postCommentLikeRepository.deleteById(new PostCommentLikeId(userId, commentId));
     }
 }
