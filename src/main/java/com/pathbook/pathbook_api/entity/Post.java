@@ -168,6 +168,7 @@ public class Post {
 
     public void setPath(PostPath path) {
         this.path = path;
+
         if (path != null) {
             path.setPost(this);
         }

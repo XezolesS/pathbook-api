@@ -8,6 +8,8 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
+import org.locationtech.jts.geom.LineString;
+
 @Entity
 @Table(name = "post_paths")
 public class PostPath {
@@ -16,10 +18,11 @@ public class PostPath {
     @Id private Long id;
 
     @Column(name = "path_points", nullable = false, columnDefinition = "LINESTRING")
-    private String pathPoints;
+    private LineString pathPoints;
 
-    @Column(name = "thumbnail_url", length = 2048)
-    private String thumbnailUrl;
+    @OneToOne
+    @JoinColumn(name = "thumbnail_filename", referencedColumnName = "filename", nullable = false)
+    private File thumbnailFile;
 
     @OneToOne
     @MapsId
@@ -32,10 +35,10 @@ public class PostPath {
 
     protected PostPath() {}
 
-    public PostPath(Post post, String pathPoints, String thumbnailUrl) {
+    public PostPath(Post post, LineString pathPoints, File thumbnailFile) {
         this.post = post;
         this.pathPoints = pathPoints;
-        this.thumbnailUrl = thumbnailUrl;
+        this.thumbnailFile = thumbnailFile;
     }
 
     // endregion
@@ -54,20 +57,20 @@ public class PostPath {
         this.post = post;
     }
 
-    public String getPathPoints() {
+    public LineString getPathPoints() {
         return pathPoints;
     }
 
-    public void setPathPoints(String pathPoints) {
+    public void setPathPoints(LineString pathPoints) {
         this.pathPoints = pathPoints;
     }
 
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
+    public File getThumbnailFile() {
+        return thumbnailFile;
     }
 
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
+    public void setThumbnailFile(File thumbnailFile) {
+        this.thumbnailFile = thumbnailFile;
     }
 
     // endregion

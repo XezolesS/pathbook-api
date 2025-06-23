@@ -1,24 +1,32 @@
 package com.pathbook.pathbook_api.service;
 
 import com.pathbook.pathbook_api.dto.FetchOption;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
 import com.pathbook.pathbook_api.dto.PostCommentDto;
 import com.pathbook.pathbook_api.dto.PostDto;
+import com.pathbook.pathbook_api.dto.PostPathPointDto;
 import com.pathbook.pathbook_api.dto.PostSortOption;
 import com.pathbook.pathbook_api.dto.PostSummaryDto;
+import com.pathbook.pathbook_api.entity.File;
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostBookmark;
 import com.pathbook.pathbook_api.entity.PostComment;
 import com.pathbook.pathbook_api.entity.PostLike;
+import com.pathbook.pathbook_api.entity.PostPath;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
 import com.pathbook.pathbook_api.entity.id.PostLikeId;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
+import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.repository.FileRepository;
 import com.pathbook.pathbook_api.repository.PostBookmarkRepository;
 import com.pathbook.pathbook_api.repository.PostCommentRepository;
 import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
+import com.pathbook.pathbook_api.storage.StorageService;
 
+import org.locationtech.jts.geom.LineString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,12 +34,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Service
 public class PostService {
     @Autowired private UserService userService;
+
+    @Autowired private StorageService storageService;
 
     @Autowired private PostRepository postRepository;
 
@@ -40,6 +51,8 @@ public class PostService {
     @Autowired private PostLikeRepository postLikeRepository;
 
     @Autowired private PostBookmarkRepository postBookmarkRepository;
+
+    @Autowired private FileRepository fileRepository;
 
     /**
      * 포스트 ID로부터 포스트 엔티티를 불러옵니다.
@@ -120,7 +133,7 @@ public class PostService {
                 postDto.setCommentCount(commentCount);
                 break;
             case FULL:
-                List<PostComment> commentList = postCommentRepository.findAllByPostId(postId);
+                List<PostComment> commentList = post.getComments();
                 postDto.setCommentCount(commentList.size());
                 postDto.setComments(PostCommentDto.fromEntities(commentList));
                 break;
@@ -160,11 +173,35 @@ public class PostService {
      *
      * @param authorId
      * @param postData
+     * @param pathThumbnail
+     * @param attachments
      * @return {@link PostDto} 작성된 포스트
      */
-    public PostDto writePost(String authorId, PostDto postData) {
+    @Transactional
+    public PostDto writePost(
+            String authorId,
+            PostDto postData,
+            MultipartFile pathThumbnail,
+            MultipartFile[] attachments) {
         User author = userService.fromUserId(authorId);
         Post newPost = new Post(author, postData.getTitle(), postData.getContent());
+
+        // 패스 저장
+        if (postData.getPath() != null) {
+            FileMetaDto newPathThumbnailDto = storageService.store(pathThumbnail, author.getId());
+            File newPathThumbnail =
+                    fileRepository
+                            .findById(newPathThumbnailDto.getFilename())
+                            .orElseThrow(
+                                    () ->
+                                            new StorageFileNotFoundException(
+                                                    newPathThumbnailDto.getFilename()));
+
+            LineString pathLineString = PostPathPointDto.toLineString(postData.getPath());
+            PostPath newPostPath = new PostPath(newPost, pathLineString, newPathThumbnail);
+
+            newPost.setPath(newPostPath);
+        }
 
         Post savedPost = postRepository.save(newPost);
 

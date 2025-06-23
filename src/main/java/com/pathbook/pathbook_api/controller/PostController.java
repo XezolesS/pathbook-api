@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/post")
@@ -101,11 +103,13 @@ public class PostController {
      * @param requestBody
      * @return
      */
-    @PostMapping("/write")
+    @PostMapping(value = "/write", consumes = {"multipart/form-data"})
     public ResponseEntity<?> postWritePost(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody PostRequest requestBody) {
-        PostDto savedPost = postService.writePost(userPrincipal.getId(), requestBody);
+            @RequestPart(name = "contents", required = true) PostRequest postRequest,
+            @RequestPart(name = "path_thumbnail", required = false) MultipartFile pathThumbnail,
+            @RequestPart(name = "attachments", required = false) MultipartFile[] attachments) {
+        PostDto savedPost = postService.writePost(userPrincipal.getId(), postRequest, pathThumbnail, attachments);
 
         return new ResponseEntity<>(new PostResponse(savedPost), HttpStatus.CREATED);
     }

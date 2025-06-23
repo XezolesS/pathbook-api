@@ -11,6 +11,7 @@ public class PostDto {
     private UserInfoDto author;
     private String title;
     private String content;
+    private PostPathDto path;
     private Long view = 0L;
     private long likeCount = 0;
     private long bookmarkCount = 0;
@@ -27,6 +28,7 @@ public class PostDto {
                 new UserInfoDto(entity.getAuthor()),
                 entity.getTitle(),
                 entity.getContent(),
+                new PostPathDto(entity.getPath()),
                 entity.getView(),
                 0,
                 0,
@@ -42,6 +44,7 @@ public class PostDto {
                 dto.author,
                 dto.title,
                 dto.content,
+                dto.path,
                 dto.view,
                 dto.likeCount,
                 dto.bookmarkCount,
@@ -52,7 +55,7 @@ public class PostDto {
     }
 
     public PostDto(Long id, UserInfoDto author, String title, String content, Long view) {
-        this(id, author, title, content, view, 0, 0, 0, null, null, null);
+        this(id, author, title, content, null, view, 0, 0, 0, null, null, null);
     }
 
     public PostDto(
@@ -60,6 +63,17 @@ public class PostDto {
             UserInfoDto author,
             String title,
             String content,
+            PostPathDto path,
+            Long view) {
+        this(id, author, title, content, path, view, 0, 0, 0, null, null, null);
+    }
+
+    public PostDto(
+            Long id,
+            UserInfoDto author,
+            String title,
+            String content,
+            PostPathDto path,
             Long view,
             long likeCount,
             long bookmarkCount,
@@ -71,6 +85,7 @@ public class PostDto {
         this.author = author;
         this.title = title;
         this.content = content;
+        this.path = path;
         this.view = view;
         this.likeCount = likeCount;
         this.bookmarkCount = bookmarkCount;
@@ -110,6 +125,14 @@ public class PostDto {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public PostPathDto getPath() {
+        return path;
+    }
+
+    public void setPath(PostPathDto path) {
+        this.path = path;
     }
 
     public Long getView() {
