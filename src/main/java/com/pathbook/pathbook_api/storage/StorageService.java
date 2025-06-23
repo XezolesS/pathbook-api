@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 
 public interface StorageService {
@@ -21,7 +22,8 @@ public interface StorageService {
     /**
      * 파일을 스토리지에 저장합니다.
      *
-     * <p>{@code ownerId != null}이면 파일에 소유자를 지정합니다.
+     * <p>{@code ownerId != null}이면 파일에 소유자를 지정합니다. 소유자 엔티티에 이미 접근한 경우 {@link #store(MultipartFile,
+     * User)}를 사용해야 이중 조회를 방지할 수 있습니다.
      *
      * @param file 파일
      * @param ownerId 소유자 Id
@@ -39,6 +41,29 @@ public interface StorageService {
      * @return 저장된 파일의 메타데이터
      */
     FileMetaDto store(MultipartFile file, User owner);
+
+    /**
+     * 모든 파일을 스토리지에 저장합니다.
+     *
+     * <p>{@code ownerId != null}이면 파일에 소유자를 지정합니다. 소유자 엔티티에 이미 접근한 경우 {@link #store(MultipartFile,
+     * User)}를 사용해야 이중 조회를 방지할 수 있습니다.
+     *
+     * @param files 파일 리스트
+     * @param ownerId 소유자 Id
+     * @return 저장된 파일의 메타데이터
+     */
+    List<FileMetaDto> storeAll(MultipartFile[] files, String ownerId);
+
+    /**
+     * 모든 파일을 스토리지에 저장합니다.
+     *
+     * <p>{@code owner != null}이면 파일에 소유자를 지정합니다.
+     *
+     * @param files 파일 리스트
+     * @param owner {@link User} 소유자 엔티티
+     * @return 저장된 파일의 메타데이터
+     */
+    List<FileMetaDto> storeAll(MultipartFile[] files, User owner);
 
     /**
      * 스토리지에 있는 모든 파일들의 경로를 반환합니다.

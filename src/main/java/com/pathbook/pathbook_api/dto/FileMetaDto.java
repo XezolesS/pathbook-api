@@ -3,6 +3,8 @@ package com.pathbook.pathbook_api.dto;
 import com.pathbook.pathbook_api.entity.File;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileMetaDto {
     private String filename;
@@ -95,5 +97,9 @@ public class FileMetaDto {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public static List<FileMetaDto> fromEntities(List<File> entities) {
+        return entities.stream().map(FileMetaDto::new).collect(Collectors.toList());
     }
 }

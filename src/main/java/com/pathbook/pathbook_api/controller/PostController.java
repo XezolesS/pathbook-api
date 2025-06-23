@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -100,16 +99,22 @@ public class PostController {
      * </ul>
      *
      * @param userPrincipal
-     * @param requestBody
+     * @param postRequest
+     * @param pathThumbnail
+     * @param attachments
      * @return
      */
-    @PostMapping(value = "/write", consumes = {"multipart/form-data"})
+    @PostMapping(
+            value = "/write",
+            consumes = {"multipart/form-data"})
     public ResponseEntity<?> postWritePost(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestPart(name = "contents", required = true) PostRequest postRequest,
             @RequestPart(name = "path_thumbnail", required = false) MultipartFile pathThumbnail,
             @RequestPart(name = "attachments", required = false) MultipartFile[] attachments) {
-        PostDto savedPost = postService.writePost(userPrincipal.getId(), postRequest, pathThumbnail, attachments);
+        PostDto savedPost =
+                postService.writePost(
+                        userPrincipal.getId(), postRequest, pathThumbnail, attachments);
 
         return new ResponseEntity<>(new PostResponse(savedPost), HttpStatus.CREATED);
     }
@@ -127,11 +132,17 @@ public class PostController {
      * @param requestBody
      * @return
      */
-    @PutMapping("/edit")
+    @PutMapping(
+            value = "/edit",
+            consumes = {"multipart/form-data"})
     public ResponseEntity<?> putEditPost(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody PostRequest requestBody) {
-        PostDto editedPost = postService.editPost(userPrincipal.getId(), requestBody);
+            @RequestPart(name = "contents", required = true) PostRequest postRequest,
+            @RequestPart(name = "path_thumbnail", required = false) MultipartFile pathThumbnail,
+            @RequestPart(name = "attachments", required = false) MultipartFile[] attachments) {
+        PostDto editedPost =
+                postService.editPost(
+                        userPrincipal.getId(), postRequest, pathThumbnail, attachments);
 
         return new ResponseEntity<>(new PostResponse(editedPost), HttpStatus.OK);
     }

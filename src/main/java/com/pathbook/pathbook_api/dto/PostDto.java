@@ -1,6 +1,8 @@
 package com.pathbook.pathbook_api.dto;
 
 import com.pathbook.pathbook_api.entity.Post;
+import com.pathbook.pathbook_api.entity.PostAttachment;
+import com.pathbook.pathbook_api.entity.PostPath;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ public class PostDto {
     private String title;
     private String content;
     private PostPathDto path;
+    private List<FileMetaDto> attachments;
     private Long view = 0L;
     private long likeCount = 0;
     private long bookmarkCount = 0;
@@ -23,12 +26,22 @@ public class PostDto {
     public PostDto() {}
 
     public PostDto(Post entity) {
+        this(entity, null, null);
+    }
+
+    public PostDto(Post entity, PostPath path) {
+        this(entity, path, null);
+    }
+
+    public PostDto(Post entity, PostPath path, List<PostAttachment> attachments) {
         this(
                 entity.getId(),
                 new UserInfoDto(entity.getAuthor()),
                 entity.getTitle(),
                 entity.getContent(),
-                new PostPathDto(entity.getPath()),
+                new PostPathDto(path),
+                FileMetaDto.fromEntities(
+                        attachments.stream().map(PostAttachment::getFile).toList()),
                 entity.getView(),
                 0,
                 0,
@@ -45,6 +58,7 @@ public class PostDto {
                 dto.title,
                 dto.content,
                 dto.path,
+                dto.attachments,
                 dto.view,
                 dto.likeCount,
                 dto.bookmarkCount,
@@ -55,7 +69,7 @@ public class PostDto {
     }
 
     public PostDto(Long id, UserInfoDto author, String title, String content, Long view) {
-        this(id, author, title, content, null, view, 0, 0, 0, null, null, null);
+        this(id, author, title, content, null, null, view, 0, 0, 0, null, null, null);
     }
 
     public PostDto(
@@ -65,7 +79,7 @@ public class PostDto {
             String content,
             PostPathDto path,
             Long view) {
-        this(id, author, title, content, path, view, 0, 0, 0, null, null, null);
+        this(id, author, title, content, path, null, view, 0, 0, 0, null, null, null);
     }
 
     public PostDto(
@@ -74,6 +88,18 @@ public class PostDto {
             String title,
             String content,
             PostPathDto path,
+            List<FileMetaDto> attachments,
+            Long view) {
+        this(id, author, title, content, path, attachments, view, 0, 0, 0, null, null, null);
+    }
+
+    public PostDto(
+            Long id,
+            UserInfoDto author,
+            String title,
+            String content,
+            PostPathDto path,
+            List<FileMetaDto> attachments,
             Long view,
             long likeCount,
             long bookmarkCount,
@@ -86,6 +112,7 @@ public class PostDto {
         this.title = title;
         this.content = content;
         this.path = path;
+        this.attachments = attachments;
         this.view = view;
         this.likeCount = likeCount;
         this.bookmarkCount = bookmarkCount;
@@ -133,6 +160,14 @@ public class PostDto {
 
     public void setPath(PostPathDto path) {
         this.path = path;
+    }
+
+    public List<FileMetaDto> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<FileMetaDto> attachments) {
+        this.attachments = attachments;
     }
 
     public Long getView() {
