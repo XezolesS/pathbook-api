@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler extends BaseExceptionHandler {
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGlobalException(Exception ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -29,7 +28,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<ProblemDetail> handleUnauthorizedAccessException(
             UnauthorizedAccessException ex) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
         ProblemDetail problemDetail =
                 initProblemDetail(status, "/unauthorized-access", "Unauthorized access");
         problemDetail.setDetail(ex.getLocalizedMessage());

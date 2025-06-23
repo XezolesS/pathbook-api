@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class AuthExceptionHandler extends BaseExceptionHandler {
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<ProblemDetail> handlePasswordMismatch(PasswordMismatchException ex) {
+
+        System.out.println("GlobalAccessDeniedHandler called!");
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         ProblemDetail problemDetail =
                 initProblemDetail(status, "/password-mismatch", "Password mismatch");

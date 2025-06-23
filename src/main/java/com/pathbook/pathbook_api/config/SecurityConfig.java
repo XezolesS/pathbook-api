@@ -1,5 +1,7 @@
 package com.pathbook.pathbook_api.config;
 
+import com.pathbook.pathbook_api.handler.GlobalAccessDeniedHandler;
+import com.pathbook.pathbook_api.handler.GlobalAuthenticationEntryPoint;
 import com.pathbook.pathbook_api.service.PathbookUserDetailsService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -65,6 +68,11 @@ public class SecurityConfig {
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
+                .exceptionHandling(
+                        exception ->
+                                exception
+                                        .accessDeniedHandler(globalAccessDeniedHandler())
+                                        .authenticationEntryPoint(globalAuthenticationEntryPoint()))
                 .logout(
                         logout ->
                                 logout.logoutUrl("/auth/logout")
@@ -118,5 +126,14 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;
+    }
+
+    @Bean
+    public AccessDeniedHandler globalAccessDeniedHandler() {
+        return new GlobalAccessDeniedHandler();
+    }
+
+    public GlobalAuthenticationEntryPoint globalAuthenticationEntryPoint() {
+        return new GlobalAuthenticationEntryPoint();
     }
 }
