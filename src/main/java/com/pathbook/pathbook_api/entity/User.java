@@ -416,6 +416,9 @@ public class User {
 
     /** 로그인 횟수를 증가시킵니다. */
     public void increaseLoginCount() {
+        if (loginCount == null)
+            loginCount = 0;
+
         loginCount++;
     }
 
