@@ -51,13 +51,25 @@ public class PostComment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(
+            mappedBy = "parent",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = false)
     private List<PostComment> replies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "comment",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostCommentLike> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "comment",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostCommentReport> reports = new ArrayList<>();
 
     // endregion
@@ -156,28 +168,12 @@ public class PostComment {
 
     // region Helper Methods
 
-    public void addLike(PostCommentLike like) {
-        likes.add(like);
-        like.setComment(this);
-    }
-
-    public void removeLike(PostCommentLike like) {
-        likes.remove(like);
-        like.setComment(null);
+    public int getReplyCount() {
+        return replies.size();
     }
 
     public int getLikeCount() {
         return likes.size();
-    }
-
-    public void addReport(PostCommentReport report) {
-        reports.add(report);
-        report.setComment(this);
-    }
-
-    public void removeReport(PostCommentReport report) {
-        reports.remove(report);
-        report.setComment(null);
     }
 
     // endregion

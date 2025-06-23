@@ -13,7 +13,8 @@ public class PostCommentDto {
     private Long postId;
     private UserInfoDto author;
     private String content;
-    private int likeCount = 0;
+    private long likeCount = 0;
+    private long replyCount = 0;
     private List<PostCommentDto> replies;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -27,8 +28,9 @@ public class PostCommentDto {
                 entity.getPost().getId(),
                 new UserInfoDto(entity.getAuthor()),
                 entity.getContent(),
-                entity.getLikeCount(),
-                PostCommentDto.fromEntities(entity.getReplies()),
+                0,
+                0,
+                null,
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }
@@ -41,9 +43,14 @@ public class PostCommentDto {
                 dto.getAuthor(),
                 dto.getContent(),
                 dto.getLikeCount(),
+                dto.getReplyCount(),
                 dto.getReplies(),
                 dto.getCreatedAt(),
                 dto.getUpdatedAt());
+    }
+
+    public PostCommentDto(Long id, Long parentId, Long postId, UserInfoDto author, String content) {
+        this(id, parentId, postId, author, content, 0, 0, null, null, null);
     }
 
     public PostCommentDto(
@@ -52,7 +59,8 @@ public class PostCommentDto {
             Long postId,
             UserInfoDto author,
             String content,
-            int likes,
+            long likeCount,
+            long replyCount,
             List<PostCommentDto> replies,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
@@ -61,7 +69,8 @@ public class PostCommentDto {
         this.postId = postId;
         this.author = author;
         this.content = content;
-        this.likeCount = likes;
+        this.likeCount = likeCount;
+        this.replyCount = replyCount;
         this.replies = replies == null ? new ArrayList<>() : replies;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -107,8 +116,20 @@ public class PostCommentDto {
         this.content = content;
     }
 
-    public int getLikeCount() {
+    public long getLikeCount() {
         return likeCount;
+    }
+
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public long getReplyCount() {
+        return replyCount;
+    }
+
+    public void setReplyCount(long replyCount) {
+        this.replyCount = replyCount;
     }
 
     public List<PostCommentDto> getReplies() {

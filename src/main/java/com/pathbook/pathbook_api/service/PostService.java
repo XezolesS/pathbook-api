@@ -1,8 +1,11 @@
 package com.pathbook.pathbook_api.service;
 
+import com.pathbook.pathbook_api.dto.FetchOption;
+import com.pathbook.pathbook_api.dto.PostCommentDto;
 import com.pathbook.pathbook_api.dto.PostDto;
 import com.pathbook.pathbook_api.entity.Post;
 import com.pathbook.pathbook_api.entity.PostBookmark;
+import com.pathbook.pathbook_api.entity.PostComment;
 import com.pathbook.pathbook_api.entity.PostLike;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
@@ -10,6 +13,7 @@ import com.pathbook.pathbook_api.entity.id.PostLikeId;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
 import com.pathbook.pathbook_api.repository.PostBookmarkRepository;
+import com.pathbook.pathbook_api.repository.PostCommentRepository;
 import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
 
@@ -24,6 +28,8 @@ public class PostService {
     @Autowired private UserService userService;
 
     @Autowired private PostRepository postRepository;
+
+    @Autowired private PostCommentRepository postCommentRepository;
 
     @Autowired private PostLikeRepository postLikeRepository;
 
@@ -56,19 +62,68 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public List<PostDto> getPostList() {
-        return postRepository.findAll().stream().map(PostDto::new).toList();
+        return postRepository.findAllWithCounts();
     }
 
     /**
      * 포스트를 불러옵니다.
      *
+     * <p>{@link FetchOption}를 통해 자식 엔티티들을 불러올 수 있습니다.
+     *
      * @param postId
+     * @param commentFetchOption 댓글 조회 방식
+     * @param likeFetchOption 좋아요 조회 방식
+     * @param bookmarkFetchOption 북마크 조회 방식
      * @return {@link PostDto} 포스트 데이터
      */
-    public PostDto getPost(Long postId) {
+    public PostDto getPost(
+            Long postId,
+            FetchOption commentFetchOption,
+            FetchOption likeFetchOption,
+            FetchOption bookmarkFetchOption) {
         Post post = fromPostId(postId);
+        PostDto postDto = new PostDto(post);
 
-        return new PostDto(post);
+        // 댓글
+        switch (commentFetchOption) {
+            case COUNT:
+                long commentCount = postCommentRepository.countByPostId(postId);
+                postDto.setCommentCount(commentCount);
+                break;
+            case FULL:
+                List<PostComment> commentList = postCommentRepository.findAllByPostId(postId);
+                postDto.setCommentCount(commentList.size());
+                postDto.setComments(PostCommentDto.fromEntities(commentList));
+                break;
+            default:
+                break;
+        }
+
+        // 좋아요
+        switch (likeFetchOption) {
+            case COUNT:
+                long likeCount = postLikeRepository.countByPostId(postId);
+                postDto.setLikeCount(likeCount);
+            case FULL:
+                // Not supported
+                break;
+            default:
+                break;
+        }
+
+        // 북마크
+        switch (bookmarkFetchOption) {
+            case COUNT:
+                long bookmarkCount = postBookmarkRepository.countByPostId(postId);
+                postDto.setBookmarkCount(bookmarkCount);
+            case FULL:
+                // Not supported
+                break;
+            default:
+                break;
+        }
+
+        return postDto;
     }
 
     /**

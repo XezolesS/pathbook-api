@@ -1,5 +1,6 @@
 package com.pathbook.pathbook_api.controller;
 
+import com.pathbook.pathbook_api.dto.FetchOption;
 import com.pathbook.pathbook_api.dto.PostDto;
 import com.pathbook.pathbook_api.dto.UserPrincipal;
 import com.pathbook.pathbook_api.dto.request.PostRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,9 +63,18 @@ public class PostController {
      * @return
      */
     @GetMapping("/p/{postId}")
-    public ResponseEntity<?> getPost(@PathVariable Long postId) {
-        PostDto post = postService.getPost(postId);
-        post.setComments(postCommentService.buildCommentTreeFromDto(post.getComments()));
+    public ResponseEntity<?> getPost(
+            @PathVariable Long postId,
+            @RequestParam(name = "c", required = false) String commentFetchOptionParam,
+            @RequestParam(name = "l", required = false) String likeFetchOptionParam,
+            @RequestParam(name = "b", required = false) String bookmarkFetchOptionParam) {
+        FetchOption commentFetchOption = FetchOption.fromString(commentFetchOptionParam);
+        FetchOption likeFetchOption = FetchOption.fromString(likeFetchOptionParam);
+        FetchOption bookmarkFetchOption = FetchOption.fromString(bookmarkFetchOptionParam);
+
+        PostDto post =
+                postService.getPost(
+                        postId, commentFetchOption, likeFetchOption, bookmarkFetchOption);
 
         return new ResponseEntity<>(new PostResponse(post), HttpStatus.OK);
     }

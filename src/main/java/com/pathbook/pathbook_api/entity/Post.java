@@ -3,6 +3,7 @@ package com.pathbook.pathbook_api.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -56,25 +57,49 @@ public class Post {
     @PrimaryKeyJoinColumn
     private PostPath path;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostComment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostLike> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostBookmark> bookmarks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostReport> reports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PostAttachment> attachments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostTag> tags = new HashSet<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "post",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<PathgroupPostItem> pathgroupItems = new ArrayList<>();
 
     // endregion
@@ -203,77 +228,16 @@ public class Post {
         return path != null;
     }
 
-    public void addComment(PostComment comment) {
-        comments.add(comment);
-        comment.setPost(this);
-    }
-
-    public void removeComment(PostComment comment) {
-        comments.remove(comment);
-        comment.setPost(null);
-    }
-
     public int getCommentCount() {
-        // TODO: 코멘트 카운트 구현
-        throw new RuntimeException("Not Implemented");
-    }
-
-    public void addLike(PostLike like) {
-        likes.add(like);
-        like.setPost(this);
-    }
-
-    public void removeLike(PostLike like) {
-        likes.remove(like);
-        like.setPost(null);
+        return comments.size();
     }
 
     public int getLikeCount() {
         return likes.size();
     }
 
-    public void addBookmark(PostBookmark bookmark) {
-        bookmarks.add(bookmark);
-        bookmark.setPost(this);
-    }
-
-    public void removeBookmark(PostBookmark bookmark) {
-        bookmarks.remove(bookmark);
-        bookmark.setPost(null);
-    }
-
     public int getBookmarkCount() {
         return bookmarks.size();
-    }
-
-    public void addReport(PostReport report) {
-        reports.add(report);
-        report.setPost(this);
-    }
-
-    public void removeReport(PostReport report) {
-        reports.remove(report);
-        report.setPost(null);
-    }
-
-    public void addAttachment(PostAttachment attachment) {
-        attachments.add(attachment);
-        attachment.setPost(this);
-    }
-
-    public void removeAttachment(PostAttachment attachment) {
-        attachments.remove(attachment);
-        attachment.setPost(null);
-    }
-
-    public void addPathgroupItem(PathgroupPostItem item) {
-        pathgroupItems.add(item);
-        item.setPost(this);
-    }
-
-    public void removePathgroupItem(PathgroupPostItem item) {
-        pathgroupItems.remove(item);
-        item.setPost(null);
     }
 
     // endregion

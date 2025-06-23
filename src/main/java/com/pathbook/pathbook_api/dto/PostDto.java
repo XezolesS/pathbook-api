@@ -12,8 +12,9 @@ public class PostDto {
     private String title;
     private String content;
     private Long view = 0L;
-    private int likeCount = 0;
-    private int bookmarkCount = 0;
+    private long likeCount = 0;
+    private long bookmarkCount = 0;
+    private long commentCount = 0;
     private List<PostCommentDto> comments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -27,9 +28,10 @@ public class PostDto {
                 entity.getTitle(),
                 entity.getContent(),
                 entity.getView(),
-                entity.getLikeCount(),
-                entity.getBookmarkCount(),
-                PostCommentDto.fromEntities(entity.getComments()),
+                0,
+                0,
+                0,
+                null,
                 entity.getCreatedAt(),
                 entity.getUpdatedAt());
     }
@@ -43,9 +45,14 @@ public class PostDto {
                 dto.getView(),
                 dto.getLikeCount(),
                 dto.getBookmarkCount(),
+                dto.getCommentCount(),
                 dto.getComments(),
                 dto.getCreatedAt(),
                 dto.getUpdatedAt());
+    }
+
+    public PostDto(Long id, UserInfoDto author, String title, String content, Long view) {
+        this(id, author, title, content, view, 0, 0, 0, null, null, null);
     }
 
     public PostDto(
@@ -54,8 +61,9 @@ public class PostDto {
             String title,
             String content,
             Long view,
-            int likes,
-            int bookmarks,
+            long likeCount,
+            long bookmarkCount,
+            long commentCount,
             List<PostCommentDto> comments,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
@@ -64,8 +72,9 @@ public class PostDto {
         this.title = title;
         this.content = content;
         this.view = view;
-        this.likeCount = likes;
-        this.bookmarkCount = bookmarks;
+        this.likeCount = likeCount;
+        this.bookmarkCount = bookmarkCount;
+        this.commentCount = commentCount;
         this.comments = comments == null ? new ArrayList<>() : comments;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -111,12 +120,28 @@ public class PostDto {
         this.view = view;
     }
 
-    public int getLikeCount() {
+    public long getLikeCount() {
         return likeCount;
     }
 
-    public int getBookmarkCount() {
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public long getBookmarkCount() {
         return bookmarkCount;
+    }
+
+    public void setBookmarkCount(long bookmarkCount) {
+        this.bookmarkCount = bookmarkCount;
+    }
+
+    public long getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(long commentCount) {
+        this.commentCount = commentCount;
     }
 
     public List<PostCommentDto> getComments() {
