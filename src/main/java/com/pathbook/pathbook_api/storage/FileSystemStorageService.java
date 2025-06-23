@@ -27,6 +27,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -76,19 +79,7 @@ public class FileSystemStorageService implements StorageService {
 
         // 파일 이름 해시
         String originalFilename = file.getOriginalFilename();
-        String ext = getFileExtension(originalFilename);
-        String hashedFilename = null;
-        try {
-            String toHash = originalFilename + LocalDateTime.now().toString();
-
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(toHash.getBytes());
-
-            byte[] digest = md.digest();
-            hashedFilename = String.format("%032x", new BigInteger(1, digest)) + "." + ext;
-        } catch (Exception ex) {
-            throw new StorageException("Failed to hash file name.", ex);
-        }
+        String hashedFilename = hashFileNameMd5(originalFilename);
 
         // 스토리지에 파일 저장 시도
         Path destinationFile;
@@ -125,6 +116,75 @@ public class FileSystemStorageService implements StorageService {
         } catch (Exception e) {
             throw new StorageException("File saved but failed to index in database.", e);
         }
+    }
+
+    @Override
+    public List<FileMetaDto> storeAll(MultipartFile[] files, String ownerId) {
+        // 소유자 검증, owner == null 이면 무시
+        User owner = null;
+        if (ownerId != null) {
+            owner =
+                    userRepository
+                            .findById(ownerId)
+                            .orElseThrow(() -> UserNotFoundException.withUserId(ownerId));
+        }
+
+        return storeAll(files, owner);
+    }
+
+    @Override
+    public List<FileMetaDto> storeAll(MultipartFile[] files, User owner) {
+        if (files == null || files.length == 0) {
+            throw new StorageException("Failed to store empty file.");
+        }
+
+        List<File> fileEntities = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            String originalFilename = file.getOriginalFilename();
+            String hashedFilename = hashFileNameMd5(originalFilename);
+
+            // 스토리지에 파일 저장 시도
+            Path destinationFile;
+            try {
+                destinationFile =
+                        this.rootLocation
+                                .resolve(Paths.get(hashedFilename))
+                                .normalize()
+                                .toAbsolutePath();
+
+                // 보안적 이슈 체크
+                if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+                    throw new StorageException("Cannot store file outside current directory.");
+                }
+
+                try (InputStream inputStream = file.getInputStream()) {
+                    Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (IOException ex) {
+                throw new StorageException("Failed to store file.", ex);
+            }
+
+            // 저장한 파일을 데이터베이스에 인덱싱 (엔티티만 생성)
+            try {
+                File fileEntity =
+                        new File(
+                                hashedFilename,
+                                originalFilename,
+                                file.getContentType(),
+                                file.getSize(),
+                                owner);
+
+                fileEntities.add(fileEntity);
+
+            } catch (Exception e) {
+                throw new StorageException("File saved but failed to index in database.", e);
+            }
+        }
+
+        return fileRepository.saveAll(fileEntities).stream()
+                .map(FileMetaDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -191,6 +251,24 @@ public class FileSystemStorageService implements StorageService {
         }
 
         FileSystemUtils.deleteRecursively(filePath.toFile());
+    }
+
+    private static String hashFileNameMd5(String originalFilename) {
+        String ext = getFileExtension(originalFilename);
+        String hashedFilename = null;
+        try {
+            String toHash = originalFilename + LocalDateTime.now().toString();
+
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(toHash.getBytes());
+
+            byte[] digest = md.digest();
+            hashedFilename = String.format("%032x", new BigInteger(1, digest)) + "." + ext;
+        } catch (Exception ex) {
+            throw new StorageException("Failed to hash file name.", ex);
+        }
+
+        return hashedFilename;
     }
 
     private static String getFileExtension(String filename) {

@@ -167,6 +167,10 @@ public class Post {
     }
 
     public void setPath(PostPath path) {
+        if (this.path != null) {
+            this.path.setPost(null);
+        }
+
         this.path = path;
         if (path != null) {
             path.setPost(this);
@@ -191,6 +195,18 @@ public class Post {
 
     public List<PostAttachment> getAttachments() {
         return attachments;
+    }
+
+    public void setAttachments(List<PostAttachment> attachments) {
+        this.attachments.clear();
+
+        if (attachments != null) {
+            for (PostAttachment attachment : attachments) {
+                attachment.setPost(this);
+            }
+
+            this.attachments.addAll(attachments);
+        }
     }
 
     public Set<PostTag> getTags() {

@@ -1,24 +1,34 @@
 package com.pathbook.pathbook_api.service;
 
 import com.pathbook.pathbook_api.dto.FetchOption;
+import com.pathbook.pathbook_api.dto.FileMetaDto;
 import com.pathbook.pathbook_api.dto.PostCommentDto;
 import com.pathbook.pathbook_api.dto.PostDto;
+import com.pathbook.pathbook_api.dto.PostPathPointDto;
 import com.pathbook.pathbook_api.dto.PostSortOption;
 import com.pathbook.pathbook_api.dto.PostSummaryDto;
+import com.pathbook.pathbook_api.entity.File;
 import com.pathbook.pathbook_api.entity.Post;
+import com.pathbook.pathbook_api.entity.PostAttachment;
 import com.pathbook.pathbook_api.entity.PostBookmark;
 import com.pathbook.pathbook_api.entity.PostComment;
 import com.pathbook.pathbook_api.entity.PostLike;
+import com.pathbook.pathbook_api.entity.PostPath;
 import com.pathbook.pathbook_api.entity.User;
 import com.pathbook.pathbook_api.entity.id.PostBookmarkId;
 import com.pathbook.pathbook_api.entity.id.PostLikeId;
 import com.pathbook.pathbook_api.exception.PostNotFoundException;
+import com.pathbook.pathbook_api.exception.StorageFileNotFoundException;
 import com.pathbook.pathbook_api.exception.UnauthorizedAccessException;
+import com.pathbook.pathbook_api.repository.FileRepository;
+import com.pathbook.pathbook_api.repository.PostAttachmentRepository;
 import com.pathbook.pathbook_api.repository.PostBookmarkRepository;
 import com.pathbook.pathbook_api.repository.PostCommentRepository;
 import com.pathbook.pathbook_api.repository.PostLikeRepository;
 import com.pathbook.pathbook_api.repository.PostRepository;
+import com.pathbook.pathbook_api.storage.StorageService;
 
+import org.locationtech.jts.geom.LineString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,12 +36,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class PostService {
     @Autowired private UserService userService;
+
+    @Autowired private StorageService storageService;
 
     @Autowired private PostRepository postRepository;
 
@@ -40,6 +54,10 @@ public class PostService {
     @Autowired private PostLikeRepository postLikeRepository;
 
     @Autowired private PostBookmarkRepository postBookmarkRepository;
+
+    @Autowired private PostAttachmentRepository postAttachmentRepository;
+
+    @Autowired private FileRepository fileRepository;
 
     /**
      * 포스트 ID로부터 포스트 엔티티를 불러옵니다.
@@ -111,7 +129,10 @@ public class PostService {
             FetchOption likeFetchOption,
             FetchOption bookmarkFetchOption) {
         Post post = fromPostId(postId);
-        PostDto postDto = new PostDto(post);
+        PostPath postPath = post.getPath();
+        List<PostAttachment> postAttachment = post.getAttachments();
+
+        PostDto postDto = new PostDto(post, postPath, postAttachment);
 
         // 댓글
         switch (commentFetchOption) {
@@ -120,7 +141,7 @@ public class PostService {
                 postDto.setCommentCount(commentCount);
                 break;
             case FULL:
-                List<PostComment> commentList = postCommentRepository.findAllByPostId(postId);
+                List<PostComment> commentList = post.getComments();
                 postDto.setCommentCount(commentList.size());
                 postDto.setComments(PostCommentDto.fromEntities(commentList));
                 break;
@@ -160,15 +181,65 @@ public class PostService {
      *
      * @param authorId
      * @param postData
+     * @param pathThumbnail
+     * @param attachments
      * @return {@link PostDto} 작성된 포스트
      */
-    public PostDto writePost(String authorId, PostDto postData) {
+    @Transactional
+    public PostDto writePost(
+            String authorId,
+            PostDto postData,
+            MultipartFile pathThumbnail,
+            MultipartFile[] attachments) {
         User author = userService.fromUserId(authorId);
         Post newPost = new Post(author, postData.getTitle(), postData.getContent());
 
+        // 패스 저장
+        if (postData.getPath() != null) {
+            FileMetaDto newPathThumbnailDto = storageService.store(pathThumbnail, author);
+            File newPathThumbnail =
+                    fileRepository
+                            .findById(newPathThumbnailDto.getFilename())
+                            .orElseThrow(
+                                    () ->
+                                            new StorageFileNotFoundException(
+                                                    newPathThumbnailDto.getFilename()));
+
+            LineString pathLineString = PostPathPointDto.toLineString(postData.getPath());
+            PostPath newPostPath = new PostPath(newPost, pathLineString, newPathThumbnail);
+
+            newPost.setPath(newPostPath);
+        }
+
+        // 첨부파일 저장
+        List<PostAttachment> newPostAttachments = new ArrayList<>();
+        if (attachments != null && attachments.length > 0) {
+            List<FileMetaDto> newAttachmentDtos = storageService.storeAll(attachments, author);
+            List<File> newAttachments =
+                    fileRepository.findAllById(
+                            newAttachmentDtos.stream().map(FileMetaDto::getFilename).toList());
+
+            for (File attachment : newAttachments) {
+                newPostAttachments.add(new PostAttachment(newPost, attachment));
+            }
+
+            newPost.setAttachments(newPostAttachments);
+        }
+
+        // DB 저장
         Post savedPost = postRepository.save(newPost);
 
-        return new PostDto(savedPost);
+        /*
+        if (attachments != null && attachments.length > 0) {
+            postAttachmentRepository.saveAll(newPostAttachments);
+        }
+        */
+
+        // 반환
+        PostPath savedPostPath = savedPost.getPath();
+        List<PostAttachment> savedPostAttachment = savedPost.getAttachments();
+
+        return new PostDto(savedPost, savedPostPath, savedPostAttachment);
     }
 
     /**
@@ -180,10 +251,15 @@ public class PostService {
      * @param postData
      * @return {@link PostDto} 수정된 포스트
      */
-    public PostDto editPost(String authorId, PostDto postData) {
+    public PostDto editPost(
+            String authorId,
+            PostDto postData,
+            MultipartFile pathThumbnail,
+            MultipartFile[] attachments) {
         Post post = fromPostId(postData.getId());
+        User author = post.getAuthor();
 
-        if (!post.getAuthor().getId().equals(authorId)) {
+        if (!author.getId().equals(authorId)) {
             throw new UnauthorizedAccessException(
                     String.format("User %s not owning post %d", authorId, postData.getId()));
         }
@@ -191,9 +267,47 @@ public class PostService {
         post.setTitle(postData.getTitle());
         post.setContent(postData.getContent());
 
+        // 패스 저장
+        post.setPath(null); // Trigger removal
+        if (postData.getPath() != null) {
+            FileMetaDto newPathThumbnailDto = storageService.store(pathThumbnail, author);
+            File newPathThumbnail =
+                    fileRepository
+                            .findById(newPathThumbnailDto.getFilename())
+                            .orElseThrow(
+                                    () ->
+                                            new StorageFileNotFoundException(
+                                                    newPathThumbnailDto.getFilename()));
+
+            LineString pathLineString = PostPathPointDto.toLineString(postData.getPath());
+            PostPath newPostPath = new PostPath(post, pathLineString, newPathThumbnail);
+
+            post.setPath(newPostPath);
+        }
+
+        // 첨부파일 저장
+        post.setAttachments(null); // Trigger removal
+        if (attachments != null && attachments.length > 0) {
+            List<PostAttachment> newPostAttachments = new ArrayList<>();
+            List<FileMetaDto> newAttachmentDtos = storageService.storeAll(attachments, author);
+            List<File> newAttachments =
+                    fileRepository.findAllById(
+                            newAttachmentDtos.stream().map(FileMetaDto::getFilename).toList());
+
+            for (File attachment : newAttachments) {
+                newPostAttachments.add(new PostAttachment(post, attachment));
+            }
+
+            post.setAttachments(newPostAttachments);
+        }
+
         Post editedPost = postRepository.save(post);
 
-        return new PostDto(editedPost);
+        // 반환
+        PostPath savedPostPath = editedPost.getPath();
+        List<PostAttachment> savedPostAttachment = editedPost.getAttachments();
+
+        return new PostDto(editedPost, savedPostPath, savedPostAttachment);
     }
 
     /**
