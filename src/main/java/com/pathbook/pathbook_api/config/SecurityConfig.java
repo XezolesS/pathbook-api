@@ -52,6 +52,11 @@ public class SecurityConfig {
         // File
         "/file/list",
         "/file/f/{filename:.+}",
+
+        // SpringDoc OpenAPI & Swagger UI
+        "/v3/api-docs/**",
+        "/swagger-ui.html",
+        "/swagger-ui/**",
     };
 
     @Value("#{'${server.allowed-origins}'.split(',')}")
@@ -117,7 +122,7 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         // Make the below setting as * to allow connection from any host
         corsConfiguration.setAllowedOrigins(allowedOrigins);
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setMaxAge(3600L);
