@@ -225,16 +225,28 @@ public class PostDto {
     // region Factory Methods
 
     public PostDto withPathEntity(PostPath path) {
+        if (path == null) {
+            return this;
+        }
+
         return withPath(new PostPathDto(path));
     }
 
     public PostDto withAttachmentEntities(List<PostAttachment> attachments) {
+        if (attachments == null || attachments.size() == 0) {
+            return this;
+        }
+
         return withAttachments(
                 FileMetaDto.fromEntities(
                         attachments.stream().map(PostAttachment::getFile).toList()));
     }
 
     public PostDto withTagEntities(Set<PostTag> entities) {
+        if (entities == null || entities.size() == 0) {
+            return this;
+        }
+
         return withTags(
                 entities.stream()
                         .map(PostTag::getTag)
